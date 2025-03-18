@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
+
+
+@font-face {
+  font-family: 'vazir';
+  src: url('/Fonts/Vazir.ttf') format('truetype'); 
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iransansweb';
+  src: url('/Fonts/iransansweb.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'yekan';
+  src: url('/Fonts/yekan.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'yekanh';
+  src: url('/Fonts/yekanheavy.ttf') format('truetype');
+  font-weight:bolder;
+
+}
+@font-face {
+  font-family: 'titr';
+  src: url('/Fonts/titr.ttf') format('truetype');
+  font-weight: 900;
+
+}
+.yekanh{
+  font-family: "yekanh";
+}
+.titr{
+  font-family: "titr";
+}
+
+
+.vazir{
+  font-family: 'vazir'!important;
+}
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*{
+  font-family: "yekan";
+}
+/* تنظیمات پایه کانتینر */
+.ccontainer {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* اندازه‌های پیش‌فرض برای تگ‌ها */
+html {
+  font-size: 16px; /* اندازه پایه */
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  line-height: 1.4;
+}
+
+h5 {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  line-height: 1.5;
+}
+
+h6 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  line-height: 1.5;
+}
+
+p {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.6;
+}
+
+a {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.6;
+}
+
+/* تنظیمات برای موبایل */
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .ccontainer {
+    width: 100%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* تنظیمات برای تبلت */
+@media screen and (min-width: 601px) and (max-width: 899px) {
+  html {
+    font-size: 15px;
+  }
+  
+  .ccontainer {
+    width: 92%;
+  }
+}
+
+
+/* تنظیمات برای نمایشگرهای بزرگ */
+@media screen and (min-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
+  
+  .ccontainer {
+    width: 95%;
+  }
 }
