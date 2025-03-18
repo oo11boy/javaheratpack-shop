@@ -11,15 +11,15 @@ interface NemoneItem {
 
 export default function Nemone() {
   const nemoneha: NemoneItem[] = [
-    { id: 1, src: "./images/nemone/1.jpg" },
-    { id: 2, src: "./images/nemone/2.jpg" },
-    { id: 3, src: "./images/nemone/3.jpg" },
-    { id: 4, src: "./images/nemone/4.jpg" },
-    { id: 5, src: "./images/nemone/5.jpg" },
-    { id: 6, src: "./images/nemone/6.jpg" },
-    { id: 7, src: "./images/nemone/7.jpg" },
-    { id: 8, src: "./images/nemone/8.jpg" },
-    { id: 9, src: "./images/nemone/9.jpg" },
+    { id: 1, src: "./Images/nemone/1.jpg" },
+    { id: 2, src: "./Images/nemone/2.jpg" },
+    { id: 3, src: "./Images/nemone/3.jpg" },
+    { id: 4, src: "./Images/nemone/4.jpg" },
+    { id: 5, src: "./Images/nemone/5.jpg" },
+    { id: 6, src: "./Images/nemone/6.jpg" },
+    { id: 7, src: "./Images/nemone/7.jpg" },
+    { id: 8, src: "./Images/nemone/8.jpg" },
+    { id: 9, src: "./Images/nemone/9.jpg" },
   ];
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
