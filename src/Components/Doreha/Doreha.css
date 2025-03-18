@@ -1,0 +1,37 @@
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes cardReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 1s ease-out forwards;
+  }
+
+  .animate-card {
+    opacity: 0;
+    animation: cardReveal 0.8s ease-out forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fadeIn, .animate-card {
+      animation: none;
+      opacity: 1;
+    }
+  }

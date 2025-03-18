@@ -76,9 +76,9 @@ export default function Header() {
         </div>
 
         {/* دکمه ورود/ثبت‌نام (فقط در دسکتاپ) */}
-        <div className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-2 rounded-lg bg-[black] transition-all duration-200">
+        <div className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
           <AccountCircleOutlinedIcon fontSize="large" className="text-[#0dcf6c]" />
-          <p className="pb-[1px] text-md text-white">ورود | ثبت نام</p>
+          <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
         </div>
       </div>
     </div>

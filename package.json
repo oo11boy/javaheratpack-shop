@@ -14,10 +14,13 @@
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",
     "framer-motion": "^12.5.0",
-    "next": "15.2.2",
+    "next": "^15.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-modal-image": "^2.6.0"
+    "react-modal-image": "^2.6.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

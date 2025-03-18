@@ -1,38 +1,36 @@
-.HeroSection{
+.HeroSection {
     margin-bottom: -110px !important;
     padding-top: 80px !important;
     padding-bottom: 180px !important;
-    background: url("/images/bg.png") no-repeat top center / 1580px !important;
-  
+    background: linear-gradient(to top, #191919 7%, rgba(0, 0, 0, 0) 50%), 
+                url("/images/bg.png") no-repeat top center / 1580px !important;
 }
-.boxhero{
+
+.boxhero {
     padding: 20px 40px;
     background-color: #222;
 }
-
-
 
 @media (max-width: 768px) {
     .HeroSection {
         margin-bottom: -20px !important;
         padding-top: 95% !important;
         padding-bottom: 20px !important;
-        background: url("/images/bgmini2.png") no-repeat top center / 100% !important;
- 
+        background: linear-gradient(to top, #191919 8%, rgba(0, 0, 0, 0) 50%), 
+                    url("/images/bgmini2.png") no-repeat top center / 100% !important;
     }
-.heroboxbtn{
-    border-radius: 5px;
-    padding: 20px;
-}
-    .boxhero{
-        width:100%!important;
-      border-radius: 0!important;
-
+    .heroboxbtn {
+        border-radius: 5px;
+        padding: 20px;
     }
-    .boldherotext{
+    .boxhero {
+        width: 100% !important;
+        border-radius: 0 !important;
+    }
+    .boldherotext {
         font-size: 40px;
     }
-    .normalherotext{
+    .normalherotext {
         font-size: 22px;
     }
 }
@@ -42,96 +40,91 @@
         margin-bottom: 0 !important;
         padding-top: 53% !important;
         padding-bottom: 20px !important;
-        background: url("/images/bgmini.png") no-repeat top center / 100% !important;
- 
+        background: linear-gradient(to top, #191919 8%, rgba(0, 0, 0, 0) 50%), 
+                    url("/images/bgmini.png") no-repeat top center / 100% !important;
     }
-    .boxhero{
-        border-radius: 15px!important;
+    .boxhero {
+        border-radius: 15px !important;
     }
 }
+
 @media (min-width: 769px) and (max-width: 1024px) {
     .HeroSection {
         margin-bottom: -110px !important;
         padding-top: 80px !important;
         padding-bottom: 180px !important;
-        background: url("/images/bg.png") no-repeat top center / 991px !important;
+        background: linear-gradient(to top, #191919 20%, rgba(0, 0, 0, 0) 50%), 
+                    url("/images/bg.png") no-repeat top center / 991px !important;
     }
-    .boxhero{
-        width:420px!important;
-      
+    .boxhero {
+        width: 420px !important;
     }
-    .boxheroimg{
-        width: 100px!important;
+    .boxheroimg {
+        width: 100px !important;
     }
-.boldherotext{
-    font-size: 22px;
-}
-.normalherotext{
-    font-size: 18px;
-}
+    .boldherotext {
+        font-size: 22px;
+    }
+    .normalherotext {
+        font-size: 18px;
+    }
 }
 
-
-@media  (min-width: 1024px) and (max-width: 1280px) {
-    .HeroSection{
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .HeroSection {
         margin-bottom: -110px !important;
         padding-top: 80px !important;
         padding-bottom: 180px !important;
-        background: url("/images/bg.png") no-repeat top center / 1280px !important;
-      
+        background: linear-gradient(to top, #191919 20%, rgba(0, 0, 0, 0) 50%), 
+                    url("/images/bg.png") no-repeat top center / 1280px !important;
     }
-
-
 }
-
-
-
 
 /* حالت اولیه: عناصر نامرئی */
 .boldherotext,
 .normalherotext,
 .heroboxbtn {
-  opacity: 0;
+    opacity: 0;
 }
 
 /* انیمیشن fade-in */
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* اعمال انیمیشن‌ها به عناصر */
 .boldherotext {
-  animation: fadeIn 1s ease-in-out forwards;
+    animation: fadeIn 1s ease-in-out forwards;
 }
 
 .normalherotext {
-  animation: fadeIn 1s ease-in-out forwards;
+    animation: fadeIn 1s ease-in-out forwards;
 }
 
 .heroboxbtn {
-  animation: fadeIn 1s ease-in-out forwards;
+    animation: fadeIn 1s ease-in-out forwards;
 }
 
 /* تاخیر در انیمیشن‌ها برای ایجاد ترتیب خاص */
 .boldherotext:nth-child(1) {
-  animation-delay: 0.5s;
+    animation-delay: 0.5s;
 }
 
 .normalherotext:nth-child(2) {
-  animation-delay: 1s;
+    animation-delay: 1s;
 }
 
 .boldherotext:nth-child(3) {
-  animation-delay: 1.5s;
+    animation-delay: 1.5s;
 }
 
 .normalherotext:nth-child(4) {
-  animation-delay: 2s;
+    animation-delay: 2s;
 }
 
 .heroboxbtn {
-  animation-delay: 2.5s;
+    animation-delay: 2.5s;
 }
