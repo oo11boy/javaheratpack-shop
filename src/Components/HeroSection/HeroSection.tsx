@@ -4,6 +4,7 @@ import { Add } from "@mui/icons-material";
 export default function HeroSection() {
   return (
     <div className="lg:h-[81vh] xl:h-screen h-screen flex justify-start items-start  lg:items-center HeroSection">
+      
       <div className=" ccontainer  flex md:block justify-center items-start">
         <div className="max-w-[555px] boxhero  px-8 bg-[#2B0D22] rounded-2xl">
           <div className="flex justify-between w-full items-center">
@@ -24,7 +25,7 @@ export default function HeroSection() {
           </div>
 
           <a
-            className="text-white bg-[#2C419A] w-full flex justify-between items-center rounded-xl mt-4 p-2"
+            className="text-white heroboxbtn bg-[#2C419A] w-full flex justify-between items-center rounded-xl mt-4 p-2"
             href=""
           >
             مشاهده دوره های آموزشی

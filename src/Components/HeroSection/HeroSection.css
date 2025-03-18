@@ -7,22 +7,48 @@
 }
 .boxhero{
     padding: 20px 40px;
+    background-color: #222;
 }
+
+
+
 @media (max-width: 768px) {
     .HeroSection {
         margin-bottom: 0 !important;
-        padding-top: 60% !important;
+        padding-top: 80% !important;
+        padding-bottom: 20px !important;
+        background: url("/images/bgmini2.png") no-repeat top center / 100% !important;
+ 
+    }
+.heroboxbtn{
+    border-radius: 5px;
+    padding: 20px;
+}
+    .boxhero{
+        width:100%!important;
+      border-radius: 0!important;
+
+    }
+    .boldherotext{
+        font-size: 40px;
+    }
+    .normalherotext{
+        font-size: 22px;
+    }
+}
+
+@media (min-width: 555px) and (max-width: 768px) {
+    .HeroSection {
+        margin-bottom: 0 !important;
+        padding-top: 53% !important;
         padding-bottom: 20px !important;
         background: url("/images/bgmini.png") no-repeat top center / 100% !important;
  
     }
-
     .boxhero{
-        width:100%!important;
-      
+        border-radius: 15px!important;
     }
 }
-
 @media (min-width: 769px) and (max-width: 1024px) {
     .HeroSection {
         margin-bottom: -110px !important;
@@ -56,4 +82,56 @@
     }
 
 
+}
+
+
+
+
+/* حالت اولیه: عناصر نامرئی */
+.boldherotext,
+.normalherotext,
+.heroboxbtn {
+  opacity: 0;
+}
+
+/* انیمیشن fade-in */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* اعمال انیمیشن‌ها به عناصر */
+.boldherotext {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.normalherotext {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.heroboxbtn {
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+/* تاخیر در انیمیشن‌ها برای ایجاد ترتیب خاص */
+.boldherotext:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.normalherotext:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.boldherotext:nth-child(3) {
+  animation-delay: 1.5s;
+}
+
+.normalherotext:nth-child(4) {
+  animation-delay: 2s;
+}
+
+.heroboxbtn {
+  animation-delay: 2.5s;
 }
