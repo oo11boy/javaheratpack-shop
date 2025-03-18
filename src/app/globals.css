@@ -40,6 +40,9 @@
 .titr{
   font-family: "titr";
 }
+.iransans{
+  font-family: "iransansweb";
+}
 
 
 .vazir{
@@ -65,6 +68,9 @@ html {
   font-size: 16px; /* اندازه پایه */
 }
 
+body{
+  background-color: #191919;
+}
 h1 {
   font-size: clamp(2rem, 5vw, 3.5rem);
   line-height: 1.2;

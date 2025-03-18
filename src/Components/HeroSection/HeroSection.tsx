@@ -3,7 +3,7 @@ import "./HeroSection.css";
 import { Add } from "@mui/icons-material";
 export default function HeroSection() {
   return (
-    <div className="lg:h-[81vh] xl:h-screen h-screen flex justify-start items-start  lg:items-center HeroSection">
+    <div className="lg:h-[81vh] xl:h-screen h-auto flex justify-start items-start  lg:items-center HeroSection">
       
       <div className=" ccontainer  flex md:block justify-center items-start">
         <div className="max-w-[555px] boxhero  px-8 bg-[#2B0D22] rounded-2xl">
