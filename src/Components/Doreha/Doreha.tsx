@@ -1,6 +1,7 @@
 "use client";
 import { SchoolOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
+import Link from 'next/link'; // اضافه کردن Link از Next.js
 import './Doreha.css';
 
 // تعریف رابط برای دیتای دوره‌ها
@@ -120,9 +121,12 @@ export default function Doreha() {
                   <span className="text-lg font-bold text-[#0dcf6c]">
                     {course.price}
                   </span>
-                  <button className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium">
+                  <Link
+                    href={`/courselist/${course.id}`} // مسیر دلخواه برای هر دوره
+                    className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"
+                  >
                     ثبت‌نام
-                  </button>
+                  </Link>
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>

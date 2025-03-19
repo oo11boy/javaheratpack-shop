@@ -348,14 +348,14 @@ const CourseDetails: React.FC = () => {
             </h2>
             <div className="space-y-4">
               <div className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
-                <p className="text-gray-300">"دوره‌ای بی‌نظیر با محتوای غنی!"</p>
+                <p className="text-gray-300">دوره‌ای بی‌نظیر با محتوای غنی!</p>
                 <div className="flex items-center gap-2 mt-2">
                   <Star className="w-5 h-5 text-green-400 fill-green-400" />
                   <p className="text-green-400 text-sm">- سارا حسینی</p>
                 </div>
               </div>
               <div className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition">
-                <p className="text-gray-300">"مدرس بسیار حرفه‌ای و دلسوز."</p>
+                <p className="text-gray-300">مدرس بسیار حرفه‌ای و دلسوز.</p>
                 <div className="flex items-center gap-2 mt-2">
                   <Star className="w-5 h-5 text-green-400 fill-green-400" />
                   <p className="text-green-400 text-sm">- علی رضایی</p>

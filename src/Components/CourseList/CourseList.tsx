@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, Search, Filter, PlayCircle, ChevronDown, Clock, ChevronRight } from 'lucide-react';
+import { BookOpen, Search, Filter, PlayCircle, ChevronDown, Clock } from 'lucide-react';
+import { ChevronLeft } from '@mui/icons-material';
+import Link from 'next/link';
 
 interface Course {
   id: string;
@@ -9,7 +11,7 @@ interface Course {
   description: string;
   category: string;
   duration: string;
-  thumbnail: string; // URL for course thumbnail
+  thumbnail: string;
   price: string;
 }
 
@@ -181,10 +183,13 @@ const CourseList: React.FC = () => {
                     </span>
                     <span>{course.category}</span>
                   </div>
-                  <button className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
+                  <Link
+                    href={`/courselist/${course.id}`} // مسیر دلخواه برای هر دوره
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
                     مشاهده دوره
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                    <ChevronLeft className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
               </div>
             ))}

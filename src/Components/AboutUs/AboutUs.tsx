@@ -38,7 +38,7 @@ const AboutUs: React.FC = () => {
           <img
             src={instructor.heroImage}
             alt="Jewelry Design"
-            className="w-full h-[400px] md:h-[500px] object-cover opacity-80"
+            className="w-full h-[300px] md:h-[400px]  object-cover opacity-80"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#0dcf6c]/10 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 md:p-10 text-center w-full">

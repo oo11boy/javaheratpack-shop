@@ -1,10 +1,11 @@
-"use client"
+"use client";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { ArticleOutlined } from '@mui/icons-material';
-import "./Articles.css"
+import Link from 'next/link'; // اضافه کردن Link از Next.js
+import "./Articles.css";
 
 const articles = [
     {
@@ -98,9 +99,12 @@ export default function ArticleSlider() {
                   <p className="text-gray-300 !text-sm mb-4 flex-grow line-clamp-2">
                     {article.excerpt}
                   </p>
-                  <button className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto">
+                  <Link
+                    href={`/bloglist/${article.id}`} // مسیر دلخواه برای هر مقاله
+                    className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto"
+                  >
                     مطالعه بیشتر
-                  </button>
+                  </Link>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
               </div>

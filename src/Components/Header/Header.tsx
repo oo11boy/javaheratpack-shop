@@ -17,13 +17,14 @@ export default function Header() {
     <div className="w-full bg-[black] p-4">
       <div className="ccontainer mx-auto flex justify-between items-center">
         {/* لوگو */}
-        <div>
+        <Link href={'../'}>
+          
           <img
             className="w-[95px] h-[30px]"
             src="../Images/logo.png"
             alt="لوگو"
           />
-        </div>
+        </Link>
 
         {/* دکمه همبرگر برای موبایل */}
         <div className="flex items-center">
@@ -80,11 +81,11 @@ export default function Header() {
             isMenuOpen ? "translate-x-0" : "translate-x-full"
           } md:static md:w-auto md:bg-transparent md:text-white md:transform-none transition-transform duration-500 ease-in-out z-50`}
         >
-          <ul className="flex flex-col md:flex-row gap-6 p-4 md:p-0 h-full md:h-auto">
+          <ul className="flex flex-col my-3 md:my-0 md:mx-3 md:flex-row gap-6 p-4 md:p-0 h-full md:h-auto">
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1 "
-                href={"./"}
+                href={"../"}
               >
                 <HomeOutlined className="text-[#0dcf6c]" />
                 خانه
@@ -93,7 +94,7 @@ export default function Header() {
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1 "
-                href={"./courselist"}
+                href={"../courselist"}
               >
                 <SchoolOutlined className="text-[#0dcf6c]" />
                 دوره‌های آموزشی
@@ -102,7 +103,7 @@ export default function Header() {
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1 "
-                href={"./bloglist"}
+                href={"../bloglist"}
               >
               <ArticleOutlined className="text-[#0dcf6c]" />
               مقالات
@@ -111,7 +112,7 @@ export default function Header() {
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1 "
-                href={"./aboutus"}
+                href={"../aboutus"}
               >
                    <InfoOutlined className="text-[#0dcf6c]" />
               درباره ما

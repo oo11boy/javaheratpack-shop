@@ -2,15 +2,16 @@
 
 import React, { useState } from 'react';
 import { FileText, Search, Filter, ChevronDown, Clock } from 'lucide-react';
+import Link from 'next/link'; // اضافه کردن Link از Next.js
 
 interface Article {
   id: string;
   title: string;
   excerpt: string;
   category: string;
-  readTime: string; // Estimated reading time
-  thumbnail: string; // URL for article thumbnail
-  date: string; // Publication date
+  readTime: string;
+  thumbnail: string;
+  date: string;
 }
 
 const mockArticles: Article[] = [
@@ -171,10 +172,13 @@ const BlogList: React.FC = () => {
                     </span>
                     <span>{article.date}</span>
                   </div>
-                  <button className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
+                  <Link
+                    href={`/bloglist/${article.id}`} // مسیر دلخواه برای هر مقاله
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
                     خواندن مقاله
                     <ChevronDown className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
