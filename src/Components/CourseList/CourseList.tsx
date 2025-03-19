@@ -5,6 +5,7 @@ import { BookOpen, Search, Filter, PlayCircle, ChevronDown, Clock } from 'lucide
 import { ChevronLeft } from '@mui/icons-material';
 import Link from 'next/link';
 import Image from 'next/image'; // اضافه کردن next/image
+import { SimpleCourse } from '@/lib/Types/Types';
 
 interface Course {
   id: string;
@@ -16,55 +17,10 @@ interface Course {
   price: string;
 }
 
-const mockCourses: Course[] = [
-  {
-    id: '1',
-    title: 'مقدمه‌ای بر برنامه‌نویسی',
-    description: 'یادگیری مفاهیم اولیه برنامه‌نویسی با پروژه‌های عملی',
-    category: 'برنامه‌نویسی',
-    duration: '12:30',
-    thumbnail: 'https://picsum.photos/300/200?random=1',
-    price: 'رایگان',
-  },
-  {
-    id: '2',
-    title: 'جاوااسکریپت پیشرفته',
-    description: 'مباحث پیشرفته جاوااسکریپت برای توسعه‌دهندگان',
-    category: 'برنامه‌نویسی',
-    duration: '18:45',
-    thumbnail: 'https://picsum.photos/300/200?random=2',
-    price: '250,000 تومان',
-  },
-  {
-    id: '3',
-    title: 'طراحی رابط کاربری',
-    description: 'اصول طراحی UI/UX با ابزارهای مدرن',
-    category: 'طراحی',
-    duration: '10:15',
-    thumbnail: 'https://picsum.photos/300/200?random=3',
-    price: '180,000 تومان',
-  },
-  {
-    id: '4',
-    title: 'یادگیری ماشین مقدماتی',
-    description: 'شروع کار با الگوریتم‌های یادگیری ماشین',
-    category: 'هوش مصنوعی',
-    duration: '15:00',
-    thumbnail: 'https://picsum.photos/300/200?random=4',
-    price: '300,000 تومان',
-  },
-  {
-    id: '5',
-    title: 'گرافیک سه‌بعدی',
-    description: 'مدلسازی و رندرینگ سه‌بعدی با بلندر',
-    category: 'طراحی',
-    duration: '20:00',
-    thumbnail: 'https://picsum.photos/300/200?random=5',
-    price: '400,000 تومان',
-  },
-];
 
-const CourseList: React.FC = () => {
+
+const CourseList= ({mockCourses}:{mockCourses: SimpleCourse[]}) => {
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);

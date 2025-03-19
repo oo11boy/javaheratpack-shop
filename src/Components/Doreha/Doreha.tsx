@@ -4,48 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from 'next/link';
 import Image from 'next/image'; // اضافه کردن next/image
 import './Doreha.css';
+import { SimpleCourse } from "@/lib/Types/Types";
 
-interface JewelryCourse {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  price: string;
-  duration: string;
-  level: string;
-}
 
-const jewelryCourses: JewelryCourse[] = [
-  {
-    id: 1,
-    title: "دوره مقدماتی طراحی جواهرات با Matrix",
-    description: "یادگیری اصول اولیه طراحی جواهرات با استفاده از نرم‌افزار Matrix",
-    image: "https://picsum.photos/300/200?random=1",
-    price: "۱,۵۰۰,۰۰۰ تومان",
-    duration: "۱ ماه",
-    level: "مبتدی",
-  },
-  {
-    id: 2,
-    title: "دوره پیشرفته Matrix برای جواهرات",
-    description: "طراحی پیچیده جواهرات با ابزارهای پیشرفته Matrix",
-    image: "https://picsum.photos/300/200?random=2",
-    price: "۲,۸۰۰,۰۰۰ تومان",
-    duration: "۲ ماه",
-    level: "پیشرفته",
-  },
-  {
-    id: 3,
-    title: "دوره رندرینگ جواهرات در Matrix",
-    description: "ایجاد رندرهای واقع‌گرایانه از طرح‌های جواهرات",
-    image: "https://picsum.photos/300/200?random=3",
-    price: "۲,۲۰۰,۰۰۰ تومان",
-    duration: "۶ هفته",
-    level: "متوسط",
-  },
-];
-
-export default function Doreha() {
+export default function Doreha({jewelryCourses}:{jewelryCourses:SimpleCourse[]}) {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const sectionRef = useRef<HTMLElement | null>(null);
 
@@ -87,7 +49,7 @@ export default function Doreha() {
           دوره‌های آموزشی
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {jewelryCourses.map((course: JewelryCourse, index: number) => (
+          {jewelryCourses.map((course: SimpleCourse, index: number) => (
             <div
               key={course.id}
               className={`group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700 ${
@@ -97,7 +59,7 @@ export default function Doreha() {
             >
               <div className="relative overflow-hidden h-56">
                 <Image
-                  src={course.image}
+                  src={course.thumbnail}
                   alt={course.title}
                   width={500} // اندازه حداقلی
                   height={300} // اندازه حداقلی

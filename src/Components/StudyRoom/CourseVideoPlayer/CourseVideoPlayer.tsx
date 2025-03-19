@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import ReactPlayer from "react-player";
+import dynamic from "next/dynamic";
 import {
   Play,
   Pause,
@@ -10,64 +10,17 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { CourseVideo } from "@/lib/Types/Types";
 
-interface Video {
-  id: string;
-  title: string;
-  url: string;
-  duration?: string;
-  description?: string;
-  isCompleted?: boolean;
-}
+// وارد کردن ReactPlayer به صورت پویا و غیرفعال کردن SSR
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
-const videos: Video[] = [
-  {
-    id: "1",
-    title: "مقدمه دوره",
-    url: "https://media.istockphoto.com/id/1413207061/fr/vid%C3%A9o/circulation-routi%C3%A8re-dans-delhi-roads.mp4?s=mp4-640x640-is&k=20&c=k8fkmGZJ8GQVJdP6BL0VdYCMtI78VolF5oqyCcYeAjw=",
-    description: "آشنایی با مفاهیم اولیه دوره",
-    isCompleted: false,
-  },
-  {
-    id: "2",
-    title: "جلسه اول: مفاهیم پایه",
-    url: "https://media.istockphoto.com/id/1413207061/fr/vid%C3%A9o/circulation-routi%C3%A8re-dans-delhi-roads.mp4?s=mp4-640x640-is&k=20&c=k8fkmGZJ8GQVJdP6BL0VdYCMtI78VolF5oqyCcYeAjw=",
-    description: "بررسی اصول و مبانی اولیه",
-    isCompleted: false,
-  },
-  {
-    id: "3",
-    title: "جلسه دوم: پیشرفته",
-    url: "https://persian19.cdn.asset.aparat.com/aparat-video/6402b1f7f90f14357f0e6e3798eb163463716329-360p.mp4?wmsAuthSign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6ImFkODNmMWIyMDdhMDcyM2JmYTFmN2IxYjU2YzM2OTc0IiwiZXhwIjoxNzQyMzMyMjQyLCJpc3MiOiJTYWJhIElkZWEgR1NJRyJ9.cJ5vTZQPLGhpO8nDag3497rcyRDWgktFYH3VHuKp8yk",
-    description: "مباحث پیشرفته و کاربردی",
-    isCompleted: false,
-  },
-];
-
-const CourseVideoPlayer: React.FC = () => {
-  const [selectedVideo, setSelectedVideo] = useState<Video>(videos[0]);
-  const [completedVideos, setCompletedVideos] = useState<Set<string>>(
-    new Set()
-  );
+const CourseVideoPlayer = ({ videos }: { videos: CourseVideo[] }) => {
+  const [selectedVideo, setSelectedVideo] = useState<CourseVideo>(videos[0]);
+  const [completedVideos, setCompletedVideos] = useState<Set<string>>(new Set());
   const [isVideoListOpen, setIsVideoListOpen] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [durations, setDurations] = useState<{ [key: string]: string }>({}); // زمان همه ویدیوها
-  const playerRef = useRef<ReactPlayer>(null);
-
-  // فرمت کردن زمان از ثانیه به MM:SS
-  const formatDuration = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  // دریافت زمان هر ویدیو
-  const handleDuration = (videoId: string, duration: number) => {
-    setDurations((prev) => ({
-      ...prev,
-      [videoId]: formatDuration(duration),
-    }));
-  };
+  const playerRef = useRef<typeof ReactPlayer>(null);
 
   // اتمام ویدیو
   const handleVideoEnd = () => {
@@ -75,12 +28,10 @@ const CourseVideoPlayer: React.FC = () => {
     setIsPlaying(false);
   };
 
-  // به‌روزرسانی پیشرفت
-
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
 
-  const handleVideoSelect = (video: Video) => {
+  const handleVideoSelect = (video: CourseVideo) => {
     setSelectedVideo(video);
     setIsPlaying(true);
     setIsVideoListOpen(false);
@@ -104,19 +55,6 @@ const CourseVideoPlayer: React.FC = () => {
 
   return (
     <div className="min-h-screen ccontainer bg-[#121824] text-white flex flex-col items-center justify-start p-4">
-      {/* پخش‌کننده‌های مخفی برای دریافت زمان همه ویدیوها */}
-      <div style={{ display: "none" }}>
-        {videos.map((video) => (
-          <ReactPlayer
-            key={video.id}
-            url={video.url}
-            width="0"
-            height="0"
-            onDuration={(duration) => handleDuration(video.id, duration)}
-          />
-        ))}
-      </div>
-
       <div className="w-full flex flex-col lg:flex-row gap-6">
         {/* لیست ویدیوها */}
         <div className="w-full lg:w-1/3 bg-[#1e2636]/80 backdrop-blur-lg rounded-xl shadow-lg flex flex-col max-h-[600px]">
@@ -172,7 +110,7 @@ const CourseVideoPlayer: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-300">
                     <Clock className="w-4 h-4" />
-                    <span>{durations[video.id] || "0:00"}</span>
+                    <span>{video.duration || "0:00"}</span>
                   </div>
                 </div>
               ))}
@@ -193,9 +131,6 @@ const CourseVideoPlayer: React.FC = () => {
               onEnded={handleVideoEnd}
               onPlay={handlePlay}
               onPause={handlePause}
-              onDuration={(duration) =>
-                handleDuration(selectedVideo.id, duration)
-              }
               config={{
                 youtube: {
                   playerVars: { showinfo: 1, rel: 0 },
@@ -213,7 +148,7 @@ const CourseVideoPlayer: React.FC = () => {
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                <span>{durations[selectedVideo.id] || "0:00"}</span>
+                <span>{selectedVideo.duration || "0:00"}</span>
               </div>
               {completedVideos.has(selectedVideo.id) && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#0dcf6c]/20 text-[#0dcf6c] rounded-full text-xs font-medium">

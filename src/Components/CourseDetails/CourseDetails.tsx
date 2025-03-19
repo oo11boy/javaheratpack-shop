@@ -14,65 +14,13 @@ import {
   Check,
 } from "lucide-react";
 import Image from "next/image"; // اضافه کردن next/image
+import { Course } from "@/lib/Types/Types";
 
-interface Course {
-  title: string;
-  description: string;
-  instructor: {
-    name: string;
-    bio: string;
-    avatar: string;
-  };
-  duration: string;
-  accessType: string;
-  price: number;
-  discountPrice?: number;
-  introVideo: string;
-  bannerImage: string;
-  syllabus: { title: string; description: string }[];
-  features: string[];
-  prerequisites: string[];
-  targetAudience: string[];
-}
 
-const courseData: Course = {
-  title: "دوره جامع طراحی جواهرات مدرن",
-  description:
-    "این دوره شما را با تکنیک‌های پیشرفته طراحی جواهرات آشنا می‌کند و از صفر تا صد، از ایده‌پردازی تا اجرا، همراه شماست. چه مبتدی باشید چه حرفه‌ای، این دوره به شما کمک می‌کند تا خلاقیت خود را به آثار هنری تبدیل کنید. در این دوره مهارت‌های طراحی دستی، کار با نرم‌افزارهای تخصصی و تکنیک‌های ساخت را خواهید آموخت.",
-  instructor: {
-    name: "نازنین مقدم",
-    bio: "نازنین مقدم، هنرمند و مدرس برجسته با ۱۵ سال تجربه در طراحی جواهرات و آموزش حرفه‌ای. او در بیش از ۲۰ نمایشگاه بین‌المللی شرکت کرده و جوایز متعددی کسب کرده است.",
-    avatar: "https://picsum.photos/300?random=1",
-  },
-  duration: "۸ هفته (۴۸ ساعت)",
-  accessType: "آنلاین و آفلاین (دسترسی مادام‌العمر)",
-  price: 2500000,
-  discountPrice: 2000000,
-  introVideo:
-    "https://caspian2.cdn.asset.aparat.com/aparat-video/f19e4e02d9ec2a53d3c84de1fc32c3bf45842597-480p.mp4?wmsAuthSign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjIyMDQ2YTEzNDIwNDBlYjhhNzcwZGU3MWFlYmQyMGMyIiwiZXhwIjoxNzQyMzk5NzA0LCJpc3MiOiJTYWJhIElkZWEgR1NJRyJ9.UQFAOtfJpHIYZfR9tUl73ES4ZP-u1bNdQq3zAUIbqrY",
-  bannerImage: "", // اگر تصویر بنر دارید، اینجا وارد کنید
-  syllabus: [
-    { title: "مقدمه‌ای بر طراحی جواهرات", description: "آشنایی با مفاهیم پایه و ابزارها." },
-    { title: "طراحی با نرم‌افزار", description: "آموزش رندرینگ و مدل‌سازی سه‌بعدی." },
-    { title: "ساخت و اجرا", description: "مراحل عملی ساخت جواهرات." },
-    { title: "بازاریابی آثار", description: "چگونه جواهرات خود را به بازار عرضه کنید." },
-  ],
-  features: [
-    "پشتیبانی اختصاصی توسط مدرس",
-    "پروژه‌های عملی و واقعی",
-    "گواهینامه معتبر پایان دوره",
-    "دسترسی به انجمن اختصاصی هنرجویان",
-  ],
-  prerequisites: ["علاقه به طراحی", "آشنایی اولیه با کامپیوتر", "بدون نیاز به تجربه قبلی"],
-  targetAudience: [
-    "علاقمندان به طراحی جواهرات",
-    "طراحان مبتدی و حرفه‌ای",
-    "کارآفرینان حوزه مد و هنر",
-  ],
-};
 
-const CourseDetails: React.FC = () => {
-  const course = courseData;
+
+const CourseDetails = ({CourseData}:{CourseData:Course}) => {
+  const course = CourseData;
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -390,6 +338,7 @@ const CourseDetails: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default CourseDetails;
