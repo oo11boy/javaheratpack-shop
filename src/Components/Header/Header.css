@@ -1,0 +1,10 @@
+.header {
+    transition: all 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  }
+  .header.scrolled {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  .header:not(.scrolled) {
+    transform: translateY(-10px);
+  }

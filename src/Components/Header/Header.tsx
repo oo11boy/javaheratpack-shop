@@ -8,10 +8,11 @@ import {
 } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "next/link";
+import LoginModal from "@/DashboardComponents/LoginModal/LoginModal";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="w-full bg-[black] p-4">
       <div className="ccontainer mx-auto flex justify-between items-center">
@@ -33,6 +34,13 @@ export default function Header() {
               className="text-[#0dcf6c]"
             />
           </Link>
+          {/* <button onClick={() => setIsModalOpen(true)} className="md:hidden text-[#999] cursor-pointer items-center space-x-2 justify-center p-2 rounded-lg bg-black transition-all duration-200">
+            <AccountCircleOutlinedIcon
+              fontSize="large"
+              className="text-[#0dcf6c]"
+            />
+          </button> */}
+          
 
           <button
             className="md:hidden text-white bg-[#0dcf6c] p-1 rounded-md focus:outline-none"
@@ -113,14 +121,26 @@ export default function Header() {
         </div>
 
         {/* دکمه ورود/ثبت‌نام (فقط در دسکتاپ) */}
-        <Link href={'../useraccount'} className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
+        {/* <Link href={'../useraccount'} className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
           <AccountCircleOutlinedIcon
             fontSize="large"
             className="text-[#0dcf6c]"
           />
           <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
-        </Link>
+        </Link> */}
+
+
+
+        <button onClick={() => setIsModalOpen(true)} className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
+          <AccountCircleOutlinedIcon
+            fontSize="large"
+            className="text-[#0dcf6c]"
+          />
+          <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
+        </button>
       </div>
+
+      <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
