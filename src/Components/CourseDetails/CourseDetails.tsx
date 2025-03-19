@@ -149,14 +149,14 @@ const CourseDetails: React.FC = () => {
         <Award className="w-5 h-5 text-green-400" /> پیش‌نیازها:{" "}
         {course.prerequisites.join(", ")}
       </p>
-      <p className="text-gray-300">
+      <div className="text-gray-300">
         <strong className="text-green-400">ویژگی‌ها:</strong>
         <ul className="list-disc list-inside mt-2 space-y-1">
           {course.features.map((feature, index) => (
             <li key={index}>{feature}</li>
           ))}
         </ul>
-      </p>
+      </div>
       <p className="text-gray-300">
         <strong className="text-green-400">مخاطبان:</strong>{" "}
         {course.targetAudience.join(", ")}
@@ -174,7 +174,7 @@ const CourseDetails: React.FC = () => {
             <video
               ref={videoRef}
               className="w-full h-64 md:h-96 object-cover rounded-2xl transition-transform duration-500 hover:scale-[1.02]"
-              poster={course.bannerImage || "https://picsum.photos/1200/600?random=2"} // تصویر پیش‌فرض در صورت خالی بودن
+              poster={course.bannerImage} // تصویر پیش‌فرض در صورت خالی بودن
               controls
               onPause={handlePause}
               onPlay={() => setIsPlaying(true)}

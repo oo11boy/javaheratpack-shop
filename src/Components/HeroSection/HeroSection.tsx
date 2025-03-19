@@ -13,7 +13,7 @@ export default function HeroSection() {
           <div className="flex justify-between w-full items-center">
             <Image
               className="w-[200px] boxheroimg hidden md:block"
-              src="/Images/vector.png"
+              src="/Images/Vector.png"
               alt="لوگوی نازنین مقدم"
               width={200} // اندازه حداقلی
               height={200} // فرض بر مربعی بودن تصویر
