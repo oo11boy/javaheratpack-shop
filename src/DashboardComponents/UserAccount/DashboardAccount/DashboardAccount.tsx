@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { User, BookOpen, Clock, ChevronRight, LogOut, Award, PlayCircle, Lock } from 'lucide-react';
+import React, { useState } from "react";
+import { User, BookOpen, Clock, ChevronRight, LogOut, Award, PlayCircle, Lock } from "lucide-react";
+import Image from "next/image"; // اضافه کردن next/image
 
 interface Course {
   id: string;
@@ -21,41 +22,41 @@ interface UserData {
 }
 
 const mockUserData: UserData = {
-  name: 'علی محمدی',
-  email: 'ali.mohammadi@example.com',
-  avatar: 'https://picsum.photos/150?random=1',
+  name: "علی محمدی",
+  email: "ali.mohammadi@example.com",
+  avatar: "https://picsum.photos/150?random=1",
   purchasedCourses: [
     {
-      id: '1',
-      title: 'دوره مقدماتی برنامه‌نویسی',
-      duration: '12:30',
+      id: "1",
+      title: "دوره مقدماتی برنامه‌نویسی",
+      duration: "12:30",
       progress: 75,
-      thumbnail: 'https://picsum.photos/300/200?random=2',
+      thumbnail: "https://picsum.photos/300/200?random=2",
     },
     {
-      id: '2',
-      title: 'دوره پیشرفته جاوااسکریپت',
-      duration: '18:45',
+      id: "2",
+      title: "دوره پیشرفته جاوااسکریپت",
+      duration: "18:45",
       progress: 20,
-      thumbnail: 'https://picsum.photos/300/200?random=3',
+      thumbnail: "https://picsum.photos/300/200?random=3",
     },
     {
-      id: '3',
-      title: 'طراحی رابط کاربری',
-      duration: '10:15',
+      id: "3",
+      title: "طراحی رابط کاربری",
+      duration: "10:15",
       progress: 100,
-      thumbnail: 'https://picsum.photos/300/200?random=4',
+      thumbnail: "https://picsum.photos/300/200?random=4",
     },
   ],
   completedCourses: 2,
-  totalHours: '41:20',
+  totalHours: "41:20",
 };
 
 const UserAccount: React.FC = () => {
   const user = mockUserData; // Replace with real data from API/context
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const handleChangePassword = () => {
     setIsModalOpen(true);
@@ -64,18 +65,18 @@ const UserAccount: React.FC = () => {
   const handleSubmitPassword = (e: React.FormEvent) => {
     e.preventDefault();
     // Placeholder for password change logic (e.g., API call)
-    console.log('Current Password:', currentPassword);
-    console.log('New Password:', newPassword);
-    alert('رمز عبور با موفقیت تغییر یافت!'); // Replace with actual logic
+    console.log("Current Password:", currentPassword);
+    console.log("New Password:", newPassword);
+    alert("رمز عبور با موفقیت تغییر یافت!"); // Replace with actual logic
     setIsModalOpen(false);
-    setCurrentPassword('');
-    setNewPassword('');
+    setCurrentPassword("");
+    setNewPassword("");
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentPassword('');
-    setNewPassword('');
+    setCurrentPassword("");
+    setNewPassword("");
   };
 
   return (
@@ -85,10 +86,13 @@ const UserAccount: React.FC = () => {
         <div className="relative flex flex-col md:flex-row items-center gap-6 bg-gradient-to-r from-[#0dcf6c]/20 to-[#1e2636] p-6 md:p-8 rounded-xl shadow-lg overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-mosaic.png')] opacity-10" />
           <div className="relative z-10">
-            <img
+            <Image
               src={user.avatar}
               alt={user.name}
+              width={144} // بر اساس md:w-36 (36 * 4 = 144px)
+              height={144} // فرض بر مربعی بودن
               className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover ring-4 ring-[#0dcf6c]/50 shadow-md"
+              sizes="(max-width: 768px) 112px, 144px" // 112px در موبایل، 144px در دسکتاپ
             />
             <div className="absolute bottom-1 right-1 w-8 h-8 bg-[#0dcf6c] rounded-full flex items-center justify-center shadow-lg">
               <User className="w-5 h-5 text-white" />
@@ -158,10 +162,13 @@ const UserAccount: React.FC = () => {
                   className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[#0dcf6c]/20"
                 >
                   <div className="relative">
-                    <img
+                    <Image
                       src={course.thumbnail}
                       alt={course.title}
+                      width={300} // بر اساس منبع (300px)
+                      height={200} // بر اساس منبع (200px)
                       className="w-full h-48 object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" // بر اساس گرید
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <PlayCircle className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 text-[#0dcf6c] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

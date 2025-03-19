@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import {
   ArticleOutlined,
@@ -8,40 +9,39 @@ import {
 } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "next/link";
+import Image from "next/image"; // اضافه کردن next/image
 import LoginModal from "@/DashboardComponents/LoginModal/LoginModal";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="w-full bg-[black] p-4">
       <div className="ccontainer mx-auto flex justify-between items-center">
         {/* لوگو */}
-        <Link href={'../'}>
-          
-          <img
+        <Link href="../">
+          <Image
             className="w-[95px] h-[30px]"
-            src="../Images/logo.png"
+            src="/Images/logo.png"
             alt="لوگو"
+            width={95} // بر اساس w-[95px]
+            height={30} // بر اساس h-[30px]
+            sizes="95px" // اندازه ثابت برای لوگو
           />
         </Link>
 
         {/* دکمه همبرگر برای موبایل */}
         <div className="flex items-center">
-        
-          <Link href={'../useraccount'} className="md:hidden text-[#999] cursor-pointer items-center space-x-2 justify-center p-2 rounded-lg bg-black transition-all duration-200">
+          <Link
+            href="../useraccount"
+            className="md:hidden text-[#999] cursor-pointer items-center space-x-2 justify-center p-2 rounded-lg bg-black transition-all duration-200"
+          >
             <AccountCircleOutlinedIcon
               fontSize="large"
               className="text-[#0dcf6c]"
             />
           </Link>
-          {/* <button onClick={() => setIsModalOpen(true)} className="md:hidden text-[#999] cursor-pointer items-center space-x-2 justify-center p-2 rounded-lg bg-black transition-all duration-200">
-            <AccountCircleOutlinedIcon
-              fontSize="large"
-              className="text-[#0dcf6c]"
-            />
-          </button> */}
-          
 
           <button
             className="md:hidden text-white bg-[#0dcf6c] p-1 rounded-md focus:outline-none"
@@ -70,7 +70,7 @@ export default function Header() {
         {/* لایه بلور اطراف منو */}
         {isMenuOpen && (
           <div
-            className="fixed inset-0 bg-[#00000063]  backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-[#00000063] backdrop-blur-sm z-40 md:hidden"
             onClick={() => setIsMenuOpen(false)}
           ></div>
         )}
@@ -84,8 +84,8 @@ export default function Header() {
           <ul className="flex flex-col my-3 md:my-0 md:mx-3 md:flex-row gap-6 p-4 md:p-0 h-full md:h-auto">
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
-                className="flex items-center justify-start gap-1 "
-                href={"../"}
+                className="flex items-center justify-start gap-1"
+                href="../"
               >
                 <HomeOutlined className="text-[#0dcf6c]" />
                 خانه
@@ -93,8 +93,8 @@ export default function Header() {
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
-                className="flex items-center justify-start gap-1 "
-                href={"../courselist"}
+                className="flex items-center justify-start gap-1"
+                href="../courselist"
               >
                 <SchoolOutlined className="text-[#0dcf6c]" />
                 دوره‌های آموزشی
@@ -102,37 +102,30 @@ export default function Header() {
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
-                className="flex items-center justify-start gap-1 "
-                href={"../bloglist"}
+                className="flex items-center justify-start gap-1"
+                href="../bloglist"
               >
-              <ArticleOutlined className="text-[#0dcf6c]" />
-              مقالات
+                <ArticleOutlined className="text-[#0dcf6c]" />
+                مقالات
               </Link>
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
-                className="flex items-center justify-start gap-1 "
-                href={"../aboutus"}
+                className="flex items-center justify-start gap-1"
+                href="../aboutus"
               >
-                   <InfoOutlined className="text-[#0dcf6c]" />
-              درباره ما
+                <InfoOutlined className="text-[#0dcf6c]" />
+                درباره ما
               </Link>
             </li>
           </ul>
         </div>
 
         {/* دکمه ورود/ثبت‌نام (فقط در دسکتاپ) */}
-        {/* <Link href={'../useraccount'} className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
-          <AccountCircleOutlinedIcon
-            fontSize="large"
-            className="text-[#0dcf6c]"
-          />
-          <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
-        </Link> */}
-
-
-
-        <button onClick={() => setIsModalOpen(true)} className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200"
+        >
           <AccountCircleOutlinedIcon
             fontSize="large"
             className="text-[#0dcf6c]"

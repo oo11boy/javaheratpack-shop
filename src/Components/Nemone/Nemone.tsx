@@ -1,9 +1,9 @@
 "use client";
 import { DiamondOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image"; // اضافه کردن next/image
 import "./Nemone.css";
 
-// تعریف رابط برای دیتای نمونه‌ها
 interface NemoneItem {
   id: number;
   src: string;
@@ -11,15 +11,15 @@ interface NemoneItem {
 
 export default function Nemone() {
   const nemoneha: NemoneItem[] = [
-    { id: 1, src: "./Images/nemone/1.jpg" },
-    { id: 2, src: "./Images/nemone/2.jpg" },
-    { id: 3, src: "./Images/nemone/3.jpg" },
-    { id: 4, src: "./Images/nemone/4.jpg" },
-    { id: 5, src: "./Images/nemone/5.jpg" },
-    { id: 6, src: "./Images/nemone/6.jpg" },
-    { id: 7, src: "./Images/nemone/7.jpg" },
-    { id: 8, src: "./Images/nemone/8.jpg" },
-    { id: 9, src: "./Images/nemone/9.jpg" },
+    { id: 1, src: "/Images/nemone/1.jpg" },
+    { id: 2, src: "/Images/nemone/2.jpg" },
+    { id: 3, src: "/Images/nemone/3.jpg" },
+    { id: 4, src: "/Images/nemone/4.jpg" },
+    { id: 5, src: "/Images/nemone/5.jpg" },
+    { id: 6, src: "/Images/nemone/6.jpg" },
+    { id: 7, src: "/Images/nemone/7.jpg" },
+    { id: 8, src: "/Images/nemone/8.jpg" },
+    { id: 9, src: "/Images/nemone/9.jpg" },
   ];
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -27,7 +27,6 @@ export default function Nemone() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // استفاده از Intersection Observer برای تشخیص ورود به دید
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries: IntersectionObserverEntry[]) => {
@@ -35,12 +34,12 @@ export default function Nemone() {
         if (entry.isIntersecting) {
           setIsVisible(true);
           if (sectionRef.current) {
-            observer.unobserve(sectionRef.current); // فقط یک بار اجرا شود
+            observer.unobserve(sectionRef.current);
           }
         }
       },
       {
-        threshold: 0.2, // وقتی 20٪ از کامپوننت قابل مشاهده شد
+        threshold: 0.2,
       }
     );
 
@@ -68,7 +67,7 @@ export default function Nemone() {
   return (
     <div
       ref={sectionRef}
-      className="mt-6 py-16 text-white bg-gradient-to-b to-gray-900 from-[gray-800]"
+      className="mt-6 py-16 text-white bg-gradient-to-b to-gray-900 from-gray-800"
     >
       <div className="ccontainer mx-auto mt-6 px-4">
         <h2 className="!text-xl border inline-block p-2 border-[#0dcf6c] yekanh rounded-xl items-center gap-3 mb-12">
@@ -82,13 +81,16 @@ export default function Nemone() {
               className={`group relative overflow-hidden rounded-2xl aspect-square transform transition-all duration-700 hover:scale-105 cursor-pointer ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
-              style={{ transitionDelay: `${index * 100}ms` }} // تاخیر تدریجی برای هر تصویر
+              style={{ transitionDelay: `${index * 100}ms` }}
               onClick={() => openModal(item.src)}
             >
-              <img
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
+              <Image
                 src={item.src}
                 alt={`نمونه کار ${item.id}`}
+                width={300} // اندازه حداقلی
+                height={300} // اندازه حداقلی برای aspect-square
+                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
@@ -111,10 +113,13 @@ export default function Nemone() {
             className="relative max-w-4xl w-full h-[80vh] animate-fadeIn"
             onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
           >
-            <img
+            <Image
               src={selectedImage ?? ""}
               alt="تصویر بزرگ"
+              width={1200} // اندازه حداقلی برای مودال
+              height={800} // اندازه حداقلی برای مودال
               className="w-full h-full object-contain rounded-lg"
+              sizes="100vw"
             />
             <button
               className="absolute top-4 right-4 text-white bg-[#0dcf6c] hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center transition-colors duration-200"

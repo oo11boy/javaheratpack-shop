@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { CheckCircle, ChevronRight, BookOpen, User } from 'lucide-react';
+import React from "react";
+import { CheckCircle, ChevronRight, BookOpen, User } from "lucide-react";
+import Image from "next/image"; // اضافه کردن next/image
 
 interface PurchasedCourse {
   id: string;
@@ -65,10 +66,13 @@ const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
                 key={course.id}
                 className="bg-[#2a3347]/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 border border-[#0dcf6c]/20 hover:bg-[#2a3347] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
-                <img
+                <Image
                   src={course.thumbnail}
                   alt={course.name}
+                  width={80} // بر اساس sm:w-20 (20 * 4 = 80px)
+                  height={80} // بر اساس sm:h-20
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shadow-md border border-[#0dcf6c]/30"
+                  sizes="(max-width: 640px) 64px, 80px" // 64px در موبایل، 80px در دسکتاپ
                 />
                 <div className="flex-1 text-center sm:text-right">
                   <h4 className="text-sm sm:text-base md:text-lg font-semibold text-gray-100 line-clamp-1">
@@ -95,14 +99,14 @@ const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
         {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <button
-            onClick={() => window.location.href = '/account'}
+            onClick={() => (window.location.href = "/account")}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
           >
             <User className="w-5 h-5 sm:w-6 sm:h-6" />
             رفتن به حساب کاربری
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = "/")}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-[#2a3347] text-[#0dcf6c] rounded-full border border-[#0dcf6c]/40 hover:bg-[#2a3347]/70 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-semibold"
           >
             بازگشت به صفحه اصلی
@@ -114,8 +118,13 @@ const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
       {/* Custom CSS */}
       <style jsx>{`
         @keyframes bounceSlow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
         }
         .animate-bounce-slow {
           animation: bounceSlow 3s infinite ease-in-out;

@@ -4,7 +4,8 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { ArticleOutlined } from '@mui/icons-material';
-import Link from 'next/link'; // اضافه کردن Link از Next.js
+import Link from 'next/link';
+import Image from 'next/image'; // اضافه کردن next/image
 import "./Articles.css";
 
 const articles = [
@@ -67,7 +68,7 @@ export default function ArticleSlider() {
           slidesPerView={1}
           pagination={{ 
             clickable: true,
-            el: '.custom-pagination' // Custom pagination container
+            el: '.custom-pagination'
           }}
           autoplay={{ delay: 3000 }}
           breakpoints={{
@@ -83,9 +84,11 @@ export default function ArticleSlider() {
             <SwiperSlide key={article.id}>
               <div className="group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden h-[400px] flex flex-col transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700">
                 <div className="relative overflow-hidden">
-                  <img
+                  <Image
                     src={article.image}
                     alt={article.title}
+                    width={500}
+                    height={600}
                     className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <span className="absolute top-4 right-4 bg-gray-900/80 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
@@ -100,7 +103,7 @@ export default function ArticleSlider() {
                     {article.excerpt}
                   </p>
                   <Link
-                    href={`/bloglist/${article.id}`} // مسیر دلخواه برای هر مقاله
+                    href={`/bloglist/${article.id}`}
                     className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto"
                   >
                     مطالعه بیشتر
@@ -111,7 +114,6 @@ export default function ArticleSlider() {
             </SwiperSlide>
           ))}
         </Swiper>
-        {/* Custom pagination container */}
         <div className="custom-pagination mt-8 flex justify-center"></div>
       </div>
     </div>

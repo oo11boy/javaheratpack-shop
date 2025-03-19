@@ -13,6 +13,7 @@ import {
   PlayCircle,
   Check,
 } from "lucide-react";
+import Image from "next/image"; // اضافه کردن next/image
 
 interface Course {
   title: string;
@@ -49,7 +50,7 @@ const courseData: Course = {
   discountPrice: 2000000,
   introVideo:
     "https://caspian2.cdn.asset.aparat.com/aparat-video/f19e4e02d9ec2a53d3c84de1fc32c3bf45842597-480p.mp4?wmsAuthSign=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjIyMDQ2YTEzNDIwNDBlYjhhNzcwZGU3MWFlYmQyMGMyIiwiZXhwIjoxNzQyMzk5NzA0LCJpc3MiOiJTYWJhIElkZWEgR1NJRyJ9.UQFAOtfJpHIYZfR9tUl73ES4ZP-u1bNdQq3zAUIbqrY",
-  bannerImage: "",
+  bannerImage: "", // اگر تصویر بنر دارید، اینجا وارد کنید
   syllabus: [
     { title: "مقدمه‌ای بر طراحی جواهرات", description: "آشنایی با مفاهیم پایه و ابزارها." },
     { title: "طراحی با نرم‌افزار", description: "آموزش رندرینگ و مدل‌سازی سه‌بعدی." },
@@ -88,7 +89,6 @@ const CourseDetails: React.FC = () => {
     }
 
     if (purchaseBoxRef.current) {
-      // ذخیره موقعیت اولیه المان نسبت به بالای صفحه
       initialTopRef.current = purchaseBoxRef.current.getBoundingClientRect().top + window.scrollY;
     }
 
@@ -97,12 +97,9 @@ const CourseDetails: React.FC = () => {
         const scrollPosition = window.scrollY;
         const elementTop = initialTopRef.current;
 
-        // وقتی اسکرول از موقعیت اولیه المان عبور کنه، استیکی می‌شه
         if (scrollPosition > elementTop) {
           setIsSticky(true);
-        }
-        // وقتی به موقعیت اولیه یا بالاتر برمی‌گرده، از استیکی خارج می‌شه
-        else {
+        } else {
           setIsSticky(false);
         }
       }
@@ -140,7 +137,6 @@ const CourseDetails: React.FC = () => {
     { icon: <Check className="w-6 h-6 text-green-400" />, text: "بازاریابی و فروش آثار" },
   ];
 
-  // کامپوننت جزئیات دوره
   const CourseDetailsSection = () => (
     <div className="space-y-4">
       <p className="flex items-center gap-2 text-gray-300">
@@ -170,7 +166,7 @@ const CourseDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4 md:p-8">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="ccontainer mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Hero Section with Video */}
@@ -178,7 +174,7 @@ const CourseDetails: React.FC = () => {
             <video
               ref={videoRef}
               className="w-full h-64 md:h-96 object-cover rounded-2xl transition-transform duration-500 hover:scale-[1.02]"
-              poster={course.bannerImage}
+              poster={course.bannerImage || "https://picsum.photos/1200/600?random=2"} // تصویر پیش‌فرض در صورت خالی بودن
               controls
               onPause={handlePause}
               onPlay={() => setIsPlaying(true)}
@@ -233,7 +229,6 @@ const CourseDetails: React.FC = () => {
                 <ShoppingCart className="w-5 h-5" /> ثبت‌نام در دوره
               </button>
             </div>
-            {/* نمایش جزئیات دوره در موبایل و تبلت */}
             <div className="bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-700">
               <h2 className="text-xl font-semibold text-green-400 mb-4">جزئیات دوره</h2>
               <CourseDetailsSection />
@@ -327,10 +322,13 @@ const CourseDetails: React.FC = () => {
 
           {/* Instructor */}
           <section className="bg-gray-800 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row gap-6 items-center hover:shadow-xl transition-shadow">
-            <img
+            <Image
               src={course.instructor.avatar}
               alt={course.instructor.name}
+              width={192} // بر اساس md:w-48 (48 * 4 = 192px)
+              height={192} // فرض بر مربعی بودن
               className="w-32 h-32 md:w-48 md:h-48 rounded-full object-cover shadow-md transform hover:scale-105 transition-transform"
+              sizes="(max-width: 768px) 128px, 192px" // 128px در موبایل، 192px در دسکتاپ
             />
             <div>
               <h2 className="text-2xl font-semibold text-green-400 flex items-center gap-2">

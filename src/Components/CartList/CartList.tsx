@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2, ChevronRight, Info, Tag } from 'lucide-react';
+import Image from 'next/image'; // اضافه کردن next/image
 
 interface CartItem {
   id: string;
@@ -153,7 +154,7 @@ const CartList: React.FC = () => {
             )}
           </div>
 
-          {/* Cart Items - Expanded Space */}
+          {/* Cart Items */}
           {activeItems.length === 0 ? (
             <p className="text-gray-400 text-center py-8 animate-fade-in flex-1 flex items-center justify-center">
               سبد خرید شما خالی است!
@@ -165,13 +166,16 @@ const CartList: React.FC = () => {
                   key={item.id}
                   className="bg-[#2a3347]/80 rounded-xl p-4 flex items-center gap-4 hover:bg-[#2a3347] transition-all duration-300 border border-[#0dcf6c]/30 shadow-md hover:shadow-lg"
                 >
-                  <img
+                  <Image
                     src={item.thumbnail}
                     alt={item.name}
+                    width={64} // بر اساس w-16 (16 * 4 = 64px)
+                    height={64} // بر اساس h-16
                     className="w-16 h-16 rounded-md object-cover shadow-sm"
+                    sizes="64px" // اندازه ثابت برای تامبنیل
                   />
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-white line-clamp-1">{item.name}</h3>
+                    <h3 className="text-sm fontsninger text-white line-clamp-1">{item.name}</h3>
                     <p className="text-xs text-gray-300">
                       {item.price.toLocaleString()} تومان
                     </p>

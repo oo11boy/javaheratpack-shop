@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { BookOpen, Search, Filter, PlayCircle, ChevronDown, Clock } from 'lucide-react';
 import { ChevronLeft } from '@mui/icons-material';
 import Link from 'next/link';
+import Image from 'next/image'; // اضافه کردن next/image
 
 interface Course {
   id: string;
@@ -79,7 +80,7 @@ const CourseList: React.FC = () => {
 
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
-      <div className=" w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8 animate-fade-in">
+      <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8 animate-fade-in">
         {/* Header */}
         <div className="flex flex-col items-center gap-4">
           <h1 className="text-3xl md:text-4xl font-extrabold text-[#0dcf6c] flex items-center gap-3 animate-pulse-once">
@@ -160,9 +161,11 @@ const CourseList: React.FC = () => {
                 className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[#0dcf6c]/20"
               >
                 <div className="relative">
-                  <img
+                  <Image
                     src={course.thumbnail}
                     alt={course.title}
+                    width={300}
+                    height={200}
                     className="w-full h-52 object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -184,7 +187,7 @@ const CourseList: React.FC = () => {
                     <span>{course.category}</span>
                   </div>
                   <Link
-                    href={`/courselist/${course.id}`} // مسیر دلخواه برای هر دوره
+                    href={`/courselist/${course.id}`}
                     className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                   >
                     مشاهده دوره

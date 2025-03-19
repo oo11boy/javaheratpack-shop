@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { BookOpen, Calendar, User, MessageCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { BookOpen, Calendar, User, MessageCircle } from "lucide-react";
+import Image from "next/image"; // اضافه کردن next/image
 
 interface Article {
   title: string;
@@ -20,31 +21,31 @@ interface Comment {
 }
 
 const articleData: Article = {
-  title: 'راهنمای جامع طراحی جواهرات مدرن',
-  author: 'نازنین مقدم',
-  date: '1403/12/28',
+  title: "راهنمای جامع طراحی جواهرات مدرن",
+  author: "نازنین مقدم",
+  date: "1403/12/28",
   summary:
-    'در این مقاله به بررسی تکنیک‌های مدرن طراحی جواهرات و ابزارهای مورد نیاز برای خلق آثار هنری پرداخته‌ایم.',
+    "در این مقاله به بررسی تکنیک‌های مدرن طراحی جواهرات و ابزارهای مورد نیاز برای خلق آثار هنری پرداخته‌ایم.",
   content:
-    'طراحی جواهرات مدرن ترکیبی از خلاقیت و فناوری است. در این مقاله، نازنین مقدم، مدرس برجسته این حوزه، شما را با مراحل طراحی، انتخاب مواد اولیه و استفاده از نرم‌افزارهای پیشرفته آشنا می‌کند. این مقاله برای هنرجویان مبتدی و حرفه‌ای مناسب است و نکات کلیدی برای شروع یک پروژه موفق را ارائه می‌دهد.',
-  heroImage: 'https://picsum.photos/1200/600?random=3',
+    "طراحی جواهرات مدرن ترکیبی از خلاقیت و فناوری است. در این مقاله، نازنین مقدم، مدرس برجسته این حوزه، شما را با مراحل طراحی، انتخاب مواد اولیه و استفاده از نرم‌افزارهای پیشرفته آشنا می‌کند. این مقاله برای هنرجویان مبتدی و حرفه‌ای مناسب است و نکات کلیدی برای شروع یک پروژه موفق را ارائه می‌دهد.",
+  heroImage: "https://picsum.photos/1200/600?random=3",
 };
 
 // نمونه نظرات اولیه
 const initialComments: Comment[] = [
-  { id: 1, author: 'سارا حسینی', text: 'مقاله بسیار کاربردی بود، ممنون!', date: '1403/12/29' },
-  { id: 2, author: 'علی رضایی', text: 'لطفاً درباره نرم‌افزارها بیشتر توضیح دهید.', date: '1403/12/30' },
+  { id: 1, author: "سارا حسینی", text: "مقاله بسیار کاربردی بود، ممنون!", date: "1403/12/29" },
+  { id: 2, author: "علی رضایی", text: "لطفاً درباره نرم‌افزارها بیشتر توضیح دهید.", date: "1403/12/30" },
 ];
 
 const SingleArticle: React.FC = () => {
   const article = articleData;
   const [comments, setComments] = useState<Comment[]>(initialComments);
-  const [newComment, setNewComment] = useState({ author: '', text: '' });
+  const [newComment, setNewComment] = useState({ author: "", text: "" });
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.author && newComment.text) {
-      const today = new Date().toLocaleDateString('fa-IR').replace(/\/\d{2}$/, ''); // تاریخ به فرمت شمسی
+      const today = new Date().toLocaleDateString("fa-IR").replace(/\/\d{2}$/, ""); // تاریخ به فرمت شمسی
       const comment: Comment = {
         id: comments.length + 1,
         author: newComment.author,
@@ -52,7 +53,7 @@ const SingleArticle: React.FC = () => {
         date: today,
       };
       setComments([...comments, comment]);
-      setNewComment({ author: '', text: '' }); // ریست کردن فرم
+      setNewComment({ author: "", text: "" }); // ریست کردن فرم
     }
   };
 
@@ -61,10 +62,14 @@ const SingleArticle: React.FC = () => {
       <div className="w-full ccontainer flex flex-col gap-10 animate-fade-in">
         {/* Hero Section */}
         <div className="relative bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
-          <img
+          <Image
             src={article.heroImage}
             alt={article.title}
+            width={1200} // بر اساس منبع (1200px)
+            height={600} // بر اساس منبع (600px)
             className="w-full h-[300px] md:h-[400px] object-cover opacity-80"
+            sizes="(max-width: 768px) 100vw, 1200px" // 100vw در موبایل، 1200px در دسکتاپ
+            priority // چون تصویر بالای صفحه است
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#0dcf6c]/10 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 md:p-10 text-center w-full">

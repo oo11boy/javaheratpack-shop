@@ -3,7 +3,7 @@
     padding-top: 80px !important;
     padding-bottom: 180px !important;
     background: linear-gradient(to top, #191919 7%, rgba(0, 0, 0, 0) 50%), 
-                url("/Images/bg.png") no-repeat top center / 1580px !important;
+                url("/Images/bg.webp") no-repeat top center / 1580px !important;
 }
 
 .boxhero {
@@ -17,7 +17,7 @@
         padding-top: 95% !important;
         padding-bottom: 20px !important;
         background: linear-gradient(to top, #191919 8%, rgba(0, 0, 0, 0) 50%), 
-                    url("/Images/bgmini2.png") no-repeat top center / 100% !important;
+                    url("/Images/bgmini2.webp") no-repeat top center / 100% !important;
     }
     .heroboxbtn {
         border-radius: 5px;
@@ -41,7 +41,7 @@
         padding-top: 53% !important;
         padding-bottom: 20px !important;
         background: linear-gradient(to top, #191919 8%, rgba(0, 0, 0, 0) 50%), 
-                    url("/Images/bgmini.png") no-repeat top center / 100% !important;
+                    url("/Images/bgmini2.webp") no-repeat top center / 100% !important;
     }
     .boxhero {
         border-radius: 15px !important;
@@ -54,7 +54,7 @@
         padding-top: 80px !important;
         padding-bottom: 180px !important;
         background: linear-gradient(to top, #191919 20%, rgba(0, 0, 0, 0) 50%), 
-                    url("/Images/bg.png") no-repeat top center / 991px !important;
+                    url("/Images/bg.webp") no-repeat top center / 991px !important;
     }
     .boxhero {
         width: 420px !important;
@@ -76,7 +76,7 @@
         padding-top: 80px !important;
         padding-bottom: 180px !important;
         background: linear-gradient(to top, #191919 20%, rgba(0, 0, 0, 0) 50%), 
-                    url("/Images/bg.png") no-repeat top center / 1280px !important;
+                    url("/Images/bg.webp") no-repeat top center / 1280px !important;
     }
 }
 

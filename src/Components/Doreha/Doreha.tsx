@@ -1,10 +1,10 @@
 "use client";
 import { SchoolOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
-import Link from 'next/link'; // اضافه کردن Link از Next.js
+import Link from 'next/link';
+import Image from 'next/image'; // اضافه کردن next/image
 import './Doreha.css';
 
-// تعریف رابط برای دیتای دوره‌ها
 interface JewelryCourse {
   id: number;
   title: string;
@@ -15,13 +15,12 @@ interface JewelryCourse {
   level: string;
 }
 
-// دیتای دوره‌ها با تصاویر واقعی
 const jewelryCourses: JewelryCourse[] = [
   {
     id: 1,
     title: "دوره مقدماتی طراحی جواهرات با Matrix",
     description: "یادگیری اصول اولیه طراحی جواهرات با استفاده از نرم‌افزار Matrix",
-    image: "https://mda.ac/wp-content/uploads/2023/01/Matrix-Software-Tutorial.jpg",
+    image: "https://picsum.photos/300/200?random=1",
     price: "۱,۵۰۰,۰۰۰ تومان",
     duration: "۱ ماه",
     level: "مبتدی",
@@ -30,7 +29,7 @@ const jewelryCourses: JewelryCourse[] = [
     id: 2,
     title: "دوره پیشرفته Matrix برای جواهرات",
     description: "طراحی پیچیده جواهرات با ابزارهای پیشرفته Matrix",
-    image: "https://talafonoun.com//panel/FileUpload/06l46o00xgl0.jpg",
+    image: "https://picsum.photos/300/200?random=2",
     price: "۲,۸۰۰,۰۰۰ تومان",
     duration: "۲ ماه",
     level: "پیشرفته",
@@ -39,7 +38,7 @@ const jewelryCourses: JewelryCourse[] = [
     id: 3,
     title: "دوره رندرینگ جواهرات در Matrix",
     description: "ایجاد رندرهای واقع‌گرایانه از طرح‌های جواهرات",
-    image: "https://www.multistation.com/voy_content/uploads/sites/4/2017/09/matrix-gold-1.jpg",
+    image: "https://picsum.photos/300/200?random=3",
     price: "۲,۲۰۰,۰۰۰ تومان",
     duration: "۶ هفته",
     level: "متوسط",
@@ -50,7 +49,6 @@ export default function Doreha() {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  // استفاده از Intersection Observer برای تشخیص ورود به دید
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries: IntersectionObserverEntry[]) => {
@@ -58,12 +56,12 @@ export default function Doreha() {
         if (entry.isIntersecting) {
           setIsVisible(true);
           if (sectionRef.current) {
-            observer.unobserve(sectionRef.current); // فقط یک بار اجرا شود
+            observer.unobserve(sectionRef.current);
           }
         }
       },
       {
-        threshold: 0.2, // وقتی 20٪ از بخش قابل مشاهده شد
+        threshold: 0.2,
       }
     );
 
@@ -95,13 +93,17 @@ export default function Doreha() {
               className={`group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
-              style={{ transitionDelay: `${index * 100}ms` }} // تاخیر تدریجی برای هر کارت
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="relative overflow-hidden">
-                <img
+              <div className="relative overflow-hidden h-56">
+                <Image
                   src={course.image}
                   alt={course.title}
-                  className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                  width={500} // اندازه حداقلی
+                  height={300} // اندازه حداقلی
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading="lazy"
                 />
                 <span className="absolute top-4 left-4 bg-[#0dcf6c] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
                   {course.level}
@@ -122,7 +124,7 @@ export default function Doreha() {
                     {course.price}
                   </span>
                   <Link
-                    href={`/courselist/${course.id}`} // مسیر دلخواه برای هر دوره
+                    href={`/courselist/${course.id}`}
                     className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"
                   >
                     ثبت‌نام

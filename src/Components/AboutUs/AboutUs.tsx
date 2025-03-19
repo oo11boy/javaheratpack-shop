@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { User, Phone, Instagram, MessageCircle, Send } from 'lucide-react';
+import Image from 'next/image'; // اضافه کردن next/image
 
 interface Instructor {
   name: string;
   title: string;
   bio: string;
-  avatar: string; // URL for instructor avatar
-  heroImage: string; // URL for a larger hero image
+  avatar: string;
+  heroImage: string;
   phone: string;
   telegram: string;
   whatsapp: string;
@@ -20,7 +21,7 @@ const instructorData: Instructor = {
   title: 'مدرس طراحی جواهرات',
   bio: 'نازنین جواهری، هنرمند و مدرس برجسته طراحی جواهرات با بیش از 15 سال تجربه در خلق آثار بی‌نظیر و آموزش هنرجویان مشتاق. او با ترکیب خلاقیت و تکنیک‌های مدرن، شما را به دنیای شگفت‌انگیز طراحی جواهرات هدایت می‌کند.',
   avatar: 'https://picsum.photos/300?random=1',
-  heroImage: 'https://picsum.photos/1200/600?random=2', // Replace with a jewelry-related hero image
+  heroImage: 'https://picsum.photos/1200/600?random=2',
   phone: '0912-345-6789',
   telegram: '@NazaninJavahri',
   whatsapp: '+989123456789',
@@ -32,13 +33,15 @@ const AboutUs: React.FC = () => {
 
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
-      <div className="w-full  flex flex-col gap-10 animate-fade-in">
+      <div className="w-full flex flex-col gap-10 animate-fade-in">
         {/* Hero Section */}
         <div className="relative bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
-          <img
+          <Image
             src={instructor.heroImage}
             alt="Jewelry Design"
-            className="w-full h-[300px] md:h-[400px]  object-cover opacity-80"
+            width={1200}
+            height={600}
+            className="w-full h-[300px] md:h-[400px] object-cover opacity-80"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#0dcf6c]/10 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 md:p-10 text-center w-full">
@@ -53,9 +56,11 @@ const AboutUs: React.FC = () => {
         <div className="bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col md:flex-row gap-8">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <img
+            <Image
               src={instructor.avatar}
               alt={instructor.name}
+              width={300}
+              height={300}
               className="w-40 h-40 md:w-64 md:h-64 rounded-full object-cover ring-4 ring-[#0dcf6c]/50 shadow-lg transition-all duration-300 hover:ring-[#0dcf6c]/70"
             />
             <div className="absolute bottom-2 right-2 w-10 h-10 bg-[#0dcf6c] rounded-full flex items-center justify-center shadow-md">
