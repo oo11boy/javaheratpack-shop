@@ -1,28 +1,18 @@
 "use client";
+import React, { useState, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { Play, Pause, Clock, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CourseVideo } from '@/lib/Types/Types';
 
-import React, { useState, useRef } from "react";
-import dynamic from "next/dynamic";
-import {
-  Play,
-  Pause,
-  Clock,
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { CourseVideo } from "@/lib/Types/Types";
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
-// وارد کردن ReactPlayer به صورت پویا و غیرفعال کردن SSR
-const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
-
-const CourseVideoPlayer = ({ videos }: { videos: CourseVideo[] }) => {
+const CourseVideoPlayer: React.FC<{ videos: CourseVideo[] }> = ({ videos }) => {
   const [selectedVideo, setSelectedVideo] = useState<CourseVideo>(videos[0]);
   const [completedVideos, setCompletedVideos] = useState<Set<string>>(new Set());
   const [isVideoListOpen, setIsVideoListOpen] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const playerRef = useRef<typeof ReactPlayer>(null);
+  const playerRef = useRef<any>(null);
 
-  // اتمام ویدیو
   const handleVideoEnd = () => {
     setCompletedVideos((prev) => new Set(prev).add(selectedVideo.id));
     setIsPlaying(false);

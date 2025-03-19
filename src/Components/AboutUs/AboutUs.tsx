@@ -1,8 +1,8 @@
+// AboutUs Component (Client Component)
 "use client";
-
-import React, { useState, useEffect } from "react";
-import { User, Phone, Instagram, MessageCircle, Send } from "lucide-react";
-import Image from "next/image";
+import React from 'react';
+import { User, Phone, Instagram, MessageCircle, Send } from 'lucide-react';
+import Image from 'next/image';
 
 interface Instructor {
   id: number;
@@ -17,49 +17,9 @@ interface Instructor {
   instagram: string;
 }
 
-const AboutUs: React.FC = () => {
-  const [instructor, setInstructor] = useState<Instructor | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchInstructor = async () => {
-      try {
-        const response = await fetch("/api/instructors", {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error("خطا در دریافت اطلاعات مدرس");
-        }
-        const data: Instructor = await response.json();
-        setInstructor(data);
-      } catch (err) {
-        setError("خطا در بارگذاری اطلاعات. لطفاً بعداً تلاش کنید.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInstructor();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#121824] to-[#1e2636] text-white">
-        <div className="flex flex-col items-center gap-4">
-          {/* انیمیشن لودینگ */}
-          <div className="w-16 h-16 border-4 border-t-[#0dcf6c] border-r-[#0aaf5a] border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-          <p className="text-lg font-semibold text-gray-300 animate-pulse">
-            در حال بارگذاری...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !instructor) {
-    return <div className="text-white text-center">{error || "مدرس یافت نشد"}</div>;
+const AboutUs: React.FC<{ instructor: Instructor | null }> = ({ instructor }) => {
+  if (!instructor) {
+    return <div className="text-white text-center">مدرس یافت نشد</div>;
   }
 
   return (
