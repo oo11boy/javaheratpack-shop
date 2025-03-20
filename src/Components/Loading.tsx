@@ -1,11 +1,17 @@
 // components/Loading.tsx
-import React from 'react';
+import React from "react";
+import Header from "./Header/Header";
+import Footer from "./Footer/Footer";
 
 const Loading = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#121824] bg-opacity-80 z-50">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
-    </div>
+    <>
+      <Header />
+      <div className="h-[90vh] inset-0 flex items-center justify-center bg-[#121824] bg-opacity-80 z-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#0dcf6c] border-solid"></div>
+      </div>
+      <Footer />
+    </>
   );
 };
 
