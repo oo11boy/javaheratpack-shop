@@ -1,15 +1,15 @@
-// صفحه اصلی (Server Component): pages/index.tsx
 import Footer from '@/Components/Footer/Footer';
 import Header from '@/Components/Header/Header';
 import HeroSection from '@/Components/HeroSection/HeroSection';
 import Nemone from '@/Components/Nemone/Nemone';
 import { SimpleCourse } from '@/lib/Types/Types';
-import Doreha from '@/Components/Doreha/Doreha';
+import HomeCourseList from '@/Components/HomeCourseList/HomeCourseList';
 import ArticleSlider from '@/Components/ArticlesSlider/ArticlesSlider';
 
 async function fetchCourseData(): Promise<SimpleCourse[]> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, {
-    next: { revalidate: 3600 },
+    cache: 'default', // رفتار پیش‌فرض مرورگر برای کش
+    next: { revalidate: 3600 }, // اختیاری: کش Next.js برای 1 ساعت
   });
   if (!response.ok) throw new Error('دوره یافت نشد');
   return response.json();
@@ -27,7 +27,7 @@ export default async function Page() {
       <Header />
       <HeroSection />
       <Nemone />
-      <Doreha jewelryCourses={jewelryCourses} />
+      <HomeCourseList jewelryCourses={jewelryCourses} />
       <ArticleSlider />
       <Footer />
     </>
