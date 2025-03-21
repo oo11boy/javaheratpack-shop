@@ -9,8 +9,14 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { getCourseVideos } from '@/lib/api';
+import { RowDataPacket } from 'mysql2/promise';
 
 const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
+
+// تعریف تایپ برای کاربر
+interface User extends RowDataPacket {
+  courseid: string | null;
+}
 
 async function fetchCourseData(id: number): Promise<CourseVideo[]> {
   return getCourseVideos(id);
@@ -25,23 +31,24 @@ async function checkUserAccess(courseId: number) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
     const connection = await getConnection();
-    const [users] = await connection.execute('SELECT courseid FROM accounts WHERE id = ?', [decoded.id]);
+    const [users] = await connection.execute<User[]>(
+      'SELECT courseid FROM accounts WHERE id = ?',
+      [decoded.id]
+    );
     await connection.end();
 
-    const user = (users as any[])[0];
+    const user = users[0];
     if (!user || !user.courseid) return { isAuthenticated: true, hasAccess: false };
 
     let courseIds: string[];
-   
     try {
       courseIds = JSON.parse(user.courseid);
-    } catch (e) {
+    } catch (error) {
       courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
+      console.log(error)
     }
-  
 
     const hasAccess = courseIds.includes(courseId.toString());
-  
     return { isAuthenticated: true, hasAccess };
   } catch (error) {
     console.error('Error verifying user access:', error);
@@ -79,7 +86,7 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
             </p>
             <div className="mt-6">
               <Link href={'../useraccount'} className="inline-block bg-[#0dcf6c] text-white py-2 px-4 rounded-full text-sm font-semibold">
-               بازگشت به حساب کاربری
+                بازگشت به حساب کاربری
               </Link>
             </div>
           </div>

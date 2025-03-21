@@ -1,7 +1,7 @@
+// lib/api.ts
 import { Course, CourseVideo, Instructor, SimpleCourse } from "./Types/Types";
 
-// lib/api.ts
-const cache = new Map<string, { data: any; timestamp: number }>();
+const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 3600 * 1000; // 1 ساعت به میلی‌ثانیه
 
 async function fetchWithCache<T>(

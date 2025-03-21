@@ -2,18 +2,45 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 
 const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
 
-// تنظیمات کوکی
 const COOKIE_NAME = 'auth_token';
 const COOKIE_OPTIONS = {
-  httpOnly: true, // جلوگیری از دسترسی جاوااسکریپت به کوکی
-  secure: process.env.NODE_ENV === 'production', // فقط در HTTPS (در تولید)
-  sameSite: 'strict' as const, // جلوگیری از CSRF
-  maxAge: 24 * 60 * 60, // 24 ساعت (هماهنگ با زمان انقضای توکن)
-  path: '/', // در دسترس کل برنامه
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  maxAge: 24 * 60 * 60,
+  path: '/',
 };
+
+// تعریف تایپ‌ها
+interface User extends RowDataPacket {
+  id: number;
+  email: string;
+  name: string;
+  lastname: string;
+  password: string;
+  phonenumber: string | null;
+  vip: number;
+  courseid: string | null;
+}
+
+interface Course extends RowDataPacket {
+  id: number;
+  title: string;
+  duration: string;
+  thumbnail: string | null;
+}
+
+interface PurchasedCourse {
+  id: number;
+  title: string;
+  duration: string;
+  thumbnail: string | null;
+  progress: number;
+}
 
 // GET: بررسی ایمیل یا گرفتن اطلاعات کاربر
 export async function GET(req: NextRequest) {
@@ -21,54 +48,47 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
     const token = req.cookies.get(COOKIE_NAME)?.value;
-
     const connection = await getConnection();
 
     if (email) {
-      const [rows] = await connection.execute(
+      const [rows] = await connection.execute<RowDataPacket[]>(
         'SELECT COUNT(*) as count FROM accounts WHERE email = ?',
         [email]
       );
       await connection.end();
-      const exists = (rows as any[])[0].count > 0;
+      const exists = rows[0].count > 0;
       return NextResponse.json({ exists }, { headers: { 'Cache-Control': 'no-store' } });
     } else if (token) {
       const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
-      const [userRows] = await connection.execute(
+      const [userRows] = await connection.execute<User[]>(
         'SELECT name, email, phonenumber, courseid FROM accounts WHERE id = ?',
         [decoded.id]
       );
-      const user = (userRows as any[])[0];
+      const user = userRows[0];
 
       if (!user) {
         await connection.end();
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
-      interface PurchasedCourse {
-        id: number;
-        title: string;
-        duration: string;
-        thumbnail: string | null;
-        progress: number;
-      }
       let purchasedCourses: PurchasedCourse[] = [];
       if (user.courseid) {
         let courseIds: string[];
         try {
           courseIds = JSON.parse(user.courseid);
-        } catch (e) {
-          courseIds = user.courseid.split(',').map((id: string) => id.trim());
+        } catch (error) {
+          courseIds = user.courseid.split(',').map(id => id.trim());
+          console.log(error)
         }
 
         if (courseIds.length > 0) {
-          const [courseRows] = await connection.execute(
+          const [courseRows] = await connection.execute<Course[]>(
             `SELECT id, title, duration, thumbnail
              FROM courses
              WHERE id IN (${courseIds.map(() => '?').join(',')})`,
             courseIds
           );
-          purchasedCourses = (courseRows as any[]).map(course => ({
+          purchasedCourses = courseRows.map(course => ({
             id: course.id,
             title: course.title,
             duration: course.duration || '0:00',
@@ -108,16 +128,15 @@ export async function POST(req: NextRequest) {
     }
 
     const connection = await getConnection();
-    const [users] = await connection.execute(
+    const [users] = await connection.execute<User[]>(
       'SELECT * FROM accounts WHERE email = ?',
       [email]
     );
-    const userArray = users as any[];
 
     const response = NextResponse.json({ redirect: '/useraccount' });
 
-    if (userArray.length > 0) {
-      const user = userArray[0];
+    if (users.length > 0) {
+      const user = users[0];
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
@@ -134,12 +153,12 @@ export async function POST(req: NextRequest) {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const [result] = await connection.execute(
+      const [result] = await connection.execute<ResultSetHeader>(
         'INSERT INTO accounts (email, name, lastname, password, phonenumber, vip, courseid) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [email, name, lastname, hashedPassword, phonenumber || null, 0, null]
       );
 
-      const newUserId = (result as any).insertId;
+      const newUserId = result.insertId;
       const token = jwt.sign({ id: newUserId, email }, JWT_SECRET, { expiresIn: '24h' });
       response.cookies.set(COOKIE_NAME, token, COOKIE_OPTIONS);
     }
@@ -164,11 +183,11 @@ export async function PUT(req: NextRequest) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
     const connection = await getConnection();
-    const [users] = await connection.execute(
+    const [users] = await connection.execute<User[]>(
       'SELECT password FROM accounts WHERE id = ?',
       [decoded.id]
     );
-    const user = (users as any[])[0];
+    const user = users[0];
 
     if (!user) {
       await connection.end();
@@ -182,7 +201,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await connection.execute(
+    await connection.execute<ResultSetHeader>(
       'UPDATE accounts SET password = ? WHERE id = ?',
       [hashedNewPassword, decoded.id]
     );

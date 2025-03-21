@@ -22,17 +22,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { setIsLoggedIn } = useAuth();
+
   const checkEmail = useCallback(async (email: string) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/auth?email=${encodeURIComponent(email)}`, {
         cache: 'no-store',
       });
-      const data = await response.json();
+      const data: { exists: boolean; error?: string } = await response.json();
       if (!response.ok) throw new Error(data.error || 'خطا در بررسی ایمیل');
       return data.exists;
-    } catch (error: any) {
-      setError(error.message === 'Email check failed' ? 'خطا در بررسی ایمیل' : error.message);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('خطای ناشناخته');
+      setError(err.message === 'Email check failed' ? 'خطا در بررسی ایمیل' : err.message);
       return false;
     } finally {
       setIsLoading(false);
@@ -47,44 +49,43 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setStep(2);
   };
 
-// داخل handleAuth
-const handleAuth = async (e: React.FormEvent, isLogin: boolean) => {
-  e.preventDefault();
-  setError(null);
-  setIsLoading(true);
+  const handleAuth = async (e: React.FormEvent, isLogin: boolean) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-  try {
-    const payload = isLogin
-      ? { email, password }
-      : { email, password, name: firstName, lastname: lastName, phonenumber: phoneNumber };
+    try {
+      const payload = isLogin
+        ? { email, password }
+        : { email, password, name: firstName, lastname: lastName, phonenumber: phoneNumber };
 
-    const response = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      credentials: 'include',
-    });
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(
-        data.error === 'Invalid credentials' ? 'ایمیل یا رمز عبور اشتباه است' :
-        data.error === 'Name and lastname required' ? 'نام و نام خانوادگی الزامی است' :
-        data.error === 'Email and password required' ? 'ایمیل و رمز عبور الزامی است' :
-        'خطا در عملیات'
-      );
+      const data: { redirect?: string; error?: string } = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          data.error === 'Invalid credentials' ? 'ایمیل یا رمز عبور اشتباه است' :
+          data.error === 'Name and lastname required' ? 'نام و نام خانوادگی الزامی است' :
+          data.error === 'Email and password required' ? 'ایمیل و رمز عبور الزامی است' :
+          'خطا در عملیات'
+        );
+      }
+
+      setIsLoggedIn(true);
+      router.push('/useraccount');
+      handleClose();
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error('خطای ناشناخته');
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoggedIn(true); // آپدیت وضعیت لاگین
-    router.push('/useraccount');
-    handleClose();
-  } catch (error: any) {
-    setError(error.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const resetForm = () => {
     setStep(1);
@@ -121,7 +122,6 @@ const handleAuth = async (e: React.FormEvent, isLogin: boolean) => {
             <div className="relative">
               <div className="w-12 h-12 border-4 border-[#0dcf6c] border-t-transparent rounded-full animate-spin"></div>
               <div className="absolute inset-0 w-12 h-12 border-4 border-[#0aaf5a] border-t-transparent rounded-full animate-spin-slow opacity-50"></div>
-            
             </div>
           </div>
         )}

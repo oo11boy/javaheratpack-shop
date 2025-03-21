@@ -4,7 +4,6 @@ import Header from '@/Components/Header/Header';
 import { getCourses } from '@/lib/api';
 import { SimpleCourse } from '@/lib/Types/Types';
 import { notFound } from 'next/navigation';
-// بقیه ایمپورت‌ها بدون تغییر
 
 export default async function CourseListPage() {
   let courseList: SimpleCourse[];

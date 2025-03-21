@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-
-
 const UserAccount: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -36,14 +34,15 @@ const UserAccount: React.FC = () => {
         credentials: "include",
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      const data: { error?: string } = await response.json();
+      if (!response.ok) throw new Error(data.error || "خطا در تغییر رمز عبور");
       alert("رمز عبور با موفقیت تغییر یافت!");
       setIsModalOpen(false);
       setCurrentPassword("");
       setNewPassword("");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error("خطای ناشناخته");
+      setError(error.message);
     }
   };
 
@@ -59,8 +58,8 @@ const UserAccount: React.FC = () => {
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#0dcf6c] border-solid"></div>
       </div>
     );
-  
   }
+
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
       <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-10 animate-fade-in">
@@ -111,14 +110,14 @@ const UserAccount: React.FC = () => {
             <Award className="w-8 h-8 text-[#0dcf6c]" />
             <div>
               <p className="text-sm text-gray-400">دوره‌های تکمیل‌شده</p>
-              <p className="text-xl font-bold text-white">{user.completedCourses}</p>
+              <p className="text-xl font-bold text-white">{user.completedCourses || 0}</p>
             </div>
           </div>
           <div className="bg-[#2a3347]/70 p-4 rounded-lg shadow-md flex items-center gap-3 hover:bg-[#2a3347] transition-colors">
             <Clock className="w-8 h-8 text-[#0dcf6c]" />
             <div>
               <p className="text-sm text-gray-400">مجموع ساعات یادگیری</p>
-              <p className="text-xl font-bold text-white">{user.totalHours}</p>
+              <p className="text-xl font-bold text-white">{user.totalHours || "0 ساعت"}</p>
             </div>
           </div>
           <div className="bg-[#2a3347]/70 p-4 rounded-lg shadow-md flex items-center gap-3 hover:bg-[#2a3347] transition-colors">
@@ -167,12 +166,11 @@ const UserAccount: React.FC = () => {
                       <Clock className="w-4 h-4" />
                       <span>{course.duration}</span>
                     </div>
-                    <div className="mt-4">
-                   
-                   
-                    </div>
-                    <Link href={`../StudyRoom/${course.id}`}  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                   مشاهده دوره
+                    <Link
+                      href={`../StudyRoom/${course.id}`}
+                      className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                    >
+                      مشاهده دوره
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>

@@ -1,7 +1,7 @@
 "use client";
 import { DiamondOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image"; // اضافه کردن next/image
+import Image from "next/image";
 import "./Nemone.css";
 
 interface NemoneItem {
@@ -28,13 +28,14 @@ export default function Nemone() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const currentSection = sectionRef.current; // کپی کردن مقدار ref به یک متغیر محلی
     const observer = new IntersectionObserver(
       (entries: IntersectionObserverEntry[]) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (sectionRef.current) {
-            observer.unobserve(sectionRef.current);
+          if (currentSection) {
+            observer.unobserve(currentSection);
           }
         }
       },
@@ -43,16 +44,16 @@ export default function Nemone() {
       }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (currentSection) {
+      observer.observe(currentSection);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (currentSection) {
+        observer.unobserve(currentSection);
       }
     };
-  }, []);
+  }, []); // آرایه وابستگی خالی است، زیرا فقط یک بار در زمان مونت اجرا می‌شود
 
   const openModal = (src: string): void => {
     setSelectedImage(src);
@@ -87,8 +88,8 @@ export default function Nemone() {
               <Image
                 src={item.src}
                 alt={`نمونه کار ${item.id}`}
-                width={300} // اندازه حداقلی
-                height={300} // اندازه حداقلی برای aspect-square
+                width={300}
+                height={300}
                 className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
                 sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 loading="lazy"
@@ -116,8 +117,8 @@ export default function Nemone() {
             <Image
               src={selectedImage ?? ""}
               alt="تصویر بزرگ"
-              width={1200} // اندازه حداقلی برای مودال
-              height={800} // اندازه حداقلی برای مودال
+              width={1200}
+              height={800}
               className="w-full h-full object-contain rounded-lg"
               sizes="100vw"
             />

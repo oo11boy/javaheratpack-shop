@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { FileText, Search, Filter, ChevronDown, Clock } from 'lucide-react';
-import Link from 'next/link'; // اضافه کردن Link از Next.js
+import Link from 'next/link';
+import Image from 'next/image'; // اضافه کردن Image از Next.js
 
 interface Article {
   id: string;
@@ -61,8 +62,9 @@ const BlogList: React.FC = () => {
   const categories = Array.from(new Set(mockArticles.map((article) => article.category)));
 
   const filteredArticles = mockArticles.filter((article) => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || article.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -150,10 +152,13 @@ const BlogList: React.FC = () => {
                 className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[#0dcf6c]/20"
               >
                 <div className="relative">
-                  <img
+                  <Image
                     src={article.thumbnail}
                     alt={article.title}
+                    width={300}
+                    height={200}
                     className="w-full h-52 object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <span className="absolute top-4 right-4 bg-[#0dcf6c]/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
@@ -173,7 +178,7 @@ const BlogList: React.FC = () => {
                     <span>{article.date}</span>
                   </div>
                   <Link
-                    href={`/bloglist/${article.id}`} // مسیر دلخواه برای هر مقاله
+                    href={`/bloglist/${article.id}`}
                     className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                   >
                     خواندن مقاله
