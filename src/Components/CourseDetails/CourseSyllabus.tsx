@@ -12,7 +12,7 @@ const CourseSyllabus: React.FC<{ syllabus: SyllabusItem[] }> = ({ syllabus }) =>
 
   return (
     <section className="bg-gray-800 rounded-2xl p-6 shadow-lg">
-      <h2 className="text-2xl font-semibold text-green-400 flex items-center gap-2 mb-4">
+      <h2 className="text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2 mb-4">
         <BookOpen className="w-6 h-6" /> سرفصل‌ها
       </h2>
       <div className="space-y-4">
@@ -23,11 +23,11 @@ const CourseSyllabus: React.FC<{ syllabus: SyllabusItem[] }> = ({ syllabus }) =>
             onClick={() => toggleSection(index)}
           >
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-green-400">{item.title}</h3>
+              <h3 className="text-lg font-medium text-[color:var(--primary-color)]">{item.title}</h3>
               {expandedSection === index ? (
-                <ChevronUp className="w-5 h-5 text-green-400 transition-transform duration-300" />
+                <ChevronUp className="w-5 h-5 text-[color:var(--primary-color)] transition-transform duration-300" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-green-400 transition-transform duration-300" />
+                <ChevronDown className="w-5 h-5 text-[color:var(--primary-color)] transition-transform duration-300" />
               )}
             </div>
             <div

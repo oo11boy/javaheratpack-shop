@@ -19,7 +19,7 @@ const CourseDescription: React.FC<{ description: string }> = ({ description }) =
 
   return (
     <section className="bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-700">
-      <h2 className="text-2xl font-semibold text-green-400 flex items-center gap-2 mb-4">
+      <h2 className="text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2 mb-4">
         <BookOpen className="w-6 h-6" /> درباره دوره
       </h2>
       <div className="relative">
@@ -37,12 +37,12 @@ const CourseDescription: React.FC<{ description: string }> = ({ description }) =
         )}
         <button
           onClick={toggleDescription}
-          className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 -translate-y-2 flex items-center justify-center w-12 h-12 bg-green-500 rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 group"
+          className="absolute bottom-[-50px] left-1/2 transform -translate-x-1/2 -translate-y-2 flex items-center justify-center w-12 h-12 bg-[color:var(--primary-color)] rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 group"
         >
           {isDescriptionExpanded ? (
-            <ChevronUp className="w-6 h-6 text-white group-hover:text-gray-100 transition-colors duration-300" />
+            <ChevronUp className="w-6 h-6 text-black group-hover:text-gray-100 transition-colors duration-300" />
           ) : (
-            <ChevronDown className="w-6 h-6 text-white group-hover:text-gray-100 transition-colors duration-300" />
+            <ChevronDown className="w-6 h-6 text-black group-hover:text-gray-100 transition-colors duration-300" />
           )}
         </button>
       </div>

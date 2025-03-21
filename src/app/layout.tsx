@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-
 import "./globals.css";
 import CartList from "@/Components/CartList/CartList";
 import { AuthProvider } from "@/context/AuthContext";

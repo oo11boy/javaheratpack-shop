@@ -15,7 +15,7 @@ const CourseInstructor: React.FC<{ instructor: Instructor }> = ({ instructor }) 
         sizes="(max-width: 768px) 128px, 192px"
       />
       <div>
-        <h2 className="text-2xl font-semibold text-green-400 flex items-center gap-2">
+        <h2 className="text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2">
           <User className="w-6 h-6" /> درباره {instructor.name}
         </h2>
           <p className="text-gray-300 mt-2">{instructor.bio}</p>

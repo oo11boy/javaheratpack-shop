@@ -74,7 +74,7 @@ const BlogList: React.FC = () => {
       <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8 animate-fade-in">
         {/* Header */}
         <div className="flex flex-col items-center gap-4">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-[#0dcf6c] flex items-center gap-3 animate-pulse-once">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-[color:var(--primary-color)] flex items-center gap-3 animate-pulse-once">
             <FileText className="w-10 h-10" />
             لیست مقالات
           </h1>
@@ -92,7 +92,7 @@ const BlogList: React.FC = () => {
               placeholder="جستجوی مقاله..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-4 pl-12 bg-[#2a3347] text-white rounded-full border border-[#0dcf6c]/20 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all shadow-md"
+              className="w-full p-4 pl-12 bg-[#2a3347] text-white rounded-full border border-[color:var(--primary-color)]/20 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all shadow-md"
             />
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           </div>
@@ -101,7 +101,7 @@ const BlogList: React.FC = () => {
           <div className="relative w-full md:w-1/4">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="w-full p-4 bg-[#0dcf6c] text-white rounded-full flex items-center justify-between hover:bg-[#0aaf5a] transition-all duration-300 shadow-lg"
+              className="w-full p-4 bg-[color:var(--primary-color)] text-black rounded-full flex items-center justify-between hover:bg-[#0aaf5a] transition-all duration-300 shadow-lg"
             >
               <span className="flex items-center gap-2">
                 <Filter className="w-5 h-5" />
@@ -117,7 +117,7 @@ const BlogList: React.FC = () => {
                       setSelectedCategory(null);
                       setIsFilterOpen(false);
                     }}
-                    className="px-4 py-2 hover:bg-[#0dcf6c]/20 hover:text-[#0dcf6c] cursor-pointer transition-colors"
+                    className="px-4 py-2 hover:bg-[color:var(--primary-color)]/20 hover:text-[color:var(--primary-color)] cursor-pointer transition-colors"
                   >
                     همه دسته‌بندی‌ها
                   </li>
@@ -128,7 +128,7 @@ const BlogList: React.FC = () => {
                         setSelectedCategory(category);
                         setIsFilterOpen(false);
                       }}
-                      className="px-4 py-2 hover:bg-[#0dcf6c]/20 hover:text-[#0dcf6c] cursor-pointer transition-colors"
+                      className="px-4 py-2 hover:bg-[color:var(--primary-color)]/20 hover:text-[color:var(--primary-color)] cursor-pointer transition-colors"
                     >
                       {category}
                     </li>
@@ -149,7 +149,7 @@ const BlogList: React.FC = () => {
             {filteredArticles.map((article) => (
               <div
                 key={article.id}
-                className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[#0dcf6c]/20"
+                className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[color:var(--primary-color)]/20"
               >
                 <div className="relative">
                   <Image
@@ -161,12 +161,12 @@ const BlogList: React.FC = () => {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <span className="absolute top-4 right-4 bg-[#0dcf6c]/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                  <span className="absolute top-4 right-4 bg-[color:var(--primary-color)]/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
                     {article.category}
                   </span>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-lg font-semibold text-white group-hover:text-[#0dcf6c] transition-colors line-clamp-1">
+                  <h3 className="text-lg font-semibold text-white group-hover:text-[color:var(--primary-color)] transition-colors line-clamp-1">
                     {article.title}
                   </h3>
                   <p className="text-sm text-gray-400 mt-1 line-clamp-2">{article.excerpt}</p>
@@ -179,7 +179,7 @@ const BlogList: React.FC = () => {
                   </div>
                   <Link
                     href={`/bloglist/${article.id}`}
-                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                   >
                     خواندن مقاله
                     <ChevronDown className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />

@@ -23,21 +23,21 @@ const VideoItem: React.FC<VideoItemProps> = ({
       onClick={() => onSelect(video)}
       className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-[1.02] group ${
         isSelected
-          ? 'bg-gradient-to-r from-[#0dcf6c] to-[#1e2636] shadow-md'
+          ? 'bg-gradient-to-r from-[color:var(--primary-color)] to-[#1e2636] shadow-md'
           : 'bg-[#2a3347]/50 hover:bg-[#2a3347]'
       }`}
     >
       <div className="flex-shrink-0">
         {isCompleted ? (
-          <CheckCircle className="w-5 h-5 text-[#0dcf6c] group-hover:text-[#0dcf6c]/80" />
+          <CheckCircle className="w-5 h-5 text-[color:var(--primary-color)] group-hover:text-[color:var(--primary-color)]/80" />
         ) : isSelected && isPlaying ? (
-          <Pause className="w-5 h-5 text-[#0dcf6c] group-hover:text-[#0dcf6c]/80" />
+          <Pause className="w-5 h-5 text-[color:var(--primary-color)] group-hover:text-[color:var(--primary-color)]/80" />
         ) : (
-          <Play className="w-5 h-5 text-gray-300 group-hover:text-[#0dcf6c]" />
+          <Play className="w-5 h-5 text-gray-300 group-hover:text-[color:var(--primary-color)]" />
         )}
       </div>
       <div className="flex-1">
-        <p className="font-semibold text-base group-hover:text-[#0dcf6c]">
+        <p className="font-semibold text-base group-hover:text-[color:var(--primary-color)]">
           {video.title}
         </p>
         <p className="text-xs text-gray-400">{video.description}</p>

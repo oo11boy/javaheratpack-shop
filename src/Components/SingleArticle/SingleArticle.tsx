@@ -71,17 +71,17 @@ const SingleArticle: React.FC = () => {
             sizes="(max-width: 768px) 100vw, 1200px" // 100vw در موبایل، 1200px در دسکتاپ
             priority // چون تصویر بالای صفحه است
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[#0dcf6c]/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[color:var(--primary-color)]/10 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 md:p-10 text-center w-full">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#0dcf6c] animate-pulse-once">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[color:var(--primary-color)] animate-pulse-once">
               {article.title}
             </h1>
             <div className="flex justify-center items-center gap-4 mt-3 text-gray-300">
               <span className="flex items-center gap-2">
-                <User className="w-5 h-5 text-[#0dcf6c]" /> {article.author}
+                <User className="w-5 h-5 text-[color:var(--primary-color)]" /> {article.author}
               </span>
               <span className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#0dcf6c]" /> {article.date}
+                <Calendar className="w-5 h-5 text-[color:var(--primary-color)]" /> {article.date}
               </span>
             </div>
           </div>
@@ -91,7 +91,7 @@ const SingleArticle: React.FC = () => {
         <div className="bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8">
           {/* Summary */}
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0dcf6c] flex items-center gap-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-[color:var(--primary-color)] flex items-center gap-2">
               <BookOpen className="w-7 h-7" /> خلاصه مقاله
             </h2>
             <p className="text-gray-300 mt-3 leading-relaxed">{article.summary}</p>
@@ -99,14 +99,14 @@ const SingleArticle: React.FC = () => {
 
           {/* Full Content */}
           <div>
-            <h3 className="text-xl md:text-2xl font-semibold text-[#0dcf6c] mb-4">متن کامل</h3>
+            <h3 className="text-xl md:text-2xl font-semibold text-[color:var(--primary-color)] mb-4">متن کامل</h3>
             <p className="text-gray-300 leading-relaxed">{article.content}</p>
           </div>
         </div>
 
         {/* Comments Section */}
         <div className="bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8">
-          <h3 className="text-xl md:text-2xl font-semibold text-[#0dcf6c] flex items-center gap-2">
+          <h3 className="text-xl md:text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2">
             <MessageCircle className="w-6 h-6" /> نظرات
           </h3>
 
@@ -119,7 +119,7 @@ const SingleArticle: React.FC = () => {
                   className="p-4 bg-[#2a3347]/70 rounded-lg flex flex-col gap-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[#0dcf6c] font-semibold flex items-center gap-2">
+                    <span className="text-[color:var(--primary-color)] font-semibold flex items-center gap-2">
                       <User className="w-5 h-5" /> {comment.author}
                     </span>
                     <span className="text-gray-400 text-sm">{comment.date}</span>
@@ -134,24 +134,24 @@ const SingleArticle: React.FC = () => {
 
           {/* Comment Form */}
           <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4 mt-6">
-            <h4 className="text-lg font-semibold text-[#0dcf6c]">ارسال نظر جدید</h4>
+            <h4 className="text-lg font-semibold text-[color:var(--primary-color)]">ارسال نظر جدید</h4>
             <input
               type="text"
               placeholder="نام شما"
               value={newComment.author}
               onChange={(e) => setNewComment({ ...newComment, author: e.target.value })}
-              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c]/50"
+              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]/50"
             />
             <textarea
               placeholder="نظر خود را بنویسید"
               value={newComment.text}
               onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
-              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c]/50 resize-y min-h-[100px]"
+              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]/50 resize-y min-h-[100px]"
             />
             <button
               type="submit"
               disabled={!newComment.author || !newComment.text}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ارسال نظر
               <MessageCircle className="w-5 h-5" />

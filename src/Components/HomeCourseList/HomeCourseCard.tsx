@@ -27,7 +27,7 @@ const HomeCourseCard: React.FC<CourseCardProps> = ({ course, isVisible, index })
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           loading="lazy"
         />
-        <span className="absolute top-4 left-4 bg-[#0dcf6c] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+        <span className="absolute top-4 left-4 bg-[color:var(--primary-color)] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
           {course.level}
         </span>
         <span className="absolute top-4 right-4 bg-gray-900/80 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
@@ -35,15 +35,15 @@ const HomeCourseCard: React.FC<CourseCardProps> = ({ course, isVisible, index })
         </span>
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[#0dcf6c] transition-colors duration-300">
+        <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[color:var(--primary-color)] transition-colors duration-300">
           {course.title}
         </h3>
         <p className="text-gray-300 text-sm mb-4 line-clamp-2">{course.description}</p>
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-[#0dcf6c]">{course.price}</span>
+          <span className="text-lg font-bold text-[color:var(--primary-color)]">{course.price}</span>
           <Link
             href={`/courselist/${course.id}`}
-            className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"
+            className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"
           >
             ثبت‌نام
           </Link>

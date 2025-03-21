@@ -37,7 +37,7 @@ const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
         isSticky ? 'fixed top-0 left-0 right-0 z-10 mx-4 md:mx-8' : 'relative'
       }`}
     >
-      <div className="text-lg font-bold text-green-400 mb-4">
+      <div className="text-lg font-bold text-[color:var(--primary-color)] mb-4">
         {course.discountPrice ? (
           <div className="flex items-center gap-2">
             <span className="line-through text-gray-500">
@@ -49,7 +49,7 @@ const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
           <span>{course.price.toLocaleString()} تومان</span>
         )}
       </div>
-      <button className="w-full py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+      <button className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
         <ShoppingCart className="w-5 h-5" /> ثبت‌نام در دوره
       </button>
     </div>

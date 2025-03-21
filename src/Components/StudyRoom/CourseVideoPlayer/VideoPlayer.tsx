@@ -34,7 +34,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   return (
     <div className="w-full lg:w-2/3 bg-[#1e2636]/80 backdrop-blur-lg rounded-xl shadow-lg p-5 flex flex-col">
-      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[500px] rounded-lg overflow-hidden ring-2 ring-[#0dcf6c]/30">
+      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[500px] rounded-lg overflow-hidden ring-2 ring-[color:var(--primary-color)]/30">
         <ReactPlayerDynamic
           ref={playerRef}
           url={video.url}
@@ -61,7 +61,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <span>{video.duration || '0:00'}</span>
           </div>
           {completedVideos.has(video.id) && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#0dcf6c]/20 text-[#0dcf6c] rounded-full text-xs font-medium">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[color:var(--primary-color)]/20 text-[color:var(--primary-color)] rounded-full text-xs font-medium">
               <CheckCircle className="w-4 h-4" />
               تکمیل شده
             </span>
@@ -71,7 +71,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           <button
             onClick={onPrevious}
             disabled={videos.findIndex((v) => v.id === video.id) === 0}
-            className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 disabled:from-gray-500 disabled:to-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 disabled:from-gray-500 disabled:to-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             <span>جلسه قبلی</span>
@@ -79,7 +79,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           <button
             onClick={onNext}
             disabled={videos.findIndex((v) => v.id === video.id) === videos.length - 1}
-            className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 disabled:from-gray-500 disabled:to-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            className="group flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 disabled:from-gray-500 disabled:to-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             <span>جلسه بعدی</span>
             <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />

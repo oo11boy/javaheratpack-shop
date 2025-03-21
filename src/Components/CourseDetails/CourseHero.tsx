@@ -44,7 +44,7 @@ const CourseHero: React.FC<{ course: Course }> = ({ course }) => {
           className="absolute inset-0 hidden lg:flex items-center justify-center group"
         >
           <PlayCircle
-            className="w-16 h-16 text-green-400 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
+            className="w-16 h-16 text-[color:var(--primary-color)] opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
             strokeWidth={2}
           />
         </button>

@@ -71,8 +71,8 @@ export default function Nemone() {
       className="mt-6 py-16 text-white bg-gradient-to-b to-gray-900 from-gray-800"
     >
       <div className="ccontainer mx-auto mt-6 px-4">
-        <h2 className="!text-xl border inline-block p-2 border-[#0dcf6c] yekanh rounded-xl items-center gap-3 mb-12">
-          <DiamondOutlined fontSize="large" className="text-[#0dcf6c] ml-2" />
+        <h2 className="!text-xl border inline-block p-2 border-[color:var(--primary-color)] yekanh rounded-xl items-center gap-3 mb-12">
+          <DiamondOutlined fontSize="large" className="text-[color:var(--primary-color)] ml-2" />
           برخی از نمونه کارهای طراحی شده
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -123,7 +123,7 @@ export default function Nemone() {
               sizes="100vw"
             />
             <button
-              className="absolute top-4 right-4 text-white bg-[#0dcf6c] hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center transition-colors duration-200"
+              className="absolute top-4 right-4 text-white bg-[color:var(--primary-color)] hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center transition-colors duration-200"
               onClick={closeModal}
             >
               ×

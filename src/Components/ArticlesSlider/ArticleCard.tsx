@@ -19,7 +19,7 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
         </span>
       </div>
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="!text-lg font-semibold text-white mb-3 group-hover:text-[#0dcf6c] transition-colors duration-300 line-clamp-1">
+        <h3 className="!text-lg font-semibold text-white mb-3 group-hover:text-[color:var(--primary-color)] transition-colors duration-300 line-clamp-1">
           {article.title}
         </h3>
         <p className="text-gray-300 !text-sm mb-4 flex-grow line-clamp-2">
@@ -27,7 +27,7 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
         </p>
         <Link
           href={`/bloglist/${article.id}`}
-          className="bg-[#0dcf6c] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto"
+          className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto"
         >
           مطالعه بیشتر
         </Link>

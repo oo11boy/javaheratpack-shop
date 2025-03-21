@@ -52,17 +52,17 @@ export default function Header() {
             className="md:hidden text-[#999] cursor-pointer items-center justify-center p-2 rounded-lg bg-black transition-all duration-200"
           >
             {isLoggedIn ? (
-              <PersonOutline fontSize="large" className="text-[#0dcf6c]" />
+              <PersonOutline fontSize="large" className="text-[color:var(--primary-color)]" />
             ) : (
               <AccountCircleOutlinedIcon
                 fontSize="large"
-                className="text-[#0dcf6c]"
+                className="text-[color:var(--primary-color)]"
               />
             )}
           </button>
 
           <button
-            className="md:hidden text-white bg-[#0dcf6c] p-1 rounded-md focus:outline-none"
+            className="md:hidden text-black bg-[color:var(--primary-color)] p-1 rounded-md focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <svg
@@ -100,39 +100,39 @@ export default function Header() {
           } md:static md:w-auto md:bg-transparent md:text-white md:transform-none transition-transform duration-500 ease-in-out z-50`}
         >
           <ul className="flex flex-col my-3 md:my-0 md:mx-3 md:flex-row gap-6 p-4 md:p-0 h-full md:h-auto">
-            <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
+            <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1"
                 href="../"
               >
-                <HomeOutlined className="text-[#0dcf6c]" />
+                <HomeOutlined className="text-[color:var(--primary-color)]" />
                 خانه
               </Link>
             </li>
-            <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
+            <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1"
                 href="../courselist"
               >
-                <SchoolOutlined className="text-[#0dcf6c]" />
+                <SchoolOutlined className="text-[color:var(--primary-color)]" />
                 دوره‌های آموزشی
               </Link>
             </li>
-            <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
+            <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1"
                 href="../bloglist"
               >
-                <ArticleOutlined className="text-[#0dcf6c]" />
+                <ArticleOutlined className="text-[color:var(--primary-color)]" />
                 مقالات
               </Link>
             </li>
-            <li className="flex items-center justify-start gap-1 hover:text-[#0dcf6c] transition-all duration-500 cursor-pointer ease-in-out">
+            <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
               <Link
                 className="flex items-center justify-start gap-1"
                 href="../aboutus"
               >
-                <InfoOutlined className="text-[#0dcf6c]" />
+                <InfoOutlined className="text-[color:var(--primary-color)]" />
                 درباره ما
               </Link>
             </li>
@@ -146,14 +146,14 @@ export default function Header() {
         >
           {isLoggedIn ? (
             <>
-              <PersonOutline fontSize="large" className="text-[#0dcf6c]" />
+              <PersonOutline fontSize="large" className="text-[color:var(--primary-color)]" />
               <p className="pb-[1px] !text-md text-white">حساب کاربری</p>
             </>
           ) : (
             <>
               <AccountCircleOutlinedIcon
                 fontSize="large"
-                className="text-[#0dcf6c]"
+                className="text-[color:var(--primary-color)]"
               />
               <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
             </>

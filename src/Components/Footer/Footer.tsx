@@ -6,7 +6,7 @@ export default function Footer() {
     <span className="text-sm font-medium">طراحی شده توسط</span>
     <a 
       href="https://unicodewebdesign.com" 
-      className="mr-2 text-[#0dcf6c]  font-semibold text-base hover:text-[#0bb55a] transition-colors duration-300   decoration-2 decoration-[#0dcf6c]/50"
+      className="mr-2 text-[color:var(--primary-color)]  font-semibold text-base hover:text-[#0bb55a] transition-colors duration-300   decoration-2 decoration-[color:var(--primary-color)]/50"
     >
       یونیکد
       

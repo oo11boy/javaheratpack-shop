@@ -70,6 +70,7 @@ export interface CourseVideo {
 
 export interface UserData {
   name: string;
+  lastname:string;
   email: string;
   phonenumber: string | null;
   avatar: string;

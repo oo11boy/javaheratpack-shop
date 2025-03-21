@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     } else if (token) {
       const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
       const [userRows] = await connection.execute<User[]>(
-        'SELECT name, email, phonenumber, courseid FROM accounts WHERE id = ?',
+        'SELECT name, lastname,email, phonenumber, courseid FROM accounts WHERE id = ?',
         [decoded.id]
       );
       const user = userRows[0];
@@ -102,9 +102,9 @@ export async function GET(req: NextRequest) {
 
       const userData = {
         name: user.name,
+        lastname:user.lastname,
         email: user.email,
         phonenumber: user.phonenumber || null,
-        avatar: 'https://picsum.photos/150?random=1',
         purchasedCourses,
       };
 

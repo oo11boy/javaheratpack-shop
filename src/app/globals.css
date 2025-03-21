@@ -51,6 +51,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+ 
+}
+
+@theme {
+  --background-color: #191919; /* پس‌زمینه پیش‌فرض */
+  --primary-color: #06ec7d;    /* رنگ اصلی پیش‌فرض */
 }
 
 *{
@@ -68,8 +74,8 @@ html {
   font-size: 16px; /* اندازه پایه */
 }
 
-body{
-  background-color: #191919;
+body {
+  background-color: var(--background-color);
 }
 /* تنظیمات برای موبایل */
 @media screen and (max-width: 600px) {
@@ -112,4 +118,14 @@ body{
 }
 .animate-spin-slow {
   animation: spin-slow 6s linear infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.pulse-on-click {
+  animation: pulse 0.3s ease-in-out;
 }

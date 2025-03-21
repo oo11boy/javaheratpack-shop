@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { X, Mail, Lock, User, ChevronRight, Phone } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
@@ -108,10 +108,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 animate-fade-in">
-      <div className="w-full max-w-md sm:max-w-lg bg-[#2a3347]/95 rounded-3xl shadow-2xl border border-[#0dcf6c]/20 p-6 sm:p-8 relative">
+      <div className="w-full max-w-md sm:max-w-lg bg-[#2a3347]/95 rounded-3xl shadow-2xl border border-[color:var(--primary-color)]/20 p-6 sm:p-8 relative">
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-[#0dcf6c] transition-colors p-2 rounded-full hover:bg-[#2a3347]"
+          className="absolute top-4 right-4 text-gray-300 hover:text-[color:var(--primary-color)] transition-colors p-2 rounded-full hover:bg-[#2a3347]"
           disabled={isLoading}
         >
           <X className="w-6 h-6" />
@@ -120,7 +120,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-3xl">
             <div className="relative">
-              <div className="w-12 h-12 border-4 border-[#0dcf6c] border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-12 h-12 border-4 border-[color:var(--primary-color)] border-t-transparent rounded-full animate-spin"></div>
               <div className="absolute inset-0 w-12 h-12 border-4 border-[#0aaf5a] border-t-transparent rounded-full animate-spin-slow opacity-50"></div>
             </div>
           </div>
@@ -134,12 +134,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {step === 1 && (
           <form onSubmit={handleEmailSubmit} className="space-y-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] bg-clip-text text-center">
               ورود یا ثبت‌نام
             </h2>
             <div className="space-y-4">
               <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                <Mail className="w-5 h-5 text-[#0dcf6c]" />
+                <Mail className="w-5 h-5 text-[color:var(--primary-color)]" />
                 ایمیل
               </label>
               <input
@@ -147,18 +147,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ایمیل خود را وارد کنید"
-                className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                 required
                 disabled={isLoading}
               />
             </div>
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               ادامه
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </form>
         )}
@@ -167,7 +167,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <div className="space-y-6">
             {isEmailRegistered ? (
               <form onSubmit={(e) => handleAuth(e, true)} className="space-y-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] bg-clip-text text-center">
                   ورود
                 </h2>
                 <div className="space-y-4">
@@ -175,7 +175,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     ایمیل: {email}
                   </p>
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                    <Lock className="w-5 h-5 text-[#0dcf6c]" />
+                    <Lock className="w-5 h-5 text-[color:var(--primary-color)]" />
                     رمز عبور
                   </label>
                   <input
@@ -183,23 +183,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="رمز عبور خود را وارد کنید"
-                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                     required
                     disabled={isLoading}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
                   ورود
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </form>
             ) : (
               <form onSubmit={(e) => handleAuth(e, false)} className="space-y-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] bg-clip-text text-center">
                   ثبت‌نام
                 </h2>
                 <div className="space-y-4">
@@ -207,7 +207,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     ایمیل: {email}
                   </p>
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                    <User className="w-5 h-5 text-[#0dcf6c]" />
+                    <User className="w-5 h-5 text-[color:var(--primary-color)]" />
                     نام
                   </label>
                   <input
@@ -215,12 +215,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="نام خود را وارد کنید"
-                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                     required
                     disabled={isLoading}
                   />
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                    <User className="w-5 h-5 text-[#0dcf6c]" />
+                    <User className="w-5 h-5 text-[color:var(--primary-color)]" />
                     نام خانوادگی
                   </label>
                   <input
@@ -228,12 +228,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="نام خانوادگی خود را وارد کنید"
-                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                     required
                     disabled={isLoading}
                   />
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                    <Phone className="w-5 h-5 text-[#0dcf6c]" />
+                    <Phone className="w-5 h-5 text-[color:var(--primary-color)]" />
                     شماره تلفن
                   </label>
                   <input
@@ -241,14 +241,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="شماره تلفن خود را وارد کنید (مثال: 09123456789)"
-                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                     required
                     disabled={isLoading}
                     pattern="09[0-9]{9}"
                     title="شماره تلفن باید با 09 شروع شود و 11 رقم باشد"
                   />
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
-                    <Lock className="w-5 h-5 text-[#0dcf6c]" />
+                    <Lock className="w-5 h-5 text-[color:var(--primary-color)]" />
                     رمز عبور
                   </label>
                   <input
@@ -256,18 +256,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="رمز عبور خود را وارد کنید"
-                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[color:var(--primary-color)]/30 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all"
                     required
                     disabled={isLoading}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
                   ثبت‌نام و ورود
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </form>
             )}

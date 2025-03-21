@@ -33,7 +33,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({ courses }) => {
             placeholder="جستجوی دوره..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-4 pl-12 bg-[#2a3347] text-white rounded-full border border-[#0dcf6c]/20 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all shadow-md"
+            className="w-full p-4 pl-12 bg-[#2a3347] text-white rounded-full border border-[color:var(--primary-color)]/20 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)] transition-all shadow-md"
           />
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
         </div>
@@ -42,7 +42,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({ courses }) => {
         <div className="relative w-full md:w-1/4">
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="w-full p-4 bg-[#0dcf6c] text-white rounded-full flex items-center justify-between hover:bg-[#0aaf5a] transition-all duration-300 shadow-lg"
+            className="w-full p-4 bg-[color:var(--primary-color)] text-black rounded-full flex items-center justify-between hover:bg-[#0aaf5a] transition-all duration-300 shadow-lg"
           >
             <span className="flex items-center gap-2">
               <Filter className="w-5 h-5" />
@@ -60,7 +60,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({ courses }) => {
                     setSelectedCategory(null);
                     setIsFilterOpen(false);
                   }}
-                  className="px-4 py-2 hover:bg-[#0dcf6c]/20 hover:text-[#0dcf6c] cursor-pointer transition-colors"
+                  className="px-4 py-2 hover:bg-[color:var(--primary-color)]/20 hover:text-[color:var(--primary-color)] cursor-pointer transition-colors"
                 >
                   همه دسته‌بندی‌ها
                 </li>
@@ -71,7 +71,7 @@ const CourseFilters: React.FC<CourseFiltersProps> = ({ courses }) => {
                       setSelectedCategory(category);
                       setIsFilterOpen(false);
                     }}
-                    className="px-4 py-2 hover:bg-[#0dcf6c]/20 hover:text-[#0dcf6c] cursor-pointer transition-colors"
+                    className="px-4 py-2 hover:bg-[color:var(--primary-color)]/20 hover:text-[color:var(--primary-color)] cursor-pointer transition-colors"
                   >
                     {category}
                   </li>

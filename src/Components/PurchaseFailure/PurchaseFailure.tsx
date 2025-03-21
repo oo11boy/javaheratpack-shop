@@ -20,8 +20,8 @@ const PurchaseFailure: React.FC<PurchaseFailureProps> = ({
     
 
         <div className="flex flex-col sm:flex-row items-center justify-center mb-8 sm:mb-12 gap-4">
-          <XCircle className="w-8 h-8 sm:w-8 sm:h-8 text-[#0dcf6c] animate-bounce-slow" />
-          <h2 className="text-3xl sm:text-3xl md:text-3xl font-extrabold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
+          <XCircle className="w-8 h-8 sm:w-8 sm:h-8 text-[color:var(--primary-color)] animate-bounce-slow" />
+          <h2 className="text-3xl sm:text-3xl md:text-3xl font-extrabold text-transparent bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] bg-clip-text text-center">
           خرید ناموفق
           </h2>
         </div>
@@ -42,7 +42,7 @@ const PurchaseFailure: React.FC<PurchaseFailureProps> = ({
           {retryAction && (
             <button
               onClick={retryAction}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
             >
               تلاش مجدد
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -50,13 +50,13 @@ const PurchaseFailure: React.FC<PurchaseFailureProps> = ({
           )}
           <button
             onClick={() => window.location.href = '/support'}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-[#2a3347] text-[#0dcf6c] rounded-full border border-[#0dcf6c]/40 hover:bg-[#2a3347]/70 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-[#2a3347] text-[color:var(--primary-color)] rounded-full border border-[color:var(--primary-color)]/40 hover:bg-[#2a3347]/70 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-semibold"
           >
             تماس با پشتیبانی
           </button>
           <button
             onClick={() => window.location.href = '/'}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-[#2a3347] text-[#0dcf6c] rounded-full border border-[#0dcf6c]/40 hover:bg-[#2a3347]/70 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-[#2a3347] text-[color:var(--primary-color)] rounded-full border border-[color:var(--primary-color)]/40 hover:bg-[#2a3347]/70 transition-all duration-300 shadow-md hover:shadow-lg text-base sm:text-lg font-semibold"
           >
             رفتن به صفحه اصلی
           </button>

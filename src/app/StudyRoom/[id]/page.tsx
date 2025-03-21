@@ -85,7 +85,7 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
               محتوای این دوره هنوز آماده نشده. ما در حال کار روی اون هستیم و به زودی می‌تونید ازش استفاده کنید.
             </p>
             <div className="mt-6">
-              <Link href={'../useraccount'} className="inline-block bg-[#0dcf6c] text-white py-2 px-4 rounded-full text-sm font-semibold">
+              <Link href={'../useraccount'} className="inline-block bg-[color:var(--primary-color)] text-white py-2 px-4 rounded-full text-sm font-semibold">
                 بازگشت به حساب کاربری
               </Link>
             </div>

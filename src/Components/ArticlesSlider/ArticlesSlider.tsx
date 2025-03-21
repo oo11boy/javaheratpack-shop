@@ -58,8 +58,8 @@ export default function ArticleSlider() {
   return (
     <div className="bg-gradient-to-b to-gray-900 from-gray-800 min-h-screen py-16">
       <div className="ccontainer mx-auto px-4 relative">
-        <h2 className="!text-xl border inline-block p-2 text-white border-[#0dcf6c] yekanh rounded-xl items-center gap-3 mb-12">
-          <span className="text-[#0dcf6c] ml-2">آخرین مقالات</span>
+        <h2 className="!text-xl border inline-block p-2 text-white border-[color:var(--primary-color)] yekanh rounded-xl items-center gap-3 mb-12">
+          <span className="text-[color:var(--primary-color)] ml-2">آخرین مقالات</span>
         </h2>
         <ArticleSwiper articles={articles} />
       </div>
