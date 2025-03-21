@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Mail, Lock, User, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { X, Mail, Lock, User, ChevronRight, Phone } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,34 +16,75 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isEmailRegistered, setIsEmailRegistered] = useState<boolean | null>(null);
-
-  // Simulated email check (replace with actual API call)
-  const checkEmail = async (email: string) => {
-    // For demo purposes, assume emails ending with "@registered.com" are registered
-    return email.endsWith('@registered.com');
-  };
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { setIsLoggedIn } = useAuth();
+  const checkEmail = useCallback(async (email: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/auth?email=${encodeURIComponent(email)}`, {
+        cache: 'no-store',
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'خطا در بررسی ایمیل');
+      return data.exists;
+    } catch (error: any) {
+      setError(error.message === 'Email check failed' ? 'خطا در بررسی ایمیل' : error.message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const registered = await checkEmail(email);
     setIsEmailRegistered(registered);
     setStep(2);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simulate login logic
-    console.log('Logging in with:', { email, password });
-    window.location.href = '/useraccount'; // Redirect to user account
-  };
+// داخل handleAuth
+const handleAuth = async (e: React.FormEvent, isLogin: boolean) => {
+  e.preventDefault();
+  setError(null);
+  setIsLoading(true);
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simulate registration logic
-    console.log('Registering with:', { email, firstName, lastName, password });
-    window.location.href = '/useraccount'; // Redirect to user account
-  };
+  try {
+    const payload = isLogin
+      ? { email, password }
+      : { email, password, name: firstName, lastname: lastName, phonenumber: phoneNumber };
+
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(
+        data.error === 'Invalid credentials' ? 'ایمیل یا رمز عبور اشتباه است' :
+        data.error === 'Name and lastname required' ? 'نام و نام خانوادگی الزامی است' :
+        data.error === 'Email and password required' ? 'ایمیل و رمز عبور الزامی است' :
+        'خطا در عملیات'
+      );
+    }
+
+    setIsLoggedIn(true); // آپدیت وضعیت لاگین
+    router.push('/useraccount');
+    handleClose();
+  } catch (error: any) {
+    setError(error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const resetForm = () => {
     setStep(1);
@@ -49,7 +92,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     setPassword('');
     setFirstName('');
     setLastName('');
+    setPhoneNumber('');
     setIsEmailRegistered(null);
+    setError(null);
+    setIsLoading(false);
   };
 
   const handleClose = () => {
@@ -61,16 +107,31 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 animate-fade-in">
-      <div className="w-full max-w-md sm:max-w-lg bg-[#2a3347]/95 rounded-3xl shadow-2xl border border-[#0dcf6c]/20 p-6 sm:p-8 transform transition-all duration-500 hover:shadow-[0_0_30px_rgba(13,207,108,0.2)]">
-        {/* Close Button */}
+      <div className="w-full max-w-md sm:max-w-lg bg-[#2a3347]/95 rounded-3xl shadow-2xl border border-[#0dcf6c]/20 p-6 sm:p-8 relative">
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 text-gray-300 hover:text-[#0dcf6c] transition-colors p-2 rounded-full hover:bg-[#2a3347]"
+          disabled={isLoading}
         >
           <X className="w-6 h-6" />
         </button>
 
-        {/* Step 1: Email Input */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-3xl">
+            <div className="relative">
+              <div className="w-12 h-12 border-4 border-[#0dcf6c] border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-12 h-12 border-4 border-[#0aaf5a] border-t-transparent rounded-full animate-spin-slow opacity-50"></div>
+            
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 p-3 bg-gradient-to-r from-red-500/20 to-red-700/20 border border-red-500/50 rounded-lg text-white text-center shadow-md animate-pulse">
+            <span className="font-medium">{error}</span>
+          </div>
+        )}
+
         {step === 1 && (
           <form onSubmit={handleEmailSubmit} className="space-y-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
@@ -88,11 +149,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 placeholder="ایمیل خود را وارد کنید"
                 className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
                 required
+                disabled={isLoading}
               />
             </div>
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
               ادامه
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -100,12 +163,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </form>
         )}
 
-        {/* Step 2: Login or Register */}
         {step === 2 && isEmailRegistered !== null && (
           <div className="space-y-6">
             {isEmailRegistered ? (
-              // Login Form
-              <form onSubmit={handleLogin} className="space-y-6">
+              <form onSubmit={(e) => handleAuth(e, true)} className="space-y-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
                   ورود
                 </h2>
@@ -124,19 +185,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     placeholder="رمز عبور خود را وارد کنید"
                     className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
                 >
                   ورود
                   <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </form>
             ) : (
-              // Registration Form
-              <form onSubmit={handleRegister} className="space-y-6">
+              <form onSubmit={(e) => handleAuth(e, false)} className="space-y-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] bg-clip-text text-center">
                   ثبت‌نام
                 </h2>
@@ -155,6 +217,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     placeholder="نام خود را وارد کنید"
                     className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
                     required
+                    disabled={isLoading}
                   />
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
                     <User className="w-5 h-5 text-[#0dcf6c]" />
@@ -167,6 +230,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     placeholder="نام خانوادگی خود را وارد کنید"
                     className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
                     required
+                    disabled={isLoading}
+                  />
+                  <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
+                    <Phone className="w-5 h-5 text-[#0dcf6c]" />
+                    شماره تلفن
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="شماره تلفن خود را وارد کنید (مثال: 09123456789)"
+                    className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
+                    required
+                    disabled={isLoading}
+                    pattern="09[0-9]{9}"
+                    title="شماره تلفن باید با 09 شروع شود و 11 رقم باشد"
                   />
                   <label className="flex items-center gap-2 text-gray-100 text-sm sm:text-base font-medium">
                     <Lock className="w-5 h-5 text-[#0dcf6c]" />
@@ -179,11 +258,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     placeholder="رمز عبور خود را وارد کنید"
                     className="w-full p-3 sm:p-4 rounded-lg bg-[#1e2636] text-white border border-[#0dcf6c]/30 focus:outline-none focus:ring-2 focus:ring-[#0dcf6c] transition-all"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
                 >
                   ثبت‌نام و ورود
                   <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -193,23 +274,32 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </div>
         )}
       </div>
-
-      {/* Custom CSS */}
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes spinSlow {
+          to { transform: rotate(-360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
+        }
         .animate-fade-in {
           animation: fadeIn 0.3s ease-out forwards;
         }
-        @media (max-width: 640px) {
-          .rounded-3xl {
-            border-radius: 1.5rem;
-          }
-          .shadow-2xl {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-          }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+        .animate-spin-slow {
+          animation: spinSlow 1.5s linear infinite;
+        }
+        .animate-pulse {
+          animation: pulse 1.5s infinite;
         }
       `}</style>
     </div>

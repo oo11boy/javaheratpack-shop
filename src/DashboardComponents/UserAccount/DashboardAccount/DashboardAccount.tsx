@@ -1,76 +1,86 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, BookOpen, Clock, ChevronRight, LogOut, Award, PlayCircle, Lock } from "lucide-react";
-import Image from "next/image"; // اضافه کردن next/image
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 interface Course {
   id: string;
   title: string;
   duration: string;
-  progress: number; // Percentage completed (0-100)
-  thumbnail: string; // URL for course thumbnail
+  progress: number;
+  thumbnail: string;
 }
 
 interface UserData {
   name: string;
   email: string;
-  avatar: string; // URL for user avatar
+  phonenumber: string | null;
+  avatar: string;
   purchasedCourses: Course[];
-  completedCourses: number;
-  totalHours: string;
+  completedCourses?: number;
+  totalHours?: string;
 }
 
-const mockUserData: UserData = {
-  name: "علی محمدی",
-  email: "ali.mohammadi@example.com",
-  avatar: "https://picsum.photos/150?random=1",
-  purchasedCourses: [
-    {
-      id: "1",
-      title: "دوره مقدماتی برنامه‌نویسی",
-      duration: "12:30",
-      progress: 75,
-      thumbnail: "https://picsum.photos/300/200?random=2",
-    },
-    {
-      id: "2",
-      title: "دوره پیشرفته جاوااسکریپت",
-      duration: "18:45",
-      progress: 20,
-      thumbnail: "https://picsum.photos/300/200?random=3",
-    },
-    {
-      id: "3",
-      title: "طراحی رابط کاربری",
-      duration: "10:15",
-      progress: 100,
-      thumbnail: "https://picsum.photos/300/200?random=4",
-    },
-  ],
-  completedCourses: 2,
-  totalHours: "41:20",
-};
-
 const UserAccount: React.FC = () => {
-  const user = mockUserData; // Replace with real data from API/context
+  const [user, setUser] = useState<UserData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { setIsLoggedIn } = useAuth();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("/api/auth", { credentials: 'include' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+        setUser({
+          ...data,
+          completedCourses: data.completedCourses || 0,
+          totalHours: data.totalHours || "0 ساعت",
+        });
+      } catch (err: any) {
+        setError(err.message);
+        router.push("/");
+      }
+    };
 
-  const handleChangePassword = () => {
-    setIsModalOpen(true);
-  };
+    fetchUserData();
+  }, [router]);
 
-  const handleSubmitPassword = (e: React.FormEvent) => {
+// داخل handleLogout
+const handleLogout = async () => {
+  await fetch("/api/logout", { method: "POST", credentials: 'include' });
+  setIsLoggedIn(false); // آپدیت وضعیت لاگین
+  router.push("/");
+};
+
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder for password change logic (e.g., API call)
-    console.log("Current Password:", currentPassword);
-    console.log("New Password:", newPassword);
-    alert("رمز عبور با موفقیت تغییر یافت!"); // Replace with actual logic
-    setIsModalOpen(false);
-    setCurrentPassword("");
-    setNewPassword("");
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+        credentials: 'include', // ارسال کوکی‌ها
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      alert("رمز عبور با موفقیت تغییر یافت!");
+      setIsModalOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const closeModal = () => {
@@ -79,6 +89,13 @@ const UserAccount: React.FC = () => {
     setNewPassword("");
   };
 
+  if (!user) {
+    return (
+      <div className="h-[90vh] inset-0 flex items-center justify-center bg-[#121824] bg-opacity-80 z-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#0dcf6c] border-solid"></div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
       <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-10 animate-fade-in">
@@ -89,10 +106,10 @@ const UserAccount: React.FC = () => {
             <Image
               src={user.avatar}
               alt={user.name}
-              width={144} // بر اساس md:w-36 (36 * 4 = 144px)
-              height={144} // فرض بر مربعی بودن
+              width={144}
+              height={144}
               className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover ring-4 ring-[#0dcf6c]/50 shadow-md"
-              sizes="(max-width: 768px) 112px, 144px" // 112px در موبایل، 144px در دسکتاپ
+              sizes="(max-width: 768px) 112px, 144px"
             />
             <div className="absolute bottom-1 right-1 w-8 h-8 bg-[#0dcf6c] rounded-full flex items-center justify-center shadow-lg">
               <User className="w-5 h-5 text-white" />
@@ -103,15 +120,19 @@ const UserAccount: React.FC = () => {
               {user.name}
             </h2>
             <p className="text-sm md:text-lg text-gray-300 mt-2 font-light">{user.email}</p>
+            <p className="text-sm md:text-lg text-gray-300 mt-1 font-light">{user.phonenumber || "شماره تلفن ثبت نشده"}</p>
             <div className="flex gap-4 mt-4">
               <button
-                onClick={handleChangePassword}
+                onClick={() => setIsModalOpen(true)}
                 className="px-5 py-2 bg-[#0dcf6c] text-white rounded-full hover:bg-[#0aaf5a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
               >
                 <Lock className="w-4 h-4" />
                 تغییر رمز عبور
               </button>
-              <button className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2">
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+              >
                 خروج
                 <LogOut className="w-4 h-4" />
               </button>
@@ -165,10 +186,10 @@ const UserAccount: React.FC = () => {
                     <Image
                       src={course.thumbnail}
                       alt={course.title}
-                      width={300} // بر اساس منبع (300px)
-                      height={200} // بر اساس منبع (200px)
+                      width={300}
+                      height={200}
                       className="w-full h-48 object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" // بر اساس گرید
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <PlayCircle className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 text-[#0dcf6c] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -182,20 +203,13 @@ const UserAccount: React.FC = () => {
                       <span>{course.duration}</span>
                     </div>
                     <div className="mt-4">
-                      <div className="w-full bg-gray-700 rounded-full h-2.5">
-                        <div
-                          className="bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] h-2.5 rounded-full transition-all duration-500"
-                          style={{ width: `${course.progress}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {course.progress}% تکمیل شده
-                      </p>
+                   
+                   
                     </div>
-                    <button className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
-                      ادامه دوره
+                    <Link href={`../StudyRoom/${course.id}`}  className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#0dcf6c] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
+                   مشاهده دوره
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -212,7 +226,10 @@ const UserAccount: React.FC = () => {
               <Lock className="w-6 h-6" />
               تغییر رمز عبور
             </h3>
-            <form onSubmit={handleSubmitPassword} className="flex flex-col gap-4">
+            {error && (
+              <p className="text-red-400 mb-4 text-center">{error}</p>
+            )}
+            <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
               <div>
                 <label htmlFor="currentPassword" className="text-sm text-gray-300">
                   رمز عبور فعلی
@@ -259,35 +276,18 @@ const UserAccount: React.FC = () => {
         </div>
       )}
 
-      {/* Custom CSS for Animations */}
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @keyframes pulseOnce {
-          0% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
-          100% {
-            transform: scale(1);
-          }
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
         }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-        .animate-pulse-once {
-          animation: pulseOnce 0.8s ease-in-out;
-        }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .animate-pulse-once { animation: pulseOnce 0.8s ease-in-out; }
       `}</style>
     </div>
   );

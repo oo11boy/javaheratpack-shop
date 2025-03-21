@@ -6,15 +6,29 @@ import {
   HomeOutlined,
   InfoOutlined,
   SchoolOutlined,
+  PersonOutline,
 } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "next/link";
-import Image from "next/image"; // اضافه کردن next/image
+import Image from "next/image";
 import LoginModal from "@/DashboardComponents/LoginModal/LoginModal";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+
+  // مدیریت کلیک روی دکمه حساب کاربری/ورود
+  const handleAccountClick = () => {
+    if (isLoggedIn === true) {
+      router.push("/useraccount");
+    } else {
+      setIsModalOpen(true); // برای هر دو حالت null و false، مودال باز می‌شه
+    }
+  };
 
   return (
     <div className="w-full bg-[black] p-4">
@@ -25,23 +39,27 @@ export default function Header() {
             className="w-[95px] h-[30px]"
             src="/Images/logo.png"
             alt="لوگو"
-            width={95} // بر اساس w-[95px]
-            height={30} // بر اساس h-[30px]
-            sizes="95px" // اندازه ثابت برای لوگو
+            width={95}
+            height={30}
+            sizes="95px"
           />
         </Link>
 
-        {/* دکمه همبرگر برای موبایل */}
-        <div className="flex items-center">
-          <Link
-            href="../useraccount"
-            className="md:hidden text-[#999] cursor-pointer items-center space-x-2 justify-center p-2 rounded-lg bg-black transition-all duration-200"
+        {/* دکمه همبرگر و آیکن حساب کاربری برای موبایل */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleAccountClick}
+            className="md:hidden text-[#999] cursor-pointer items-center justify-center p-2 rounded-lg bg-black transition-all duration-200"
           >
-            <AccountCircleOutlinedIcon
-              fontSize="large"
-              className="text-[#0dcf6c]"
-            />
-          </Link>
+            {isLoggedIn ? (
+              <PersonOutline fontSize="large" className="text-[#0dcf6c]" />
+            ) : (
+              <AccountCircleOutlinedIcon
+                fontSize="large"
+                className="text-[#0dcf6c]"
+              />
+            )}
+          </button>
 
           <button
             className="md:hidden text-white bg-[#0dcf6c] p-1 rounded-md focus:outline-none"
@@ -121,16 +139,25 @@ export default function Header() {
           </ul>
         </div>
 
-        {/* دکمه ورود/ثبت‌نام (فقط در دسکتاپ) */}
+        {/* دکمه حساب کاربری/ورود (فقط در دسکتاپ) */}
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleAccountClick}
           className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200"
         >
-          <AccountCircleOutlinedIcon
-            fontSize="large"
-            className="text-[#0dcf6c]"
-          />
-          <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
+          {isLoggedIn ? (
+            <>
+              <PersonOutline fontSize="large" className="text-[#0dcf6c]" />
+              <p className="pb-[1px] !text-md text-white">حساب کاربری</p>
+            </>
+          ) : (
+            <>
+              <AccountCircleOutlinedIcon
+                fontSize="large"
+                className="text-[#0dcf6c]"
+              />
+              <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
+            </>
+          )}
         </button>
       </div>
 
