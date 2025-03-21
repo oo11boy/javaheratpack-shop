@@ -94,7 +94,7 @@ export async function GET(
     return NextResponse.json(courseDetails, {
       headers: {
         'ETag': etag,
-        'Cache-Control': 'public, max-age=3600, must-revalidate',
+        'Cache-Control': 'public, max-age=3600, must-revalidate', // کش برای ۱ ساعت
       },
     });
   } catch (error) {

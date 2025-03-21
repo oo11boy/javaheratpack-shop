@@ -6,14 +6,14 @@ import { notFound } from 'next/navigation';
 
 async function fetchCourseData(id: number): Promise<CourseVideo[]> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coursesvideo?courseid=${id}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 3600 }, // ISR برای بازسازی هر ۱ ساعت
   });
   if (!response.ok) throw new Error('دوره یافت نشد');
   return response.json();
 }
 
 export default async function VideoPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params; // params رو await می‌کنیم
+  const resolvedParams = await params;
   let videos: CourseVideo[];
   try {
     videos = await fetchCourseData(parseInt(resolvedParams.id));
@@ -31,3 +31,5 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
     </div>
   );
 }
+
+export const revalidate = 3600; // بازسازی صفحه هر ۱ ساعت

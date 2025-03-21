@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const courseId = searchParams.get('courseid');
 
     let query: string;
-    let params: number[] = []; // نوع دقیق به جای any[]
+    let params: number[] = [];
 
     if (courseId) {
       query = `
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'ETag': etag,
-        'Cache-Control': 'public, max-age=3600, must-revalidate',
+        'Cache-Control': 'public, max-age=3600, must-revalidate', // کش برای ۱ ساعت
       },
     });
   } catch (error) {

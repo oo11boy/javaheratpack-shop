@@ -1,7 +1,6 @@
 import React from "react";
 import { Clock, BookOpen, Award, ShoppingCart } from "lucide-react";
 import { Course } from "@/lib/Types/Types";
-import CoursePurchaseBox from "./CoursePurchaseBox";
 
 const CourseSidebar: React.FC<{ course: Course }> = ({ course }) => {
   return (

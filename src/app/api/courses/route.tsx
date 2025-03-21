@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
 import { SimpleCourse } from '@/lib/Types/Types';
-import { RowDataPacket } from 'mysql2/promise'; // اضافه کردن نوع
+import { RowDataPacket } from 'mysql2/promise';
 
 function generateETag(courses: SimpleCourse[]): string {
   const dataString = JSON.stringify(courses, Object.keys(courses).sort());
@@ -49,6 +49,7 @@ export async function GET(request: Request): Promise<NextResponse<SimpleCourse[]
       headers: {
         'ETag': etag,
         'Cache-Control': 'public, max-age=3600, must-revalidate',
+        'Vary': 'Accept-Encoding', // برای اطمینان از کش درست با فشرده‌سازی
       },
     });
   } catch (error) {
