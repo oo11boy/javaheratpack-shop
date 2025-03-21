@@ -21,7 +21,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { setIsLoggedIn } = useAuth();
+
+  const { setIsLoggedIn, refreshUserData } = useAuth(); 
 
   const checkEmail = useCallback(async (email: string) => {
     setIsLoading(true);
@@ -53,40 +54,41 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
+  
     try {
       const payload = isLogin
         ? { email, password }
         : { email, password, name: firstName, lastname: lastName, phonenumber: phoneNumber };
-
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+  
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        credentials: 'include',
+        credentials: "include",
       });
-
+  
       const data: { redirect?: string; error?: string } = await response.json();
       if (!response.ok) {
         throw new Error(
-          data.error === 'Invalid credentials' ? 'ایمیل یا رمز عبور اشتباه است' :
-          data.error === 'Name and lastname required' ? 'نام و نام خانوادگی الزامی است' :
-          data.error === 'Email and password required' ? 'ایمیل و رمز عبور الزامی است' :
-          'خطا در عملیات'
+          data.error === "Invalid credentials" ? "ایمیل یا رمز عبور اشتباه است" :
+          data.error === "Name and lastname required" ? "نام و نام خانوادگی الزامی است" :
+          data.error === "Email and password required" ? "ایمیل و رمز عبور الزامی است" :
+          "خطا در عملیات"
         );
       }
-
+  
       setIsLoggedIn(true);
-      router.push('/useraccount');
+      await refreshUserData(); // رفرش داده‌ها پس از لاگین
+      router.push("/useraccount");
       handleClose();
     } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error('خطای ناشناخته');
+      const err = error instanceof Error ? error : new Error("خطای ناشناخته");
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const resetForm = () => {
     setStep(1);
     setEmail('');

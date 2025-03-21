@@ -6,7 +6,6 @@ import {
   HomeOutlined,
   InfoOutlined,
   SchoolOutlined,
-  PersonOutline,
 } from "@mui/icons-material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "next/link";
@@ -52,7 +51,7 @@ export default function Header() {
             className="md:hidden text-[#999] cursor-pointer items-center justify-center p-2 rounded-lg bg-black transition-all duration-200"
           >
             {isLoggedIn ? (
-              <PersonOutline fontSize="large" className="text-[color:var(--primary-color)]" />
+              <AccountCircleOutlinedIcon fontSize="large" className="text-[color:var(--primary-color)]" />
             ) : (
               <AccountCircleOutlinedIcon
                 fontSize="large"
@@ -146,7 +145,7 @@ export default function Header() {
         >
           {isLoggedIn ? (
             <>
-              <PersonOutline fontSize="large" className="text-[color:var(--primary-color)]" />
+              <AccountCircleOutlinedIcon fontSize="large" className="text-[color:var(--primary-color)]" />
               <p className="pb-[1px] !text-md text-white">حساب کاربری</p>
             </>
           ) : (

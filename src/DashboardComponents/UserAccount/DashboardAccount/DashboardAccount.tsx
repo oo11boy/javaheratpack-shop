@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, BookOpen, Clock, LogOut, Award, PlayCircle, Lock, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,14 +12,29 @@ const UserAccount: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // متغیر جدید برای مدیریت لودینگ خروج
   const router = useRouter();
-  const { userData: user, setIsLoggedIn, setUserData } = useAuth();
-  
+  const { userData: user, setIsLoggedIn, setUserData, isLoggedIn } = useAuth();
+
+  // بررسی وضعیت لاگین و ریدایرکت به صفحه اصلی در صورت عدم لاگین
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      router.push("/"); // ریدایرکت به صفحه اصلی
+    }
+  }, [isLoggedIn, router]);
+
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
-    setIsLoggedIn(false);
-    setUserData(null);
-    router.push("/");
+    setIsLoggingOut(true); // شروع لودینگ
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      setIsLoggedIn(false);
+      setUserData(null);
+      router.push("/");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      setIsLoggingOut(false); // پایان لودینگ (در صورت خطا هم اجرا می‌شود)
+    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -52,12 +67,17 @@ const UserAccount: React.FC = () => {
     setNewPassword("");
   };
 
-  if (!user) {
+  // نمایش لودینگ در حالت لاگین نامشخص یا خروج
+  if (isLoggedIn === null || isLoggingOut) {
     return (
       <div className="h-[90vh] inset-0 flex items-center justify-center bg-[#121824] bg-opacity-80 z-50">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[color:var(--primary-color)] border-solid"></div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // این خط عملاً اجرا نمی‌شود چون useEffect ریدایرکت را انجام داده است
   }
 
   return (
@@ -75,7 +95,6 @@ const UserAccount: React.FC = () => {
               className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover ring-4 ring-[color:var(--primary-color)]/50 shadow-md"
               sizes="(max-width: 768px) 112px, 144px"
             />
-           
           </div>
           <div className="text-center md:text-right z-10">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--primary-color)] tracking-tight animate-pulse-once">
@@ -94,6 +113,7 @@ const UserAccount: React.FC = () => {
               <button
                 onClick={handleLogout}
                 className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                disabled={isLoggingOut} // غیرفعال کردن دکمه هنگام لودینگ
               >
                 خروج
                 <LogOut className="w-4 h-4" />

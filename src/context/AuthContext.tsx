@@ -1,3 +1,4 @@
+// AuthContext.tsx
 "use client";
 
 import { UserData } from "@/lib/Types/Types";
@@ -6,8 +7,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface AuthContextType {
   isLoggedIn: boolean | null;
   setIsLoggedIn: (value: boolean) => void;
-  userData: UserData | null; // اضافه کردن داده کاربر
+  userData: UserData | null;
   setUserData: (data: UserData | null) => void;
+  refreshUserData: () => Promise<void>; // تابع جدید برای رفرش داده‌ها
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,37 +18,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await fetch("/api/auth", {
-          method: "GET",
-          credentials: "include",
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch("/api/auth", {
+        method: "GET",
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(true);
+        setUserData({
+          ...data,
+          completedCourses: data.completedCourses || 0,
+          totalHours: data.totalHours || "0 ساعت",
+          purchasedCourses: data.purchasedCourses || [], // اطمینان از مقدار پیش‌فرض
         });
-        if (response.ok) {
-          const data = await response.json();
-          setIsLoggedIn(true);
-          setUserData({
-            ...data,
-            completedCourses: data.completedCourses || 0,
-            totalHours: data.totalHours || "0 ساعت",
-          });
-        } else {
-          setIsLoggedIn(false);
-          setUserData(null);
-        }
-      } catch (error) {
-        console.error("Error checking login status:", error);
+      } else {
         setIsLoggedIn(false);
         setUserData(null);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setIsLoggedIn(false);
+      setUserData(null);
+    }
+  };
 
-    checkLoginStatus();
+  // تابع برای رفرش دستی داده‌ها
+  const refreshUserData = async () => {
+    await fetchUserData();
+  };
+
+  useEffect(() => {
+    fetchUserData(); // بارگذاری اولیه
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userData, setUserData }}>
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userData, setUserData, refreshUserData }}>
       {children}
     </AuthContext.Provider>
   );
