@@ -1,21 +1,15 @@
 import CourseList from '@/Components/CourseList/CourseList';
 import Footer from '@/Components/Footer/Footer';
 import Header from '@/Components/Header/Header';
+import { getCourses } from '@/lib/api';
 import { SimpleCourse } from '@/lib/Types/Types';
 import { notFound } from 'next/navigation';
-
-async function fetchCourseData(): Promise<SimpleCourse[]> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/courses`, {
-    next: { revalidate: 3600 }, // ISR برای بازسازی هر ۱ ساعت
-  });
-  if (!response.ok) throw new Error('دوره یافت نشد');
-  return response.json();
-}
+// بقیه ایمپورت‌ها بدون تغییر
 
 export default async function CourseListPage() {
   let courseList: SimpleCourse[];
   try {
-    courseList = await fetchCourseData();
+    courseList = await getCourses();
   } catch (error) {
     console.error('خطا در دریافت داده‌ها:', error);
     notFound();
@@ -30,4 +24,4 @@ export default async function CourseListPage() {
   );
 }
 
-export const revalidate = 3600; // بازسازی صفحه هر ۱ ساعت
+export const revalidate = 3600;

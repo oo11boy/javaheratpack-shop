@@ -66,3 +66,14 @@ export interface CourseVideo {
   courseid: number;
   place: number;
 }
+
+
+export interface UserData {
+  name: string;
+  email: string;
+  phonenumber: string | null;
+  avatar: string;
+  purchasedCourses: Course[];
+  completedCourses?: number;
+  totalHours?: string;
+}

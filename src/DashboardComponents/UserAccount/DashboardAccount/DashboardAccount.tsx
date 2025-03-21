@@ -1,64 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { User, BookOpen, Clock, ChevronRight, LogOut, Award, PlayCircle, Lock } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-interface Course {
-  id: string;
-  title: string;
-  duration: string;
-  progress: number;
-  thumbnail: string;
-}
 
-interface UserData {
-  name: string;
-  email: string;
-  phonenumber: string | null;
-  avatar: string;
-  purchasedCourses: Course[];
-  completedCourses?: number;
-  totalHours?: string;
-}
 
 const UserAccount: React.FC = () => {
-  const [user, setUser] = useState<UserData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { setIsLoggedIn } = useAuth();
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch("/api/auth", { credentials: 'include' });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        setUser({
-          ...data,
-          completedCourses: data.completedCourses || 0,
-          totalHours: data.totalHours || "0 ساعت",
-        });
-      } catch (err: any) {
-        setError(err.message);
-        router.push("/");
-      }
-    };
+  const { userData: user, setIsLoggedIn, setUserData } = useAuth();
 
-    fetchUserData();
-  }, [router]);
-
-// داخل handleLogout
-const handleLogout = async () => {
-  await fetch("/api/logout", { method: "POST", credentials: 'include' });
-  setIsLoggedIn(false); // آپدیت وضعیت لاگین
-  router.push("/");
-};
+  const handleLogout = async () => {
+    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    setIsLoggedIn(false);
+    setUserData(null);
+    router.push("/");
+  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +33,7 @@ const handleLogout = async () => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword }),
-        credentials: 'include', // ارسال کوکی‌ها
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -95,6 +59,7 @@ const handleLogout = async () => {
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#0dcf6c] border-solid"></div>
       </div>
     );
+  
   }
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">

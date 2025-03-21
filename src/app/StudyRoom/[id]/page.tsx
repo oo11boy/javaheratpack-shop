@@ -8,18 +8,12 @@ import { getConnection } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { getCourseVideos } from '@/lib/api';
 
 const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
 
 async function fetchCourseData(id: number): Promise<CourseVideo[]> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/coursesvideo?courseid=${id}`);
-  console.log(`API response status for course ${id}:`, response.status);
-  if (!response.ok) {
-    const text = await response.text();
-    console.log(`API response text for course ${id}:`, text);
-    throw new Error('دوره یافت نشد');
-  }
-  return response.json();
+  return getCourseVideos(id);
 }
 
 async function checkUserAccess(courseId: number) {
@@ -38,16 +32,16 @@ async function checkUserAccess(courseId: number) {
     if (!user || !user.courseid) return { isAuthenticated: true, hasAccess: false };
 
     let courseIds: string[];
-    console.log('Raw courseid from DB:', user.courseid);
+   
     try {
       courseIds = JSON.parse(user.courseid);
     } catch (e) {
       courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
     }
-    console.log('Parsed courseIds:', courseIds);
+  
 
     const hasAccess = courseIds.includes(courseId.toString());
-    console.log(`Checking access for course ${courseId}:`, hasAccess);
+  
     return { isAuthenticated: true, hasAccess };
   } catch (error) {
     console.error('Error verifying user access:', error);
