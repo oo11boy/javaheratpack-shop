@@ -14,7 +14,6 @@ const UserAccount: React.FC = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false); // متغیر جدید برای مدیریت لودینگ خروج
   const router = useRouter();
   const { userData: user, setIsLoggedIn, setUserData, isLoggedIn } = useAuth();
-
   // بررسی وضعیت لاگین و ریدایرکت به صفحه اصلی در صورت عدم لاگین
   useEffect(() => {
     if (isLoggedIn === false) {
@@ -141,7 +140,7 @@ const UserAccount: React.FC = () => {
             <BookOpen className="w-8 h-8 text-[color:var(--primary-color)]" />
             <div>
               <p className="text-sm text-gray-400">دوره‌های خریداری‌شده</p>
-              <p className="text-xl font-bold text-white">{user.purchasedCourses.length}</p>
+              <p className="text-xl font-bold text-white">{user.courseid.length}</p>
             </div>
           </div>
         </div>
@@ -152,13 +151,13 @@ const UserAccount: React.FC = () => {
             <BookOpen className="w-8 h-8" />
             دوره‌های خریداری‌شده
           </h3>
-          {user.purchasedCourses.length === 0 ? (
+          {user.courseid.length === 0 ? (
             <p className="text-gray-400 text-center py-6 text-lg">
               هنوز دوره‌ای خریداری نکرده‌اید! به فروشگاه سر بزنید.
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {user.purchasedCourses.map((course) => (
+              {user.courseid.map((course) => (
                 <div
                   key={course.id}
                   className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[color:var(--primary-color)]/20"

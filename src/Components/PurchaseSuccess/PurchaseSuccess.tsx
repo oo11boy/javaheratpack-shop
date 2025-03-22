@@ -13,14 +13,14 @@ interface PurchasedCourse {
 }
 
 interface PurchaseSuccessProps {
-  purchasedCourses: PurchasedCourse[];
+  courseid: PurchasedCourse[];
   totalAmount?: number;
   purchaseDate: string;
   orderCode: string;
 }
 
 const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
-  purchasedCourses,
+  courseid,
   totalAmount = 0,
   purchaseDate,
   orderCode,
@@ -61,7 +61,7 @@ const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
             دوره‌های خریداری‌شده
           </h3>
           <div className="max-h-72 overflow-y-auto custom-scrollbar pr-2 sm:pr-3">
-            {purchasedCourses.map((course) => (
+            {courseid.map((course) => (
               <div
                 key={course.id}
                 className="bg-[#2a3347]/80 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 border border-[color:var(--primary-color)]/20 hover:bg-[#2a3347] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"

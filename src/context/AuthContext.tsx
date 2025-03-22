@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           ...data,
           completedCourses: data.completedCourses || 0,
           totalHours: data.totalHours || "0 ساعت",
-          purchasedCourses: data.purchasedCourses || [], // اطمینان از مقدار پیش‌فرض
+          courseid: data.courseid || [], // اطمینان از مقدار پیش‌فرض
         });
       } else {
         setIsLoggedIn(false);

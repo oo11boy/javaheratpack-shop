@@ -78,7 +78,7 @@ export interface UserData {
   email: string;
   phonenumber: string | null;
   avatar: string;
-  purchasedCourses: Course[];
+  courseid: Course[];
   completedCourses?: number;
   totalHours?: string;
 }

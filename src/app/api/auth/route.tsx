@@ -57,30 +57,29 @@ export async function GET(req: NextRequest) {
       );
       await connection.end();
       const exists = rows[0].count > 0;
-      return NextResponse.json({ exists }, { headers: { 'Cache-Control': 'no-store' } });
+      return NextResponse.json(
+        { exists },
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+      );
     } else if (token) {
       const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
       const [userRows] = await connection.execute<User[]>(
-        'SELECT id, name, lastname,email, phonenumber, courseid FROM accounts WHERE id = ?',
+        'SELECT id, name, lastname, email, phonenumber, courseid FROM accounts WHERE id = ?',
         [decoded.id]
       );
       const user = userRows[0];
 
       if (!user) {
         await connection.end();
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+        );
       }
 
-      let purchasedCourses: PurchasedCourse[] = [];
+      let courseid: PurchasedCourse[] = [];
       if (user.courseid) {
-        let courseIds: string[];
-        try {
-          courseIds = JSON.parse(user.courseid);
-        } catch (error) {
-          courseIds = user.courseid.split(',').map(id => id.trim());
-          console.log(error)
-        }
-
+        const courseIds = user.courseid.split(',').map(id => id.trim()).filter(id => id !== '');
         if (courseIds.length > 0) {
           const [courseRows] = await connection.execute<Course[]>(
             `SELECT id, title, duration, thumbnail
@@ -88,7 +87,7 @@ export async function GET(req: NextRequest) {
              WHERE id IN (${courseIds.map(() => '?').join(',')})`,
             courseIds
           );
-          purchasedCourses = courseRows.map(course => ({
+          courseid = courseRows.map(course => ({
             id: course.id,
             title: course.title,
             duration: course.duration || '0:00',
@@ -101,21 +100,30 @@ export async function GET(req: NextRequest) {
       await connection.end();
 
       const userData = {
-        id:user.id,
+        id: user.id,
         name: user.name,
-        lastname:user.lastname,
+        lastname: user.lastname,
         email: user.email,
         phonenumber: user.phonenumber || null,
-        purchasedCourses,
+        courseid, // تغییر نام متغیر به courseid برای سازگاری
       };
 
-      return NextResponse.json(userData);
+      return NextResponse.json(
+        userData,
+        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+      );
     } else {
-      return NextResponse.json({ error: 'Token required' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Token required' },
+        { status: 401, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+      );
     }
   } catch (error) {
     console.error('GET error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Server error' },
+      { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
+    );
   }
 }
 

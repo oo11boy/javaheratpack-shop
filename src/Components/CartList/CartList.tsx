@@ -5,10 +5,8 @@ import { ShoppingCart, X, Trash2, Info, Tag, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
-
-
 const CartList: React.FC = () => {
-  const { Cart, setCart,isCartOpen,setIsCartOpen} = useCart();
+  const { Cart, setCart, isCartOpen, setIsCartOpen } = useCart();
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -28,15 +26,33 @@ const CartList: React.FC = () => {
   };
 
   const totalBasePrice = Cart.reduce((sum, item) => sum + item.price, 0);
-
-  let packageDiscount = 0;
   const packageCount = Cart.length;
-  if (packageCount === 2) packageDiscount = 0.1;
-  if (packageCount === 3) packageDiscount = 0.2;
-
+  const packageDiscount = packageCount === 2 ? 0.1 : packageCount === 3 ? 0.2 : 0;
   const maxDiscount = Math.max(packageDiscount, appliedDiscount);
   const discountedPrice = totalBasePrice * (1 - maxDiscount);
   const discountAmount = totalBasePrice - discountedPrice;
+
+  const handleCheckout = async () => {
+    try {
+      const courseIds = Cart.map((item) => item.id);
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseIds, totalAmount: discountedPrice }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl; // هدایت به درگاه زیپال
+      } else {
+        alert(data.error || "خطا در اتصال به درگاه پرداخت");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("خطا در سرور");
+    }
+  };
 
   return (
     <div className="relative font-sans">
@@ -78,18 +94,16 @@ const CartList: React.FC = () => {
           <div className="bg-[#2a3347]/80 rounded-xl p-4 mb-4 border border-[color:var(--primary-color)]/30 shadow-inner">
             <p className="text-sm text-gray-200 flex items-center gap-2">
               <Info className="w-5 h-5 text-[color:var(--primary-color)]" />
-              شرایط تخفیف ویژه با محدودیت زمانی: 
+              شرایط تخفیف ویژه با محدودیت زمانی:
             </p>
             <ul className="text-xs text-gray-300 mt-2 space-y-2">
-         
               <li className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-                با خرید ۲ دوره آموزشی: ۱۰٪ تخفیف   روی تمام دوره ها دریافت میکنید
+                با خرید ۲ دوره آموزشی: ۱۰٪ تخفیف روی تمام دوره‌ها
               </li>
-        
               <li className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-             با خرید ۳ دوره آموزشی: ۲۰٪ تخفیف روی تمام دوره ها دریافت میکنید
+                با خرید ۳ دوره آموزشی: ۲۰٪ تخفیف روی تمام دوره‌ها
               </li>
             </ul>
           </div>
@@ -150,12 +164,8 @@ const CartList: React.FC = () => {
                     sizes="64px"
                   />
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-white line-clamp-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-gray-300">
-                      {item.price.toLocaleString()} تومان
-                    </p>
+                    <h3 className="text-sm font-medium text-white line-clamp-1">{item.title}</h3>
+                    <p className="text-xs text-gray-300">{item.price.toLocaleString()} تومان</p>
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
@@ -174,9 +184,7 @@ const CartList: React.FC = () => {
               <div className="space-y-3 bg-[#2a3347]/80 p-4 rounded-xl border border-[color:var(--primary-color)]/30">
                 <div className="flex justify-between text-sm">
                   <span>جمع اولیه:</span>
-                  <span className="text-gray-300">
-                    {totalBasePrice.toLocaleString()} تومان
-                  </span>
+                  <span className="text-gray-300">{totalBasePrice.toLocaleString()} تومان</span>
                 </div>
                 {maxDiscount > 0 && (
                   <>
@@ -195,7 +203,10 @@ const CartList: React.FC = () => {
                   </>
                 )}
               </div>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95">
+              <button
+                onClick={handleCheckout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+              >
                 تکمیل خرید
                 <ChevronLeft className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -215,28 +226,15 @@ const CartList: React.FC = () => {
       {/* Custom CSS */}
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         @keyframes pulseShort {
-          0%,
-          100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
         }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-        .animate-pulse-short {
-          animation: pulseShort 2s infinite;
-        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-pulse-short { animation: pulseShort 2s infinite; }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

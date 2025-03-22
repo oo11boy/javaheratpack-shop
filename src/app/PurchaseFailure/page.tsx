@@ -1,3 +1,4 @@
+//src\app\PurchaseFailure\page.tsx
 import Footer from '@/Components/Footer/Footer'
 import Header from '@/Components/Header/Header'
 import PurchaseFailure from '@/Components/PurchaseFailure/PurchaseFailure'
