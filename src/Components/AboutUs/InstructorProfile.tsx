@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
-import { User } from 'lucide-react';
 import ContactLinks from './ContactLinks';
 import { Instructor } from '@/lib/Types/Types';
 

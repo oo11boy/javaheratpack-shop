@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { User, BookOpen, Clock, LogOut, Award, PlayCircle, Lock, ChevronLeft } from "lucide-react";
+import { BookOpen, Clock, LogOut, Award, PlayCircle, Lock, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
