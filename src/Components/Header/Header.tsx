@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import {
   ArticleOutlined,
@@ -24,14 +23,50 @@ export default function Header() {
   const handleAccountClick = () => {
     if (isLoggedIn === true) {
       router.push("/useraccount");
-    } else {
-      setIsModalOpen(true); // برای هر دو حالت null و false، مودال باز می‌شه
+    } else if (isLoggedIn === false) {
+      setIsModalOpen(true); // فقط وقتی false است مودال باز می‌شود
     }
+    // اگر isLoggedIn === null باشد، به دلیل disabled بودن دکمه، این تابع اجرا نمی‌شود
+  };
+
+  // کامپوننت دکمه با غیرفعال کردن
+  const renderAccountButton = (isMobile: boolean) => {
+    const isDisabled = isLoggedIn === null; // دکمه وقتی null است غیرفعال می‌شود
+
+    return (
+      <button
+        onClick={handleAccountClick}
+        disabled={isDisabled} // دکمه غیرفعال می‌شود وقتی isLoggedIn هنوز مشخص نیست
+        className={`${
+          isMobile
+            ? "md:hidden text-[#999] cursor-pointer items-center justify-center p-2 rounded-lg bg-black transition-all duration-200"
+            : "hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200"
+        } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`} // استایل برای حالت غیرفعال
+      >
+        {isLoggedIn ? (
+          <>
+            <AccountCircleOutlinedIcon
+              fontSize="large"
+              className="text-[color:var(--primary-color)]"
+            />
+            {!isMobile && <p className="pb-[1px] !text-md text-white">حساب کاربری</p>}
+          </>
+        ) : (
+          <>
+            <AccountCircleOutlinedIcon
+              fontSize="large"
+              className="text-[color:var(--primary-color)]"
+            />
+            {!isMobile && <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>}
+          </>
+        )}
+      </button>
+    );
   };
 
   return (
     <div className="w-full bg-[black] p-4">
-      <div className="ccontainer mx-auto flex justify-between items-center">
+      <div className="container mx-auto flex justify-between items-center">
         {/* لوگو */}
         <Link href="../">
           <Image
@@ -46,39 +81,18 @@ export default function Header() {
 
         {/* دکمه همبرگر و آیکن حساب کاربری برای موبایل */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleAccountClick}
-            className="md:hidden text-[#999] cursor-pointer items-center justify-center p-2 rounded-lg bg-black transition-all duration-200"
-          >
-            {isLoggedIn ? (
-              <AccountCircleOutlinedIcon fontSize="large" className="text-[color:var(--primary-color)]" />
-            ) : (
-              <AccountCircleOutlinedIcon
-                fontSize="large"
-                className="text-[color:var(--primary-color)]"
-              />
-            )}
-          </button>
+          {renderAccountButton(true)}
 
           <button
             className="md:hidden text-black bg-[color:var(--primary-color)] p-1 rounded-md focus:outline-none"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d={
-                  isMenuOpen
-                    ? "M6 18L18 6M6 6l12 12"
-                    : "M4 6h16M4 12h16M4 18h16"
-                }
+                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
               />
             </svg>
           </button>
@@ -100,37 +114,25 @@ export default function Header() {
         >
           <ul className="flex flex-col my-3 md:my-0 md:mx-3 md:flex-row gap-6 p-4 md:p-0 h-full md:h-auto">
             <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
-              <Link
-                className="flex items-center justify-start gap-1"
-                href="../"
-              >
+              <Link className="flex items-center justify-start gap-1" href="../">
                 <HomeOutlined className="text-[color:var(--primary-color)]" />
                 خانه
               </Link>
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
-              <Link
-                className="flex items-center justify-start gap-1"
-                href="../courselist"
-              >
+              <Link className="flex items-center justify-start gap-1" href="../courselist">
                 <SchoolOutlined className="text-[color:var(--primary-color)]" />
                 دوره‌های آموزشی
               </Link>
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
-              <Link
-                className="flex items-center justify-start gap-1"
-                href="../bloglist"
-              >
+              <Link className="flex items-center justify-start gap-1" href="../bloglist">
                 <ArticleOutlined className="text-[color:var(--primary-color)]" />
                 مقالات
               </Link>
             </li>
             <li className="flex items-center justify-start gap-1 hover:text-[color:var(--primary-color)] transition-all duration-500 cursor-pointer ease-in-out">
-              <Link
-                className="flex items-center justify-start gap-1"
-                href="../aboutus"
-              >
+              <Link className="flex items-center justify-start gap-1" href="../aboutus">
                 <InfoOutlined className="text-[color:var(--primary-color)]" />
                 درباره ما
               </Link>
@@ -139,25 +141,8 @@ export default function Header() {
         </div>
 
         {/* دکمه حساب کاربری/ورود (فقط در دسکتاپ) */}
-        <button
-          onClick={handleAccountClick}
-          className="hidden md:flex text-[#999] cursor-pointer shadow-[2px_2px_4px_rgba(255,255,255,0.4),-2px_-2px_4px_rgba(0,0,0,0.8)] active:shadow-[-2px_-2px_4px_rgba(255,255,255,0.4),2px_2px_4px_rgba(0,0,0,0.8)] items-center space-x-2 justify-center p-1 rounded-lg bg-[black] transition-all duration-200"
-        >
-          {isLoggedIn ? (
-            <>
-              <AccountCircleOutlinedIcon fontSize="large" className="text-[color:var(--primary-color)]" />
-              <p className="pb-[1px] !text-md text-white">حساب کاربری</p>
-            </>
-          ) : (
-            <>
-              <AccountCircleOutlinedIcon
-                fontSize="large"
-                className="text-[color:var(--primary-color)]"
-              />
-              <p className="pb-[1px] !text-md text-white">ورود | ثبت نام</p>
-            </>
-          )}
-        </button>
+        {renderAccountButton(false)}
+
       </div>
 
       <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

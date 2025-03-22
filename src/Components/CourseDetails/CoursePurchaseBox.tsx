@@ -1,34 +1,22 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
-import { Course } from "@/lib/Types/Types";
+import { Course, UserData } from "@/lib/Types/Types";
 import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
-import Link from "next/link"; // برای لینک به StudyRoom
+import Link from "next/link";
 
-const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
+const CoursePurchaseBox: React.FC<{ course: Course; userdata: UserData | null }> = ({ course, userdata }) => {
   const [isSticky, setIsSticky] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // حالت لودینگ
   const purchaseBoxRef = useRef<HTMLDivElement>(null);
   const initialTopRef = useRef<number>(0);
   const { addtocart } = useCart();
-  const { userData, isLoggedIn } = useAuth();
 
-  // بررسی وضعیت لود شدن userData
-  useEffect(() => {
-    if (userData !== null || isLoggedIn === false) {
-      setIsLoading(false); // وقتی userData لود شد یا کاربر لاگین نکرده، لودینگ خاموش می‌شه
-    }
-  }, [userData, isLoggedIn]);
-
-  // محاسبه وضعیت خرید
-  const isPurchased = userData?.purchasedCourses?.some((item) => item.id === course.id);
+  const isPurchased = userdata?.courseid?.some((item) => item.id === course.id) || false;
 
   useEffect(() => {
     const updateInitialTop = () => {
       if (purchaseBoxRef.current) {
-        initialTopRef.current =
-          purchaseBoxRef.current.getBoundingClientRect().top + window.scrollY;
+        initialTopRef.current = purchaseBoxRef.current.getBoundingClientRect().top + window.scrollY;
       }
     };
     updateInitialTop();
@@ -65,11 +53,7 @@ const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
         )}
       </div>
 
-      {isLoading ? (
-        <div className="w-full py-3 bg-gray-600 text-white rounded-lg flex items-center justify-center">
-          <div className="animate-spin rounded-full w-5 h-5 border-t-4 border-[color:var(--primary-color)] border-solid"></div>
-        </div>
-      ) : isPurchased ? (
+      {isPurchased ? (
         <Link
           href={`/StudyRoom/${course.id}`}
           className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg"

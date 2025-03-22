@@ -47,7 +47,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
-    const token = req.cookies.get(COOKIE_NAME)?.value;
+    const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get('Authorization')?.replace('Bearer ', '');
+
     const connection = await getConnection();
 
     if (email) {
@@ -57,73 +58,60 @@ export async function GET(req: NextRequest) {
       );
       await connection.end();
       const exists = rows[0].count > 0;
-      return NextResponse.json(
-        { exists },
-        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
-      );
-    } else if (token) {
-      const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
-      const [userRows] = await connection.execute<User[]>(
-        'SELECT id, name, lastname, email, phonenumber, courseid FROM accounts WHERE id = ?',
-        [decoded.id]
-      );
-      const user = userRows[0];
-
-      if (!user) {
-        await connection.end();
-        return NextResponse.json(
-          { error: 'User not found' },
-          { status: 404, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
-        );
-      }
-
-      let courseid: PurchasedCourse[] = [];
-      if (user.courseid) {
-        const courseIds = user.courseid.split(',').map(id => id.trim()).filter(id => id !== '');
-        if (courseIds.length > 0) {
-          const [courseRows] = await connection.execute<Course[]>(
-            `SELECT id, title, duration, thumbnail
-             FROM courses
-             WHERE id IN (${courseIds.map(() => '?').join(',')})`,
-            courseIds
-          );
-          courseid = courseRows.map(course => ({
-            id: course.id,
-            title: course.title,
-            duration: course.duration || '0:00',
-            thumbnail: course.thumbnail || null,
-            progress: 0,
-          }));
-        }
-      }
-
-      await connection.end();
-
-      const userData = {
-        id: user.id,
-        name: user.name,
-        lastname: user.lastname,
-        email: user.email,
-        phonenumber: user.phonenumber || null,
-        courseid, // تغییر نام متغیر به courseid برای سازگاری
-      };
-
-      return NextResponse.json(
-        userData,
-        { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
-      );
-    } else {
-      return NextResponse.json(
-        { error: 'Token required' },
-        { status: 401, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
-      );
+      return NextResponse.json({ exists });
     }
+
+    if (!token) {
+      return NextResponse.json({ error: 'Token required' }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    const [userRows] = await connection.execute<User[]>(
+      'SELECT id, name, lastname, email, phonenumber, courseid FROM accounts WHERE id = ?',
+      [decoded.id]
+    );
+    const user = userRows[0];
+
+    if (!user) {
+      await connection.end();
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    let courseid: PurchasedCourse[] = [];
+    if (user.courseid) {
+      const courseIds = user.courseid.split(',').map(id => id.trim()).filter(id => id !== '');
+      if (courseIds.length > 0) {
+        const [courseRows] = await connection.execute<Course[]>(
+          `SELECT id, title, duration, thumbnail
+           FROM courses
+           WHERE id IN (${courseIds.map(() => '?').join(',')})`,
+          courseIds
+        );
+        courseid = courseRows.map(course => ({
+          id: course.id,
+          title: course.title,
+          duration: course.duration || '0:00',
+          thumbnail: course.thumbnail || null,
+          progress: 0,
+        }));
+      }
+    }
+
+    await connection.end();
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+      phonenumber: user.phonenumber || null,
+      courseid,
+    };
+
+    return NextResponse.json(userData);
   } catch (error) {
     console.error('GET error:', error);
-    return NextResponse.json(
-      { error: 'Server error' },
-      { status: 500, headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' } }
-    );
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
 
@@ -184,7 +172,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const { currentPassword, newPassword } = await req.json();
-    const token = req.cookies.get(COOKIE_NAME)?.value;
+    const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get('Authorization')?.replace('Bearer ', '');
 
     if (!token || !currentPassword || !newPassword) {
       return NextResponse.json({ error: 'Token, current password, and new password required' }, { status: 400 });
@@ -219,6 +207,54 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
   } catch (error) {
     console.error('PUT error:', error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
+
+// POST: افزودن دوره به سبد خرید (برای هماهنگی با CourseSidebar)
+export async function POST_cart(req: NextRequest) {
+  try {
+    const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get('Authorization')?.replace('Bearer ', '');
+    const { courseId } = await req.json();
+
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    if (!courseId) {
+      return NextResponse.json({ error: 'Course ID required' }, { status: 400 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    const connection = await getConnection();
+
+    const [userRows] = await connection.execute<User[]>(
+      'SELECT courseid FROM accounts WHERE id = ?',
+      [decoded.id]
+    );
+    const user = userRows[0];
+
+    if (!user) {
+      await connection.end();
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // مدیریت سبد خرید در دیتابیس (فرض بر اینکه courseid یک رشته جدا شده با کاما است)
+    let courseIds = user.courseid ? user.courseid.split(',').map(id => id.trim()) : [];
+    if (!courseIds.includes(courseId.toString())) {
+      courseIds.push(courseId.toString());
+      const updatedCourseIds = courseIds.join(',');
+
+      await connection.execute<ResultSetHeader>(
+        'UPDATE accounts SET courseid = ? WHERE id = ?',
+        [updatedCourseIds, decoded.id]
+      );
+    }
+
+    await connection.end();
+    return NextResponse.json({ message: 'Course added to cart successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('POST_cart error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

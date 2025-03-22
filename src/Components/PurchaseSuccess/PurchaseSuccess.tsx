@@ -99,7 +99,7 @@ const PurchaseSuccess: React.FC<PurchaseSuccessProps> = ({
         {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <button
-            onClick={() => (window.location.href = "/account")}
+            onClick={() => (window.location.href = "/useraccount")}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
           >
             <User className="w-5 h-5 sm:w-6 sm:h-6" />
