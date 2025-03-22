@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import CartList from "@/Components/CartList/CartList";
 import { AuthProvider } from "@/context/AuthContext";
+import {  CartContextProvider } from "@/context/CartContext";
 
 
 export const metadata: Metadata = {
@@ -18,8 +19,12 @@ export default function RootLayout({
     <html lang="fa" dir="rtl">
       <body>
       <AuthProvider>
+        <CartContextProvider>
+          
         {children}
         <CartList/>
+        
+        </CartContextProvider>
         </AuthProvider>
       </body>
     </html>

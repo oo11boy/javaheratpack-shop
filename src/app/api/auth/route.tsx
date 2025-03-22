@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     } else if (token) {
       const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
       const [userRows] = await connection.execute<User[]>(
-        'SELECT name, lastname,email, phonenumber, courseid FROM accounts WHERE id = ?',
+        'SELECT id, name, lastname,email, phonenumber, courseid FROM accounts WHERE id = ?',
         [decoded.id]
       );
       const user = userRows[0];
@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
       await connection.end();
 
       const userData = {
+        id:user.id,
         name: user.name,
         lastname:user.lastname,
         email: user.email,

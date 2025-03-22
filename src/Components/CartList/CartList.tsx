@@ -1,57 +1,36 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { ShoppingCart, X, Plus, Minus, Trash2, Info, Tag, ChevronLeft } from 'lucide-react';
-import Image from 'next/image'; // اضافه کردن next/image
+import React, { useState } from "react";
+import { ShoppingCart, X, Trash2, Info, Tag, ChevronLeft } from "lucide-react";
+import Image from "next/image";
+import { useCart } from "@/context/CartContext";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  thumbnail: string;
-}
 
-const initialCartItems: CartItem[] = [
-  { id: '1', name: 'پکیج شماره ۱', price: 7000000, quantity: 2, thumbnail: 'https://picsum.photos/100/100?random=1' },
-  { id: '2', name: 'پکیج شماره ۲', price: 7000000, quantity: 1, thumbnail: 'https://picsum.photos/100/100?random=2' },
-  { id: '3', name: 'پکیج شماره ۳', price: 10000000, quantity: 1, thumbnail: 'https://picsum.photos/100/100?random=3' },
-];
 
 const CartList: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [discountCode, setDiscountCode] = useState('');
+  const { Cart, setCart,isCartOpen,setIsCartOpen} = useCart();
+  const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
 
-  const updateQuantity = (id: string, change: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(0, item.quantity + change) } : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems((prevItems) => prevItems.map((item) => (item.id === id ? { ...item, quantity: 0 } : item)));
+  const removeItem = (id: number) => {
+    setCart(Cart.filter((item) => item.id !== id));
   };
 
   const applyDiscountCode = () => {
-    if (discountCode.toLowerCase() === 'save20') {
+    if (discountCode.toLowerCase() === "save20") {
       setAppliedDiscount(0.2);
-    } else if (discountCode.toLowerCase() === 'save10') {
+    } else if (discountCode.toLowerCase() === "save10") {
       setAppliedDiscount(0.1);
     } else {
       setAppliedDiscount(0);
     }
   };
 
-  const activeItems = cartItems.filter((item) => item.quantity > 0);
-  const totalBasePrice = activeItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalBasePrice = Cart.reduce((sum, item) => sum + item.price, 0);
 
   let packageDiscount = 0;
-  const packageCount = activeItems.length;
+  const packageCount = Cart.length;
   if (packageCount === 2) packageDiscount = 0.1;
   if (packageCount === 3) packageDiscount = 0.2;
 
@@ -67,17 +46,17 @@ const CartList: React.FC = () => {
         className="fixed bottom-6 right-6 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-[#1B2535] p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center gap-3 z-20 group"
       >
         <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        {activeItems.length > 0 && (
+        {Cart.length > 0 && (
           <span className="bg-[#1B2535] text-[color:var(--primary-color)] rounded-full w-7 h-7 flex items-center justify-center font-bold shadow-md">
-            {activeItems.length}
+            {Cart.length}
           </span>
         )}
       </button>
 
       {/* Cart Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full md:w-96 bg-gradient-to-br from-[#121824] via-[#1e2636] to-[#2a3347] text-white shadow-2xl transform transition-all duration-500 ease-in-out z-30 ${
-          isCartOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        className={`fixed top-0 right-0 h-full w-full md:w-1/3 bg-gradient-to-br from-[#121824] via-[#1e2636] to-[#2a3347] text-white shadow-2xl transform transition-all duration-500 ease-in-out z-30 ${
+          isCartOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
         <div className="p-6 h-full flex flex-col">
@@ -99,24 +78,18 @@ const CartList: React.FC = () => {
           <div className="bg-[#2a3347]/80 rounded-xl p-4 mb-4 border border-[color:var(--primary-color)]/30 shadow-inner">
             <p className="text-sm text-gray-200 flex items-center gap-2">
               <Info className="w-5 h-5 text-[color:var(--primary-color)]" />
-              شرایط تخفیف:
+              شرایط تخفیف ویژه با محدودیت زمانی: 
             </p>
             <ul className="text-xs text-gray-300 mt-2 space-y-2">
+         
               <li className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-                پکیج ۱ و ۲: هر کدام ۷,۰۰۰,۰۰۰ تومان
+                با خرید ۲ دوره آموزشی: ۱۰٪ تخفیف   روی تمام دوره ها دریافت میکنید
               </li>
+        
               <li className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-                با ۲ پکیج: ۱۰٪ تخفیف
-              </li>
-              <li className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-                پکیج ۳: ۱۰,۰۰۰,۰۰۰ تومان
-              </li>
-              <li className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-[color:var(--primary-color)]" />
-                با ۳ پکیج: ۲۰٪ تخفیف
+             با خرید ۳ دوره آموزشی: ۲۰٪ تخفیف روی تمام دوره ها دریافت میکنید
               </li>
             </ul>
           </div>
@@ -148,52 +121,41 @@ const CartList: React.FC = () => {
                   </button>
                 </div>
                 {appliedDiscount > 0 && (
-                  <p className="text-sm text-[color:var(--primary-color)] mt-2">تخفیف {appliedDiscount * 100}% اعمال شد!</p>
+                  <p className="text-sm text-[color:var(--primary-color)] mt-2">
+                    تخفیف {appliedDiscount * 100}% اعمال شد!
+                  </p>
                 )}
               </div>
             )}
           </div>
 
           {/* Cart Items */}
-          {activeItems.length === 0 ? (
+          {Cart.length === 0 ? (
             <p className="text-gray-400 text-center py-8 animate-fade-in flex-1 flex items-center justify-center">
               سبد خرید شما خالی است!
             </p>
           ) : (
             <div className="flex-[2] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-              {activeItems.map((item) => (
+              {Cart.map((item) => (
                 <div
                   key={item.id}
                   className="bg-[#2a3347]/80 rounded-xl p-4 flex items-center gap-4 hover:bg-[#2a3347] transition-all duration-300 border border-[color:var(--primary-color)]/30 shadow-md hover:shadow-lg"
                 >
                   <Image
                     src={item.thumbnail}
-                    alt={item.name}
-                    width={64} // بر اساس w-16 (16 * 4 = 64px)
-                    height={64} // بر اساس h-16
+                    alt={item.title}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 rounded-md object-cover shadow-sm"
-                    sizes="64px" // اندازه ثابت برای تامبنیل
+                    sizes="64px"
                   />
                   <div className="flex-1">
-                    <h3 className="text-sm fontsninger text-white line-clamp-1">{item.name}</h3>
+                    <h3 className="text-sm font-medium text-white line-clamp-1">
+                      {item.title}
+                    </h3>
                     <p className="text-xs text-gray-300">
                       {item.price.toLocaleString()} تومان
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="p-1 bg-[color:var(--primary-color)]/20 rounded-full hover:bg-[color:var(--primary-color)]/40 transition-all duration-200"
-                      >
-                        <Minus className="w-4 h-4 text-[color:var(--primary-color)]" />
-                      </button>
-                      <span className="text-sm text-white w-8 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="p-1 bg-[color:var(--primary-color)]/20 rounded-full hover:bg-[color:var(--primary-color)]/40 transition-all duration-200"
-                      >
-                        <Plus className="w-4 h-4 text-[color:var(--primary-color)]" />
-                      </button>
-                    </div>
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
@@ -207,22 +169,28 @@ const CartList: React.FC = () => {
           )}
 
           {/* Total and Checkout */}
-          {activeItems.length > 0 && (
+          {Cart.length > 0 && (
             <div className="mt-6 space-y-4">
               <div className="space-y-3 bg-[#2a3347]/80 p-4 rounded-xl border border-[color:var(--primary-color)]/30">
                 <div className="flex justify-between text-sm">
                   <span>جمع اولیه:</span>
-                  <span className="text-gray-300">{totalBasePrice.toLocaleString()} تومان</span>
+                  <span className="text-gray-300">
+                    {totalBasePrice.toLocaleString()} تومان
+                  </span>
                 </div>
                 {maxDiscount > 0 && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span>تخفیف ({maxDiscount * 100}%):</span>
-                      <span className="text-[color:var(--primary-color)]">{discountAmount.toLocaleString()} تومان</span>
+                      <span className="text-[color:var(--primary-color)]">
+                        {discountAmount.toLocaleString()} تومان
+                      </span>
                     </div>
                     <div className="flex justify-between text-lg font-semibold">
                       <span>جمع نهایی:</span>
-                      <span className="text-[color:var(--primary-color)]">{discountedPrice.toLocaleString()} تومان</span>
+                      <span className="text-[color:var(--primary-color)]">
+                        {discountedPrice.toLocaleString()} تومان
+                      </span>
                     </div>
                   </>
                 )}
@@ -247,12 +215,21 @@ const CartList: React.FC = () => {
       {/* Custom CSS */}
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         @keyframes pulseShort {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
         }
         .animate-fade-in {
           animation: fadeIn 0.3s ease-out forwards;

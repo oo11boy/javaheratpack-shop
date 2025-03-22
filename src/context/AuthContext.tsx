@@ -9,7 +9,7 @@ interface AuthContextType {
   setIsLoggedIn: (value: boolean) => void;
   userData: UserData | null;
   setUserData: (data: UserData | null) => void;
-  refreshUserData: () => Promise<void>; // تابع جدید برای رفرش داده‌ها
+  refreshUserData: () => Promise<void>; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchUserData(); // بارگذاری اولیه
   }, []);
+
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userData, setUserData, refreshUserData }}>

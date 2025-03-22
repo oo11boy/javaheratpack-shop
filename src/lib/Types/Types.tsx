@@ -35,6 +35,8 @@ export interface Course {
   category: string;
   thumbnail: string;
   instructor: Instructor;
+  name: string;
+  courseLink: string;
 }
 
 export interface SimpleCourse {
@@ -65,10 +67,12 @@ export interface CourseVideo {
   isCompleted?: boolean;
   courseid: number;
   place: number;
+
 }
 
 
 export interface UserData {
+  id:number,
   name: string;
   lastname:string;
   email: string;
@@ -77,4 +81,9 @@ export interface UserData {
   purchasedCourses: Course[];
   completedCourses?: number;
   totalHours?: string;
+}
+
+
+export interface PurchasedCourse {
+
 }
