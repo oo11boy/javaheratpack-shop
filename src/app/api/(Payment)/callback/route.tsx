@@ -5,6 +5,9 @@ import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 const ZIBAL_MERCHANT = "zibal";
 const ZIBAL_VERIFY_URL = "https://gateway.zibal.ir/v1/verify";
 
+// Define the base URL based on environment (configurable via .env)
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -14,13 +17,13 @@ export async function GET(req: NextRequest) {
 
     if (!trackId || !orderId) {
       return NextResponse.redirect(
-        `http://localhost:3000/PurchaseFailure?error=${encodeURIComponent("اطلاعات پرداخت ناقص است")}`
+        `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent("اطلاعات پرداخت ناقص است")}`
       );
     }
 
     if (!success) {
       return NextResponse.redirect(
-        `http://localhost:3000/PurchaseFailure?error=${encodeURIComponent("پرداخت ناموفق بود")}`
+        `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent("پرداخت ناموفق بود")}`
       );
     }
 
@@ -34,11 +37,12 @@ export async function GET(req: NextRequest) {
     const verifyResult = await verifyResponse.json();
     if (verifyResult.result !== 100) {
       return NextResponse.redirect(
-        `http://localhost:3000/PurchaseFailure?error=${encodeURIComponent(verifyResult.message || "خطا در تأیید پرداخت")}`
+        `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent(verifyResult.message || "خطا در تأیید پرداخت")}`
       );
     }
 
     // استخراج اطلاعات از orderId
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, timestamp, userId, courseIdsStr] = orderId.split("-");
     const userIdNum = parseInt(userId, 10);
     const newCourseIds = courseIdsStr.split(",").map(Number);
@@ -65,14 +69,14 @@ export async function GET(req: NextRequest) {
     const purchaseDate = new Date(parseInt(timestamp)).toLocaleString("fa-IR");
     const totalAmount = verifyResult.amount / 10; // تبدیل از ریال به تومان
     return NextResponse.redirect(
-      `http://localhost:3000/PurchaseSuccess?orderId=${orderId}&purchaseDate=${encodeURIComponent(
+      `${BASE_URL}/PurchaseSuccess?orderId=${orderId}&purchaseDate=${encodeURIComponent(
         purchaseDate
       )}&totalAmount=${totalAmount}&courseIds=${courseIdsStr}`
     );
   } catch (error) {
     console.error("Payment callback error:", error);
     return NextResponse.redirect(
-      `http://localhost:3000/PurchaseFailure?error=${encodeURIComponent("خطا در سرور")}`
+      `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent("خطا در سرور")}`
     );
   }
 }

@@ -82,6 +82,8 @@ export async function GET(
       targetAudience: course.targetAudience ? course.targetAudience.split(',').sort() : [],
       category: course.category || '',
       thumbnail: course.thumbnail || '',
+      name: course.title, // Assuming 'name' is the same as 'title'
+      courseLink: `/StudyRoom/${course.id}`, // Derive courseLink from the id
     };
 
     const etag = generateETag(courseDetails);

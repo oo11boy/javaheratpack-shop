@@ -4,6 +4,7 @@ import PurchaseSuccess from "@/Components/PurchaseSuccess/PurchaseSuccess";
 import { getConnection } from "@/lib/db";
 import { RowDataPacket } from "mysql2/promise";
 
+// Define the interface for purchased courses
 interface PurchasedCourse {
   id: string;
   name: string;
@@ -12,21 +13,31 @@ interface PurchasedCourse {
   courseLink: string;
 }
 
-export default async function Page({ searchParams }: { searchParams: { [key: string]: string } }) {
-  const { orderId, purchaseDate, totalAmount, courseIds } = searchParams;
+// Use the correct type for searchParams in a server component
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Await the searchParams since it's a Promise
+  const resolvedSearchParams = await searchParams;
+  const { orderId, purchaseDate, totalAmount, courseIds } = resolvedSearchParams;
 
   if (!orderId || !purchaseDate || !totalAmount || !courseIds) {
     return <div>خطا: اطلاعات ناقص است</div>;
   }
 
-  // گرفتن اطلاعات دوره‌ها از دیتابیس
+  // Ensure courseIds is a string (not an array or undefined)
+  const courseIdsString = Array.isArray(courseIds) ? courseIds.join(",") : courseIds;
+
+  // Fetch course data from the database
   const connection = await getConnection();
   const [courseRows] = await connection.execute<RowDataPacket[]>(
-    `SELECT id, title AS name, price, thumbnail FROM courses WHERE id IN (${courseIds
+    `SELECT id, title AS name, price, thumbnail FROM courses WHERE id IN (${courseIdsString
       .split(",")
       .map(() => "?")
       .join(",")})`,
-    courseIds.split(",")
+    courseIdsString.split(",")
   );
   await connection.end();
 
@@ -35,7 +46,7 @@ export default async function Page({ searchParams }: { searchParams: { [key: str
     name: course.name,
     price: parseFloat(course.price),
     thumbnail: course.thumbnail || "https://picsum.photos/100/100",
-    courseLink: `/course/${course.id}`,
+    courseLink: `/StudyRoom/${course.id}`,
   }));
 
   return (
@@ -43,9 +54,9 @@ export default async function Page({ searchParams }: { searchParams: { [key: str
       <Header />
       <PurchaseSuccess
         courseid={courseid}
-        totalAmount={parseFloat(totalAmount)}
-        purchaseDate={decodeURIComponent(purchaseDate)}
-        orderCode={orderId}
+        totalAmount={parseFloat(totalAmount as string)}
+        purchaseDate={decodeURIComponent(purchaseDate as string)}
+        orderCode={orderId as string}
       />
       <Footer />
     </div>

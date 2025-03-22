@@ -85,5 +85,9 @@ export interface UserData {
 
 
 export interface PurchasedCourse {
-
+  id: number;
+  title: string;
+  duration: string;
+  thumbnail: string | null;
+  progress: number;
 }

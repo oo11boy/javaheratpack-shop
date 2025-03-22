@@ -9,7 +9,7 @@ interface CartContextType {
   addtocart: (course: Course) => void;
   setCart: React.Dispatch<React.SetStateAction<Course[]>>;
   setIsCartOpen:React.Dispatch<React.SetStateAction<boolean>>;
-  isCartOpen:Boolean;
+  isCartOpen:boolean;
 }
 
 // Create context with default values
