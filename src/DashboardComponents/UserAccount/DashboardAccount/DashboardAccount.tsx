@@ -11,9 +11,17 @@ const UserAccount: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // متغیر جدید برای مدیریت لودینگ خروج
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
-  const { userData: user, setIsLoggedIn, setUserData, isLoggedIn } = useAuth();
+  const { userData: user, setIsLoggedIn, setUserData, isLoggedIn, refreshUserData } = useAuth();
+
+  // به‌روزرسانی داده‌ها هنگام ورود به کامپوننت
+  useEffect(() => {
+    if (isLoggedIn) {
+      refreshUserData(); // فراخوانی تابع برای به‌روزرسانی داده‌ها
+    }
+  }, [isLoggedIn, refreshUserData]);
+
   // بررسی وضعیت لاگین و ریدایرکت به صفحه اصلی در صورت عدم لاگین
   useEffect(() => {
     if (isLoggedIn === false) {
@@ -22,7 +30,7 @@ const UserAccount: React.FC = () => {
   }, [isLoggedIn, router]);
 
   const handleLogout = async () => {
-    setIsLoggingOut(true); // شروع لودینگ
+    setIsLoggingOut(true);
     try {
       await fetch("/api/logout", { method: "POST", credentials: "include" });
       setIsLoggedIn(false);
@@ -31,7 +39,7 @@ const UserAccount: React.FC = () => {
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
-      setIsLoggingOut(false); // پایان لودینگ (در صورت خطا هم اجرا می‌شود)
+      setIsLoggingOut(false);
     }
   };
 
@@ -53,6 +61,7 @@ const UserAccount: React.FC = () => {
       setIsModalOpen(false);
       setCurrentPassword("");
       setNewPassword("");
+      await refreshUserData(); // به‌روزرسانی داده‌ها پس از تغییر رمز
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error("خطای ناشناخته");
       setError(error.message);
@@ -65,7 +74,6 @@ const UserAccount: React.FC = () => {
     setNewPassword("");
   };
 
-  // نمایش لودینگ در حالت لاگین نامشخص یا خروج
   if (isLoggedIn === null || isLoggingOut) {
     return (
       <div className="h-[90vh] inset-0 flex items-center justify-center bg-[#121824] bg-opacity-80 z-50">
@@ -75,9 +83,8 @@ const UserAccount: React.FC = () => {
   }
 
   if (!user) {
-    return null; // این خط عملاً اجرا نمی‌شود چون useEffect ریدایرکت را انجام داده است
+    return null;
   }
-
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
       <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-10 animate-fade-in">

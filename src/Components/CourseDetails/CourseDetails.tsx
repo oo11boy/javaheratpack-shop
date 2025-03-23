@@ -1,5 +1,5 @@
 import React from 'react';
-import { Course, UserData } from '@/lib/Types/Types';
+import { Course } from '@/lib/Types/Types';
 import CourseHero from './CourseHero';
 import CoursePurchaseBox from './CoursePurchaseBox';
 import CourseSidebar from './CourseSidebar';
@@ -9,7 +9,7 @@ import CourseSyllabus from './CourseSyllabus';
 import CourseInstructor from './CourseInstructor';
 import CourseReviews from './CourseReviews';
 
-const CourseDetails: React.FC<{ CourseData: Course; userdata: UserData | null }> = ({ CourseData, userdata }) => {
+const CourseDetails: React.FC<{ CourseData: Course; }> = ({ CourseData }) => {
    const course = CourseData;
 
   return (
@@ -23,8 +23,8 @@ const CourseDetails: React.FC<{ CourseData: Course; userdata: UserData | null }>
             </h1>
           </div>
           <div className="lg:hidden space-y-6">
-            <CoursePurchaseBox userdata={userdata} course={course} />
-            <CourseSidebar  userdata={userdata}  course={course} />
+            <CoursePurchaseBox  course={course} />
+            <CourseSidebar    course={course} />
           </div>
           <CourseDescription description={course.description} />
           <section className="bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-[color:var(--primary-color)]/30">
@@ -57,7 +57,7 @@ const CourseDetails: React.FC<{ CourseData: Course; userdata: UserData | null }>
           <CourseReviews />
         </div>
         <aside className="hidden lg:block lg:col-span-1">
-          <CourseSidebar userdata={userdata} course={course} />
+          <CourseSidebar course={course} />
         </aside>
       </div>
     </div>

@@ -1,9 +1,8 @@
-'use client';
-
-import React, { useState, useCallback } from 'react';
-import { X, Mail, Lock, User, Phone, ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+"use client";
+import React, { useState, useCallback, useEffect } from "react";
+import { X, Mail, Lock, User, Phone, ChevronLeft } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -12,30 +11,48 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [step, setStep] = useState(1);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isEmailRegistered, setIsEmailRegistered] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // پیام موفقیت
   const router = useRouter();
+  const pathname = usePathname();
+  const { setIsLoggedIn, refreshUserData } = useAuth();
 
-  const { setIsLoggedIn, refreshUserData } = useAuth(); 
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+    }
+  }, [isOpen]);
+
+  // پاک کردن پیام موفقیت پس از 3 ثانیه
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        handleClose(); // بستن مودال پس از محو شدن پیام
+      }, 3000); // 3 ثانیه
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const checkEmail = useCallback(async (email: string) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/auth?email=${encodeURIComponent(email)}`, {
-        cache: 'no-store',
+        cache: "no-store",
       });
       const data: { exists: boolean; error?: string } = await response.json();
-      if (!response.ok) throw new Error(data.error || 'خطا در بررسی ایمیل');
+      if (!response.ok) throw new Error(data.error || "خطا در بررسی ایمیل");
       return data.exists;
     } catch (error: unknown) {
-      const err = error instanceof Error ? error : new Error('خطای ناشناخته');
-      setError(err.message === 'Email check failed' ? 'خطا در بررسی ایمیل' : err.message);
+      const err = error instanceof Error ? error : new Error("خطای ناشناخته");
+      setError(err.message === "Email check failed" ? "خطا در بررسی ایمیل" : err.message);
       return false;
     } finally {
       setIsLoading(false);
@@ -54,48 +71,50 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-  
+
     try {
       const payload = isLogin
         ? { email, password }
         : { email, password, name: firstName, lastname: lastName, phonenumber: phoneNumber };
-  
+
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
         credentials: "include",
       });
-  
+
       const data: { redirect?: string; error?: string } = await response.json();
       if (!response.ok) {
         throw new Error(
-          data.error === "Invalid credentials" ? "ایمیل یا رمز عبور اشتباه است" :
-          data.error === "Name and lastname required" ? "نام و نام خانوادگی الزامی است" :
-          data.error === "Email and password required" ? "ایمیل و رمز عبور الزامی است" :
-          "خطا در عملیات"
+          data.error === "Invalid credentials"
+            ? "ایمیل یا رمز عبور اشتباه است"
+            : data.error === "Name and lastname required"
+            ? "نام و نام خانوادگی الزامی است"
+            : data.error === "Email and password required"
+            ? "ایمیل و رمز عبور الزامی است"
+            : "خطا در عملیات"
         );
       }
-  
+
       setIsLoggedIn(true);
-      await refreshUserData(); // رفرش داده‌ها پس از لاگین
-      router.push("/useraccount");
-      handleClose();
+      await refreshUserData();
+      setSuccessMessage(isLogin ? "ورود با موفقیت انجام شد!" : "ثبت‌نام با موفقیت انجام شد!");
+      router.push(pathname);
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error("خطای ناشناخته");
       setError(err.message);
-    } finally {
       setIsLoading(false);
     }
   };
-  
+
   const resetForm = () => {
     setStep(1);
-    setEmail('');
-    setPassword('');
-    setFirstName('');
-    setLastName('');
-    setPhoneNumber('');
+    setEmail("");
+    setPassword("");
+    setFirstName("");
+    setLastName("");
+    setPhoneNumber("");
     setIsEmailRegistered(null);
     setError(null);
     setIsLoading(false);
@@ -131,6 +150,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {error && (
           <div className="mb-4 p-3 bg-gradient-to-r from-red-500/20 to-red-700/20 border border-red-500/50 rounded-lg text-white text-center shadow-md animate-pulse">
             <span className="font-medium">{error}</span>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="fixed top-3 left-[55%] transform -translate-x-1/2 p-3 bg-gradient-to-r from-green-500/90 to-[#0aaf5a]/90 rounded-lg text-white text-center shadow-lg animate-tooltip">
+            <span className="font-medium">{successMessage}</span>
           </div>
         )}
 
@@ -278,18 +303,49 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       </div>
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
         @keyframes spinSlow {
-          to { transform: rotate(-360deg); }
+          to {
+            transform: rotate(-360deg);
+          }
         }
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+        @keyframes tooltip {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
+          10% {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+          90% {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
         }
         .animate-fade-in {
           animation: fadeIn 0.3s ease-out forwards;
@@ -302,6 +358,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         }
         .animate-pulse {
           animation: pulse 1.5s infinite;
+        }
+        .animate-tooltip {
+          animation: tooltip 3s ease-in-out forwards;
         }
       `}</style>
     </div>

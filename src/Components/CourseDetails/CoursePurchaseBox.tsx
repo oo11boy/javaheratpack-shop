@@ -1,22 +1,25 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
-import { Course, UserData } from "@/lib/Types/Types";
+import { Course } from "@/lib/Types/Types";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
-const CoursePurchaseBox: React.FC<{ course: Course; userdata: UserData | null }> = ({ course, userdata }) => {
+const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
   const [isSticky, setIsSticky] = useState(false);
+  const [isPurchased, setIsPurchased] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const purchaseBoxRef = useRef<HTMLDivElement>(null);
   const initialTopRef = useRef<number>(0);
   const { addtocart } = useCart();
-
-  const isPurchased = userdata?.courseid?.some((item) => item.id === course.id) || false;
+  const { userData, isLoggedIn } = useAuth();
 
   useEffect(() => {
     const updateInitialTop = () => {
       if (purchaseBoxRef.current) {
-        initialTopRef.current = purchaseBoxRef.current.getBoundingClientRect().top + window.scrollY;
+        initialTopRef.current =
+          purchaseBoxRef.current.getBoundingClientRect().top + window.scrollY;
       }
     };
     updateInitialTop();
@@ -30,8 +33,22 @@ const CoursePurchaseBox: React.FC<{ course: Course; userdata: UserData | null }>
     };
 
     window.addEventListener("scroll", handleScroll);
+
+    setIsLoading(true);
+    const purchased =
+      userData?.courseid?.some((item) => item.id === course.id) || false;
+    setIsPurchased(purchased);
+    setIsLoading(false);
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [userData, course.id]);
+
+  const handleAddToCart = async () => {
+    setIsLoading(true);
+    await addtocart(course);
+    setIsPurchased(true);
+    setIsLoading(false);
+  };
 
   return (
     <div
@@ -53,7 +70,11 @@ const CoursePurchaseBox: React.FC<{ course: Course; userdata: UserData | null }>
         )}
       </div>
 
-      {isPurchased ? (
+      {isLoading ? (
+        <div className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg flex items-center justify-center gap-2 shadow-md">
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-black"></div>
+        </div>
+      ) : isPurchased ? (
         <Link
           href={`/StudyRoom/${course.id}`}
           className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
@@ -61,14 +82,22 @@ const CoursePurchaseBox: React.FC<{ course: Course; userdata: UserData | null }>
           <ShoppingCart className="w-5 h-5" />
           مشاهده دوره
         </Link>
-      ) : (
+      ) : isLoggedIn ? (
         <button
-          onClick={() => addtocart(course)}
+          onClick={handleAddToCart}
           className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
         >
           <ShoppingCart className="w-5 h-5" />
           ثبت و خرید دوره
         </button>
+      ) : (
+        <button
+        onClick={handleAddToCart}
+        className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+      >
+        <ShoppingCart className="w-5 h-5" />
+        ثبت و خرید دوره
+      </button>
       )}
     </div>
   );

@@ -1,15 +1,20 @@
 "use client";
-
 import React, { useState } from "react";
 import { ShoppingCart, X, Trash2, Info, Tag, ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import LoginModal from "@/DashboardComponents/LoginModal/LoginModal";
 
 const CartList: React.FC = () => {
   const { Cart, setCart, isCartOpen, setIsCartOpen } = useCart();
+  const { isLoggedIn } = useAuth(); // وضعیت لاگین از AuthContext
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLoginMessage, setShowLoginMessage] = useState(false); // پیام "ابتدا وارد شوید"
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // وضعیت مودال
 
   const removeItem = (id: number) => {
     setCart(Cart.filter((item) => item.id !== id));
@@ -33,6 +38,17 @@ const CartList: React.FC = () => {
   const discountAmount = totalBasePrice - discountedPrice;
 
   const handleCheckout = async () => {
+    if (!isLoggedIn) {
+      // اگر کاربر لاگین نکرده باشد
+      setShowLoginMessage(true);
+      setTimeout(() => {
+        setShowLoginMessage(false);
+        setIsLoginModalOpen(true); // باز کردن مودال پس از محو شدن پیام
+      }, 2000); // پیام به مدت 2 ثانیه نمایش داده می‌شود
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const courseIds = Cart.map((item) => item.id);
       const response = await fetch("/api/payment", {
@@ -44,13 +60,15 @@ const CartList: React.FC = () => {
 
       const data = await response.json();
       if (data.paymentUrl) {
-        window.location.href = data.paymentUrl; // هدایت به درگاه زیپال
+        window.location.href = data.paymentUrl;
       } else {
         alert(data.error || "خطا در اتصال به درگاه پرداخت");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Checkout error:", error);
       alert("خطا در سرور");
+      setIsLoading(false);
     }
   };
 
@@ -205,9 +223,12 @@ const CartList: React.FC = () => {
               </div>
               <button
                 onClick={handleCheckout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                disabled={isLoading}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-black rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
-                تکمیل خرید
+                {isLoading ? "در حال انتقال..." : "تکمیل خرید"}
                 <ChevronLeft className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -215,12 +236,37 @@ const CartList: React.FC = () => {
         </div>
       </div>
 
+      {/* Login Required Message */}
+      {showLoginMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 p-3 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 rounded-lg text-white text-center shadow-lg animate-tooltip z-50">
+          <span className="font-medium">ابتدا وارد شوید!</span>
+        </div>
+      )}
+
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+
       {/* Overlay */}
       {isCartOpen && (
         <div
           onClick={() => setIsCartOpen(false)}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 animate-fade-in"
         />
+      )}
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in">
+          <div className="relative flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-t-4 border-[color:var(--primary-color)] border-solid rounded-full animate-spin-slow"></div>
+            <div className="relative">
+              <p className="text-white text-lg font-semibold animate-pulse">
+                در حال انتقال به درگاه پرداخت...
+              </p>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[color:var(--primary-color)]/20 to-transparent h-1 animate-loading-bar"></div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Custom CSS */}
@@ -233,8 +279,37 @@ const CartList: React.FC = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
         }
+        @keyframes spinSlow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes loadingBar {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes tooltip {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
+          10% {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+          90% {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
+        }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
         .animate-pulse-short { animation: pulseShort 2s infinite; }
+        .animate-spin-slow { animation: spinSlow 1.5s linear infinite; }
+        .animate-loading-bar { animation: loadingBar 2s infinite; }
+        .animate-tooltip { animation: tooltip 2s ease-in-out forwards; }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

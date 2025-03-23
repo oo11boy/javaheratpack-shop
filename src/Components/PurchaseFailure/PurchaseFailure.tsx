@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { XCircle, AlertTriangle } from 'lucide-react';
-import { ChevronRight } from '@mui/icons-material';
+import { ChevronLeft } from '@mui/icons-material';
 
 interface PurchaseFailureProps {
   errorMessage?: string;
@@ -45,7 +45,7 @@ const PurchaseFailure: React.FC<PurchaseFailureProps> = ({
               className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 text-base sm:text-lg font-semibold"
             >
               تلاش مجدد
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           )}
           <button

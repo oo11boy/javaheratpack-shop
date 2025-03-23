@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 const ZIBAL_MERCHANT = "zibal"; // حساب تستی زیبال
 const ZIBAL_REQUEST_URL = "https://gateway.zibal.ir/v1/request";
-const CALLBACK_URL = "http://localhost:3000/api/callback"; // مسیر جدید Callback
+const CALLBACK_URL = process.env.NEXT_PUBLIC_API_URL+'/callback'; // مسیر جدید Callback
 const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
 
 // درخواست پرداخت
