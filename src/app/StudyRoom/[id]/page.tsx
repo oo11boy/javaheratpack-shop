@@ -30,6 +30,8 @@ async function checkUserAccess(courseId: number) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    console.log('Decoded JWT:', decoded);
+
     const connection = await getConnection();
     const [users] = await connection.execute<User[]>(
       'SELECT courseid FROM accounts WHERE id = ?',
@@ -38,17 +40,30 @@ async function checkUserAccess(courseId: number) {
     await connection.end();
 
     const user = users[0];
+    console.log('User from DB:', user);
     if (!user || !user.courseid) return { isAuthenticated: true, hasAccess: false };
 
     let courseIds: string[];
-    try {
-      courseIds = JSON.parse(user.courseid);
-    } catch (error) {
-      courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
-      console.log(error)
+    console.log('Raw courseid:', user.courseid);
+
+    if (typeof user.courseid === 'string') {
+      try {
+        const parsed = JSON.parse(user.courseid);
+        console.log('Parsed as JSON:', parsed);
+        // اگر پارس‌شده یک آرایه نیست، آن را به آرایه تبدیل کن
+        courseIds = Array.isArray(parsed) ? parsed : [parsed.toString()];
+      } catch (error) {
+        console.log('JSON parse failed, splitting string:', error);
+        courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
+      }
+    } else {
+      courseIds = [];
+      console.log('courseid is not a string, setting empty array');
     }
 
+    console.log('Final Course IDs:', courseIds);
     const hasAccess = courseIds.includes(courseId.toString());
+    console.log('Course ID to check:', courseId, 'Has access:', hasAccess);
     return { isAuthenticated: true, hasAccess };
   } catch (error) {
     console.error('Error verifying user access:', error);
@@ -62,8 +77,8 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
 
   const { isAuthenticated, hasAccess } = await checkUserAccess(courseId);
 
-  if (!isAuthenticated) redirect('/login');
-  if (!hasAccess) notFound();
+  if (!isAuthenticated) redirect('../');
+  if (!hasAccess) redirect('../useraccount');
 
   let videos: CourseVideo[] = [];
   try {
