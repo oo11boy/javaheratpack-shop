@@ -1,0 +1,321 @@
+/* استایل کلی صفحه */
+.article-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #121824 0%, #1e2636 100%);
+    color: #e5e7eb;
+    font-family: 'Vazirmatn', sans-serif;
+    padding: 2rem;
+  }
+  
+  .article-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  
+  /* هدر مقاله (Hero Section) */
+  .article-hero {
+    position: relative;
+    background: rgba(30, 38, 54, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .article-hero img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  
+  .article-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent 50%);
+  }
+  
+  .article-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+  }
+  
+  .article-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .article-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    font-size: 1rem;
+    color: #d1d5db;
+  }
+  
+  .article-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  /* بخش خلاصه */
+  .article-summary-section {
+    background: rgba(42, 51, 71, 0.9);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    border-right: 4px solid var(--primary-color);
+  }
+  
+  .article-summary-section h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .article-summary-section p {
+    font-size: 1.125rem;
+    color: #d1d5db;
+    line-height: 1.75;
+    font-style: italic; /* برای تمایز از متن کامل */
+  }
+  
+  /* بخش متن کامل */
+  .article-content-section {
+    background: rgba(30, 38, 54, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  
+  .article-content-section h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+  }
+  
+  .article-content h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(to right, var(--primary-color), #0aaf5a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+    text-align: center;
+  }
+  
+  .article-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e5e7eb;
+    margin: 2rem 0 1rem;
+  }
+  
+  .article-content p {
+    font-size: 1.125rem;
+    color: #d1d5db;
+    line-height: 1.75;
+    margin-bottom: 1.25rem;
+  }
+  
+  .article-content img,
+  .article-content video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 1.5rem auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    display: block;
+  }
+  
+  /* بخش کامنت‌ها */
+  .comments-section {
+    background: rgba(30, 38, 54, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  
+  .comments-section h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .comment-card {
+    background: rgba(42, 51, 71, 0.8);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .comment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .comment-author {
+    font-weight: 600;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .comment-date {
+    font-size: 0.875rem;
+    color: #9ca3af;
+  }
+  
+  .comment-text {
+    color: #d1d5db;
+    font-size: 1rem;
+  }
+  
+  .comment-form {
+    margin-top: 2rem;
+  }
+  
+  .comment-form h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+  
+  .comment-form input,
+  .comment-form textarea {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(42, 51, 71, 0.7);
+    border: none;
+    border-radius: 0.5rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .comment-form input:focus,
+  .comment-form textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary-color);
+  }
+  
+  .comment-form textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .comment-form button {
+    background: linear-gradient(to right, var(--primary-color), #0aaf5a);
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .comment-form button:hover {
+    background: linear-gradient(to right, #0aaf5a, #088f4a);
+    transform: scale(1.05);
+  }
+  
+  .comment-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  /* ریسپانسیو */
+  @media (max-width: 768px) {
+    .article-page {
+      padding: 1rem;
+    }
+  
+    .article-hero img {
+      height: 300px;
+    }
+  
+    .article-hero h1 {
+      font-size: 1.875rem;
+    }
+  
+    .article-meta {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  
+    .article-summary-section,
+    .article-content-section,
+    .comments-section {
+      padding: 1.5rem;
+    }
+  
+    .article-content h1 {
+      font-size: 1.75rem;
+    }
+  
+    .article-content h2 {
+      font-size: 1.25rem;
+    }
+  
+    .article-content p {
+      font-size: 1rem;
+    }
+  }

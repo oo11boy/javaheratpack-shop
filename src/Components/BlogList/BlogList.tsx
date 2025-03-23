@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { FileText, Search, Filter, ChevronDown, Clock } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image'; // اضافه کردن Image از Next.js
+import React, { useState } from "react";
+import { FileText, Search, Filter, ChevronDown, Clock } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 interface Article {
   id: string;
@@ -15,47 +15,12 @@ interface Article {
   date: string;
 }
 
-const mockArticles: Article[] = [
-  {
-    id: '1',
-    title: 'چگونه برنامه‌نویس بهتری شویم؟',
-    excerpt: 'نکات و ترفندهایی برای بهبود مهارت‌های برنامه‌نویسی در کمترین زمان',
-    category: 'برنامه‌نویسی',
-    readTime: '5 دقیقه',
-    thumbnail: 'https://picsum.photos/300/200?random=6',
-    date: '1403/12/20',
-  },
-  {
-    id: '2',
-    title: 'آینده هوش مصنوعی در 2025',
-    excerpt: 'بررسی روندها و پیش‌بینی‌های مرتبط با هوش مصنوعی',
-    category: 'هوش مصنوعی',
-    readTime: '8 دقیقه',
-    thumbnail: 'https://picsum.photos/300/200?random=7',
-    date: '1403/12/15',
-  },
-  {
-    id: '3',
-    title: 'طراحی UX: اصول و مبانی',
-    excerpt: 'یادگیری اصول اولیه طراحی تجربه کاربری برای مبتدیان',
-    category: 'طراحی',
-    readTime: '6 دقیقه',
-    thumbnail: 'https://picsum.photos/300/200?random=8',
-    date: '1403/12/10',
-  },
-  {
-    id: '4',
-    title: 'بهینه‌سازی کد با الگوریتم‌ها',
-    excerpt: 'چگونه با الگوریتم‌های مناسب کد خود را سریع‌تر کنیم',
-    category: 'برنامه‌نویسی',
-    readTime: '7 دقیقه',
-    thumbnail: 'https://picsum.photos/300/200?random=9',
-    date: '1403/12/05',
-  },
-];
+interface BlogListProps {
+  mockArticles: Article[]; // prop برای دریافت مقالات از صفحه
+}
 
-const BlogList: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+const BlogList: React.FC<BlogListProps> = ({ mockArticles }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -105,9 +70,9 @@ const BlogList: React.FC = () => {
             >
               <span className="flex items-center gap-2">
                 <Filter className="w-5 h-5" />
-                {selectedCategory || 'همه دسته‌بندی‌ها'}
+                {selectedCategory || "همه دسته‌بندی‌ها"}
               </span>
-              <ChevronDown className={`w-5 h-5 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-5 h-5 transition-transform ${isFilterOpen ? "rotate-180" : ""}`} />
             </button>
             {isFilterOpen && (
               <div className="absolute top-14 left-0 w-full bg-[#2a3347] rounded-lg shadow-xl z-10 animate-fade-in">
@@ -141,9 +106,7 @@ const BlogList: React.FC = () => {
 
         {/* Article List */}
         {filteredArticles.length === 0 ? (
-          <p className="text-gray-400 text-center py-8 text-lg">
-            مقاله‌ای با این مشخصات یافت نشد!
-          </p>
+          <p className="text-gray-400 text-center py-8 text-lg">مقاله‌ای با این مشخصات یافت نشد!</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredArticles.map((article) => (

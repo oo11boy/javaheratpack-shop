@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BookOpen, Calendar, User, MessageCircle } from "lucide-react";
-import Image from "next/image"; // اضافه کردن next/image
-
+import Image from "next/image";
+import sanitizeHtml from "sanitize-html";
+import "./SingleArticle.css";
+import { Check } from "@mui/icons-material";
 interface Article {
+  id: string;
   title: string;
   author: string;
   date: string;
@@ -20,176 +23,181 @@ interface Comment {
   date: string;
 }
 
-const articleData: Article = {
-  title: "راهنمای جامع طراحی جواهرات مدرن",
-  author: "نازنین مقدم",
-  date: "1403/12/28",
-  summary:
-    "در این مقاله به بررسی تکنیک‌های مدرن طراحی جواهرات و ابزارهای مورد نیاز برای خلق آثار هنری پرداخته‌ایم.",
-  content:
-    "طراحی جواهرات مدرن ترکیبی از خلاقیت و فناوری است. در این مقاله، نازنین مقدم، مدرس برجسته این حوزه، شما را با مراحل طراحی، انتخاب مواد اولیه و استفاده از نرم‌افزارهای پیشرفته آشنا می‌کند. این مقاله برای هنرجویان مبتدی و حرفه‌ای مناسب است و نکات کلیدی برای شروع یک پروژه موفق را ارائه می‌دهد.",
-  heroImage: "https://picsum.photos/1200/600?random=3",
-};
+interface SingleArticleProps {
+  articleData: Article;
+}
 
-// نمونه نظرات اولیه
-const initialComments: Comment[] = [
-  { id: 1, author: "سارا حسینی", text: "مقاله بسیار کاربردی بود، ممنون!", date: "1403/12/29" },
-  { id: 2, author: "علی رضایی", text: "لطفاً درباره نرم‌افزارها بیشتر توضیح دهید.", date: "1403/12/30" },
-];
-
-const SingleArticle: React.FC = () => {
-  const article = articleData;
-  const [comments, setComments] = useState<Comment[]>(initialComments);
+const SingleArticle: React.FC<SingleArticleProps> = ({ articleData }) => {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState({ author: "", text: "" });
+  const [loading, setLoading] = useState(true);
+  const [submitMessage, setSubmitMessage] = useState("");
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/articles/${articleData.id}/comments`);
+        if (!res.ok) throw new Error("خطا در دریافت کامنت‌ها");
+        const data = await res.json();
+        setComments(data);
+      } catch (error) {
+        console.error("خطا:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchComments();
+  }, [articleData.id]);
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newComment.author && newComment.text) {
-      const today = new Date().toLocaleDateString("fa-IR").replace(/\/\d{2}$/, ""); // تاریخ به فرمت شمسی
-      const comment: Comment = {
-        id: comments.length + 1,
-        author: newComment.author,
-        text: newComment.text,
-        date: today,
-      };
-      setComments([...comments, comment]);
-      setNewComment({ author: "", text: "" }); // ریست کردن فرم
+    if (!newComment.author || !newComment.text) return;
+
+    try {
+      const res = await fetch(`/api/articles/${articleData.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newComment),
+      });
+      if (!res.ok) throw new Error("خطا در ارسال کامنت");
+      const { message } = await res.json();
+
+      setSubmitMessage(message);
+      setNewComment({ author: "", text: "" });
+     
+    } catch (error) {
+      console.error("خطا در ارسال کامنت:", error);
+      setSubmitMessage("خطا در ارسال کامنت");
     }
   };
 
+  const sanitizedContent = sanitizeHtml(articleData.content, {
+    allowedTags: [
+      "h1",
+      "h2",
+      "p",
+      "img",
+      "video",
+      "source",
+      "br",
+      "strong",
+      "em",
+    ],
+    allowedAttributes: {
+      img: ["src", "alt", "style"],
+      video: ["src", "controls", "style"],
+    },
+  });
+
   return (
-    <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
-      <div className="w-full ccontainer flex flex-col gap-10 animate-fade-in">
+    <div className="article-page">
+      <div className="article-container animate-fade-in">
         {/* Hero Section */}
-        <div className="relative bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden">
+        <div className="article-hero">
           <Image
-            src={article.heroImage}
-            alt={article.title}
-            width={1200} // بر اساس منبع (1200px)
-            height={600} // بر اساس منبع (600px)
-            className="w-full h-[300px] md:h-[400px] object-cover opacity-80"
-            sizes="(max-width: 768px) 100vw, 1200px" // 100vw در موبایل، 1200px در دسکتاپ
-            priority // چون تصویر بالای صفحه است
+            src={articleData.heroImage}
+            alt={articleData.title}
+            width={1200}
+            height={400}
+            className="w-full"
+            sizes="(max-width: 768px) 100vw, 1200px"
+            priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-[color:var(--primary-color)]/10 to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6 md:p-10 text-center w-full">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[color:var(--primary-color)] animate-pulse-once">
-              {article.title}
-            </h1>
-            <div className="flex justify-center items-center gap-4 mt-3 text-gray-300">
-              <span className="flex items-center gap-2">
-                <User className="w-5 h-5 text-[color:var(--primary-color)]" /> {article.author}
+          <div className="article-hero-content">
+            <h1>{articleData.title}</h1>
+            <div className="article-meta">
+              <span>
+                <User className="w-5 h-5 text-[color:var(--primary-color)]" />{" "}
+                {articleData.author}
               </span>
-              <span className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[color:var(--primary-color)]" /> {article.date}
+              <span>
+                <Calendar className="w-5 h-5 text-[color:var(--primary-color)]" />{" "}
+                {articleData.date}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Article Content */}
-        <div className="bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8">
-          {/* Summary */}
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[color:var(--primary-color)] flex items-center gap-2">
-              <BookOpen className="w-7 h-7" /> خلاصه مقاله
-            </h2>
-            <p className="text-gray-300 mt-3 leading-relaxed">{article.summary}</p>
-          </div>
+        {/* Summary Section */}
+        <div className="article-summary-section">
+          <h2>
+            <BookOpen className="w-7 h-7" /> خلاصه مقاله
+          </h2>
+          <p>{articleData.summary}</p>
+        </div>
 
-          {/* Full Content */}
-          <div>
-            <h3 className="text-xl md:text-2xl font-semibold text-[color:var(--primary-color)] mb-4">متن کامل</h3>
-            <p className="text-gray-300 leading-relaxed">{article.content}</p>
-          </div>
+        {/* Content Section */}
+        <div className="article-content-section">
+          <div
+            className="article-content"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          />
         </div>
 
         {/* Comments Section */}
-        <div className="bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-8">
-          <h3 className="text-xl md:text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2">
+        <div className="comments-section">
+          <h3>
             <MessageCircle className="w-6 h-6" /> نظرات
           </h3>
-
-          {/* Comments List */}
-          {comments.length > 0 ? (
-            <div className="flex flex-col gap-4">
+          {loading ? (
+            <p>در حال بارگذاری کامنت‌ها...</p>
+          ) : comments.length > 0 ? (
+            <div>
               {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="p-4 bg-[#2a3347]/70 rounded-lg flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[color:var(--primary-color)] font-semibold flex items-center gap-2">
+                <div key={comment.id} className="comment-card">
+                  <div className="comment-header">
+                    <span className="comment-author">
                       <User className="w-5 h-5" /> {comment.author}
                     </span>
-                    <span className="text-gray-400 text-sm">{comment.date}</span>
+                    <span className="comment-date">{comment.date}</span>
                   </div>
-                  <p className="text-gray-300">{comment.text}</p>
+                  <p className="comment-text">{comment.text}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">هنوز نظری ثبت نشده است. اولین نفر باشید!</p>
+            <p>هنوز کامنت تأییدشده‌ای وجود ندارد.</p>
           )}
-
-          {/* Comment Form */}
-          <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4 mt-6">
-            <h4 className="text-lg font-semibold text-[color:var(--primary-color)]">ارسال نظر جدید</h4>
+          <form onSubmit={handleCommentSubmit} className="comment-form">
+            <h4>ارسال نظر جدید</h4>
+           
             <input
               type="text"
               placeholder="نام شما"
               value={newComment.author}
-              onChange={(e) => setNewComment({ ...newComment, author: e.target.value })}
-              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]/50"
+              onChange={(e) =>
+                setNewComment({ ...newComment, author: e.target.value })
+              }
             />
             <textarea
               placeholder="نظر خود را بنویسید"
               value={newComment.text}
-              onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
-              className="p-3 bg-[#2a3347]/70 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]/50 resize-y min-h-[100px]"
+              onChange={(e) =>
+                setNewComment({ ...newComment, text: e.target.value })
+              }
             />
             <button
               type="submit"
               disabled={!newComment.author || !newComment.text}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-white rounded-full hover:from-[#0aaf5a] hover:to-[#088f4a] transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              <MessageCircle className="w-5 h-5 ml-2" />
               ارسال نظر
-              <MessageCircle className="w-5 h-5" />
             </button>
+            {submitMessage && (
+              <p
+                className={`text-lg flex items-center justify-center gap-2 text-center border p-4 rounded-2xl border-[color:var(--primary-color)] my-4 ${
+                  submitMessage.includes("خطا")
+                    ? "text-red-400"
+                    : "text-green-400"
+                }`}
+              >
+                <Check />
+                {submitMessage}
+              </p>
+            )}
           </form>
         </div>
       </div>
-
-      {/* Custom CSS for Animations */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes pulseOnce {
-          0% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
-          100% {
-            transform: scale(1);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-        .animate-pulse-once {
-          animation: pulseOnce 0.8s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 };
