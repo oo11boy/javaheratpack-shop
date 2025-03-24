@@ -5,19 +5,30 @@ import { notFound } from 'next/navigation';
 
 async function getArticle(id: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 3600 }, // کشینگ به مدت 1 ساعت
   });
-  if (!res.ok) throw new Error('مقاله یافت نشد');
+
+  if (!res.ok) {
+    throw new Error('مقاله یافت نشد');
+  }
+
   return res.json();
 }
 
-export default async function SingleArticlePage({ params }: { params: { id: string } }) {
+export default async function SingleArticlePage({
+  params,
+}: {
+  params: Promise<{ id: string }>; // تعریف params به صورت Promise
+}) {
+  const resolvedParams = await params; // منتظر دریافت params
+  const { id } = resolvedParams;
+
   let article;
   try {
-    article = await getArticle(params.id);
+    article = await getArticle(id);
   } catch (error) {
     console.error('خطا در دریافت مقاله:', error);
-    notFound();
+    notFound(); // هدایت به صفحه 404 در صورت خطا
   }
 
   return (
@@ -29,4 +40,4 @@ export default async function SingleArticlePage({ params }: { params: { id: stri
   );
 }
 
-export const revalidate = 3600;
+export const revalidate = 3600; // کشینگ سراسری صفحه به مدت 1 ساعت

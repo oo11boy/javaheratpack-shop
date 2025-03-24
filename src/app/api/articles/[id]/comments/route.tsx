@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
@@ -12,10 +12,13 @@ interface Comment {
 }
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<Comment[] | { error: string }>> {
-  const { id } = params;
+  const resolvedParams = await params; // منتظر دریافت params
+  const { id } = resolvedParams;
+
+ 
 
   try {
     const connection = await getConnection();
@@ -30,6 +33,8 @@ export async function GET(
     );
     await connection.end();
 
+   
+
     const comments: Comment[] = rows.map((row) => ({
       id: row.id,
       article_id: row.article_id,
@@ -38,6 +43,8 @@ export async function GET(
       date: row.date,
       status: row.status,
     }));
+
+  
 
     return NextResponse.json(comments, {
       headers: {
@@ -50,33 +57,36 @@ export async function GET(
   }
 }
 
-
 export async function POST(
-    request: Request,
-    { params }: { params: { id: string } }
-  ): Promise<NextResponse<{ message: string } | { error: string }>> {
-    const { id } = params;
-    const { author, text } = await request.json();
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse<{ message: string } | { error: string }>> {
+  const resolvedParams = await params; // منتظر دریافت params
+  const { id } = resolvedParams;
+  const { author, text } = await request.json();
+
+ 
+  if (!author || !text) {
+    return NextResponse.json({ error: "نام و متن کامنت الزامی است" }, { status: 400 });
+  }
+
+  try {
+    const connection = await getConnection();
+    const date = new Date().toLocaleDateString("fa-IR").replace(/\/\d{2}$/, "");
+
   
-    if (!author || !text) {
-      return NextResponse.json({ error: "نام و متن کامنت الزامی است" }, { status: 400 });
-    }
-  
-    try {
-      const connection = await getConnection();
-      const date = new Date().toLocaleDateString("fa-IR").replace(/\/\d{2}$/, "");
-      await connection.execute(
-        `
+    await connection.execute(
+      `
         INSERT INTO comments (article_id, author, text, date, status)
         VALUES (?, ?, ?, ?, 'inactive')
       `,
-        [id, author, text, date]
-      );
-      await connection.end();
-  
-      return NextResponse.json({ message: "کامنت ثبت شد و در انتظار تأیید است" }, { status: 201 });
-    } catch (error) {
-      console.error("خطا در ثبت کامنت:", error);
-      return NextResponse.json({ error: "خطا در ثبت کامنت" }, { status: 500 });
-    }
+      [id, author, text, date]
+    );
+    await connection.end();
+
+    return NextResponse.json({ message: "کامنت ثبت شد و در انتظار تأیید است" }, { status: 201 });
+  } catch (error) {
+    console.error("خطا در ثبت کامنت:", error);
+    return NextResponse.json({ error: "خطا در ثبت کامنت" }, { status: 500 });
   }
+}

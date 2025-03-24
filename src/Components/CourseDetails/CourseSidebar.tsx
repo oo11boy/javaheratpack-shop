@@ -20,9 +20,6 @@ const CourseSidebar: React.FC<{ course: Course }> = ({ course }) => {
     setIsLoading(false);
   }, [userData, course.id]);
 
-  console.log("CourseSidebar - userdata:", userData);
-  console.log("CourseSidebar - course.id:", course.id);
-  console.log("CourseSidebar - isPurchased:", isPurchased);
 
   return (
     <div className="bg-gray-800 rounded-2xl p-6 shadow-lg lg:sticky top-8 border border-gray-700">

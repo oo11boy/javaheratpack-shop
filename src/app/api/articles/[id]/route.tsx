@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'; // تغییر به NextRequest
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
 import { RowDataPacket } from 'mysql2';
@@ -19,10 +19,11 @@ function generateETag(article: Article): string {
 }
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest, // استفاده از NextRequest به جای Request
+  { params }: { params: Promise<{ id: string }> } // تعریف params به صورت Promise
 ): Promise<NextResponse<Article | { error: string }>> {
-  const { id } = params;
+  const resolvedParams = await params; // منتظر دریافت params
+  const { id } = resolvedParams;
 
   try {
     const connection = await getConnection();
