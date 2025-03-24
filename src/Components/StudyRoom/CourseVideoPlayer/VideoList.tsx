@@ -32,9 +32,11 @@ const VideoList: React.FC<VideoListProps> = ({
         <h2 className="!text-xl font-bold flex items-center justify-between text-[color:var(--primary-color)]">
           <span className="flex items-center gap-2">
             {isVideoListOpen ? (
-              <ChevronRight className="w-6 h-6 lg:hidden rotate-90" />
-            ) : (
+             
               <ChevronRight className="w-6 h-6 lg:hidden -rotate-90" />
+            ) : (
+              <ChevronRight className="w-6 h-6 lg:hidden rotate-90" />
+              
             )}
             فهرست ویدیوها
           </span>

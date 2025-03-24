@@ -4,8 +4,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Article } from './ArticlesSlider';
+
 import ArticleCard from './ArticleCard';
+import { Article } from '@/lib/Types/Types';
 
 interface ArticleSwiperProps {
   articles: Article[];

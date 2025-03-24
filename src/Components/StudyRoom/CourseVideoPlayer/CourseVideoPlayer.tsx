@@ -43,7 +43,7 @@ const CourseVideoPlayer: React.FC<{ videos: CourseVideo[] }> = ({ videos }) => {
   };
 
   return (
-    <div className="min-h-screen ccontainer bg-[#121824] text-white flex flex-col items-center justify-start p-4">
+    <div className="ccontainer bg-[#121824] text-white flex flex-col items-center justify-start p-4">
       <div className="w-full flex flex-col lg:flex-row gap-6">
         <VideoList
           videos={videos}

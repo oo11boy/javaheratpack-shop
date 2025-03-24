@@ -2,7 +2,6 @@ import Footer from '@/Components/Footer/Footer';
 import Header from '@/Components/Header/Header';
 import CourseVideoPlayer from '@/Components/StudyRoom/CourseVideoPlayer/CourseVideoPlayer';
 import { CourseVideo } from '@/lib/Types/Types';
-import { notFound } from 'next/navigation';
 import { redirect } from 'next/navigation';
 import { getConnection } from '@/lib/db';
 import jwt from 'jsonwebtoken';

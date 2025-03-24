@@ -1,7 +1,6 @@
 import BlogList from '@/Components/BlogList/BlogList';
 import Footer from '@/Components/Footer/Footer';
 import Header from '@/Components/Header/Header';
-import { notFound } from 'next/navigation';
 
 async function getArticles() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`, {

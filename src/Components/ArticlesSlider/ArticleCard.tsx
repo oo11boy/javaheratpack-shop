@@ -1,14 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Article } from './ArticlesSlider';
+import { Article } from '@/lib/Types/Types';
 
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
   return (
     <div className="group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden h-[400px] flex flex-col transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700">
       <div className="relative overflow-hidden">
         <Image
-          src={article.image}
+          src={article.thumbnail}
           alt={article.title}
           width={500}
           height={600}
@@ -27,7 +27,7 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
         </p>
         <Link
           href={`/bloglist/${article.id}`}
-          className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium mt-auto"
+          className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-4 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 text-center  transform hover:scale-105 font-medium mt-auto"
         >
           مطالعه بیشتر
         </Link>

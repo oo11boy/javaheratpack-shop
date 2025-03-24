@@ -1,4 +1,5 @@
 "use client";
+
 import { DiamondOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -10,25 +11,33 @@ interface NemoneItem {
 }
 
 export default function Nemone() {
-  const nemoneha: NemoneItem[] = [
-    { id: 1, src: "/Images/nemone/1.jpg" },
-    { id: 2, src: "/Images/nemone/2.jpg" },
-    { id: 3, src: "/Images/nemone/3.jpg" },
-    { id: 4, src: "/Images/nemone/4.jpg" },
-    { id: 5, src: "/Images/nemone/5.jpg" },
-    { id: 6, src: "/Images/nemone/6.jpg" },
-    { id: 7, src: "/Images/nemone/7.jpg" },
-    { id: 8, src: "/Images/nemone/8.jpg" },
-    { id: 9, src: "/Images/nemone/9.jpg" },
-  ];
-
+  const [nemoneha, setNemoneha] = useState<NemoneItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
+  // دریافت داده‌ها از API
   useEffect(() => {
-    const currentSection = sectionRef.current; // کپی کردن مقدار ref به یک متغیر محلی
+    const fetchNemone = async () => {
+      try {
+        const res = await fetch("/api/nemone");
+        if (!res.ok) throw new Error("خطا در دریافت نمونه‌کارها");
+        const data: NemoneItem[] = await res.json();
+        setNemoneha(data);
+      } catch (error) {
+        console.error("خطا:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNemone();
+  }, []);
+
+  // Intersection Observer برای انیمیشن ورود
+  useEffect(() => {
+    const currentSection = sectionRef.current;
     const observer = new IntersectionObserver(
       (entries: IntersectionObserverEntry[]) => {
         const entry = entries[0];
@@ -39,9 +48,7 @@ export default function Nemone() {
           }
         }
       },
-      {
-        threshold: 0.2,
-      }
+      { threshold: 0.2 }
     );
 
     if (currentSection) {
@@ -53,7 +60,7 @@ export default function Nemone() {
         observer.unobserve(currentSection);
       }
     };
-  }, []); // آرایه وابستگی خالی است، زیرا فقط یک بار در زمان مونت اجرا می‌شود
+  }, []);
 
   const openModal = (src: string): void => {
     setSelectedImage(src);
@@ -75,33 +82,37 @@ export default function Nemone() {
           <DiamondOutlined fontSize="large" className="text-[color:var(--primary-color)] ml-2" />
           برخی از نمونه کارهای طراحی شده
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {nemoneha.map((item: NemoneItem, index: number) => (
-            <div
-              key={item.id}
-              className={`group relative overflow-hidden rounded-2xl aspect-square transform transition-all duration-700 hover:scale-105 cursor-pointer ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-              onClick={() => openModal(item.src)}
-            >
-              <Image
-                src={item.src}
-                alt={`نمونه کار ${item.id}`}
-                width={300}
-                height={300}
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                <span className="text-white text-sm font-medium p-3">
-                  نمونه {item.id}
-                </span>
+        {isLoading ? (
+          <p className="text-center">در حال بارگذاری نمونه‌کارها...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {nemoneha.map((item: NemoneItem, index: number) => (
+              <div
+                key={item.id}
+                className={`group relative overflow-hidden rounded-2xl aspect-square transform transition-all duration-700 hover:scale-105 cursor-pointer ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+                onClick={() => openModal(item.src)}
+              >
+                <Image
+                  src={item.src}
+                  alt={`نمونه کار ${item.id}`}
+                  width={300}
+                  height={300}
+                  className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-80"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                  <span className="text-white text-sm font-medium p-3">
+                    نمونه {item.id}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* مودال تمام صفحه */}

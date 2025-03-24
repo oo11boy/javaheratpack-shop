@@ -91,3 +91,19 @@ export interface PurchasedCourse {
   thumbnail: string | null;
   progress: number;
 }
+
+
+
+export interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  readTime: string;
+  thumbnail: string;
+  date: string;
+}
+
+export interface BlogListProps {
+  mockArticles: Article[]; // prop برای دریافت مقالات از صفحه
+}

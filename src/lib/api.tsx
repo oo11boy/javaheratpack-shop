@@ -1,5 +1,4 @@
-// lib/api.ts
-import { Course, CourseVideo, Instructor, SimpleCourse } from "./Types/Types";
+import { Article, Course, CourseVideo, Instructor, SimpleCourse } from "./Types/Types";
 
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 3600 * 1000; // 1 ساعت به میلی‌ثانیه
@@ -21,7 +20,7 @@ async function fetchWithCache<T>(
   const response = await fetch(url, {
     ...options,
     next: { revalidate: 3600 }, // ISR برای Next.js
-    cache: 'force-cache', // استفاده از کش مرورگر
+    cache: "force-cache", // استفاده از کش مرورگر
   });
 
   if (!response.ok) {
@@ -49,4 +48,8 @@ export async function getCourseVideos(courseId: number): Promise<CourseVideo[]> 
   return fetchWithCache<CourseVideo[]>(
     `${process.env.NEXT_PUBLIC_API_URL}/coursesvideo?courseid=${courseId}`
   );
+}
+
+export async function getArticles(): Promise<Article[]> {
+  return fetchWithCache<Article[]>(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
 }
