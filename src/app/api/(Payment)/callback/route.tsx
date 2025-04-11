@@ -1,3 +1,4 @@
+// src\app\api\(Payment)\callback\route.tsx
 import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
@@ -6,7 +7,7 @@ const ZIBAL_MERCHANT = "zibal";
 const ZIBAL_VERIFY_URL = "https://gateway.zibal.ir/v1/verify";
 
 // Define the base URL based on environment (configurable via .env)
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.BASE_URL;
 
 export async function GET(req: NextRequest) {
   try {

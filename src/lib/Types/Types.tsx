@@ -15,6 +15,7 @@ export interface Instructor {
 export interface SyllabusItem {
   title: string;
   description: string;
+
 }
 
 export interface Course {
@@ -81,6 +82,7 @@ export interface UserData {
   courseid: Course[];
   completedCourses?: number;
   totalHours?: string;
+  vip:number
 }
 
 
@@ -97,11 +99,16 @@ export interface PurchasedCourse {
 export interface Article {
   id: string;
   title: string;
+  author: string;
+  date: string;
+  summary: string;
+  content: string;
+  heroImage: string;
   excerpt: string;
   category: string;
   readTime: string;
   thumbnail: string;
-  date: string;
+
 }
 
 export interface BlogListProps {

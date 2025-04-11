@@ -1,3 +1,4 @@
+// src\app\api\logout\route.tsx
 import {  NextResponse } from 'next/server';
 
 export async function POST() {

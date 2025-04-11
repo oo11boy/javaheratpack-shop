@@ -11,7 +11,6 @@ function generateETag(videos: CourseVideo[]): string {
 
 export async function GET(request: NextRequest) {
   let connection;
-
   try {
     connection = await getConnection();
     const { searchParams } = new URL(request.url);
@@ -22,17 +21,17 @@ export async function GET(request: NextRequest) {
 
     if (courseId) {
       query = `
-        SELECT id, title, url, duration, description, isCompleted, courseid, place
+        SELECT id, title, url, duration, description, isCompleted, courseId AS courseid, place
         FROM videocourse
-        WHERE courseid = ?
+        WHERE courseId = ?
         ORDER BY place ASC
       `;
       params = [parseInt(courseId)];
     } else {
       query = `
-        SELECT id, title, url, duration, description, isCompleted, courseid, place
+        SELECT id, title, url, duration, description, isCompleted, courseId AS courseid, place
         FROM videocourse
-        ORDER BY courseid, place ASC
+        ORDER BY courseId, place ASC
       `;
     }
 
@@ -60,7 +59,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'ETag': etag,
-        'Cache-Control': 'public, max-age=3600, must-revalidate', // کش برای ۱ ساعت
+        'Cache-Control': 'public, max-age=3600, must-revalidate',
       },
     });
   } catch (error) {
@@ -68,5 +67,32 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'خطا در دریافت داده‌ها' }, { status: 500 });
   } finally {
     if (connection) await connection.end();
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const connection = await getConnection();
+
+    // تبدیل undefined به null برای فیلدهای اختیاری
+    const safeData = {
+      place: data.place,
+      title: data.title,
+      url: data.url,
+      duration: data.duration ?? null, // اگر undefined بود، null می‌شه
+      description: data.description ?? null, // اگر undefined بود، null می‌شه
+      courseId: data.courseId,
+    };
+
+    const [result] = await connection.execute(
+      `INSERT INTO videocourse (place, title, url, duration, description, courseId) VALUES (?, ?, ?, ?, ?, ?)`,
+      [safeData.place, safeData.title, safeData.url, safeData.duration, safeData.description, safeData.courseId]
+    );
+    await connection.end();
+    return NextResponse.json({ id: (result as any).insertId, ...safeData }, { status: 201 });
+  } catch (error) {
+    console.error('خطا در افزودن ویدیو:', error);
+    return NextResponse.json({ error: 'خطا در افزودن ویدیو' }, { status: 500 });
   }
 }

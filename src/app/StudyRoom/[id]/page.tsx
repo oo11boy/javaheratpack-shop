@@ -51,6 +51,7 @@ async function checkUserAccess(courseId: number) {
         courseIds = Array.isArray(parsed) ? parsed : [parsed.toString()];
       } catch (error) {
         courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
+     console.log(error)
       }
     } else {
       courseIds = [];

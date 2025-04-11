@@ -1,3 +1,4 @@
+// src\app\api\auth\route.tsx
 import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import bcrypt from "bcryptjs";
@@ -15,7 +16,6 @@ const COOKIE_OPTIONS = {
   path: "/",
 };
 
-// Define types
 interface User extends RowDataPacket {
   id: number;
   email: string;
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
     const [userRows] = await connection.execute<User[]>(
-      "SELECT id, name, lastname, email, phonenumber, courseid FROM accounts WHERE id = ?",
+      "SELECT id, name, lastname, email, phonenumber, courseid, vip FROM accounts WHERE id = ?", // vip اضافه شد
       [decoded.id]
     );
     const user = userRows[0];
@@ -104,16 +104,18 @@ export async function GET(req: NextRequest) {
       lastname: user.lastname,
       email: user.email,
       phonenumber: user.phonenumber || null,
+      vip: user.vip, // vip به پاسخ اضافه شد
       courseid,
     };
 
-    return NextResponse.json(userData);
+    return NextResponse.json(userData, {
+      headers: { "Cache-Control": "no-store" }, // جلوگیری از کش شدن پاسخ
+    });
   } catch (error) {
     console.error("GET error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
 export async function POST(req: NextRequest) {
   try {
     const { email, password, name, lastname, phonenumber, courseId, action } = await req.json();

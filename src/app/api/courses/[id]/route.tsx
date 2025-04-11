@@ -1,8 +1,10 @@
+// src\app\api\courses\[id]\route.tsx
 import { NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
 import { Course } from '@/lib/Types/Types';
 import { RowDataPacket } from 'mysql2/promise';
+import { revalidatePath } from 'next/cache';
 
 function generateETag(course: Course): string {
   const dataString = JSON.stringify(course, Object.keys(course).sort());
@@ -102,5 +104,51 @@ export async function GET(
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'خطا در دریافت جزئیات دوره' }, { status: 500 });
+  }
+}
+
+
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  try {
+    const data = await request.json();
+    const connection = await getConnection();
+
+    // تنظیم مقادیر پیش‌فرض یا تبدیل undefined به null
+    const params = [
+      data.title || null, // اگر title undefined باشد، null ارسال می‌شود
+      data.description || null,
+      data.duration || null,
+      data.accessType || null,
+      data.price !== undefined ? data.price : null, // برای اعداد
+      data.discountPrice !== undefined ? data.discountPrice : null,
+      data.introVideo || null,
+      data.level || null,
+      data.bannerImage || null,
+      data.features ? data.features.join(",") : null, // اگر features undefined باشد، null ارسال می‌شود
+      data.prerequisites ? data.prerequisites.join(",") : null,
+      data.targetAudience ? data.targetAudience.join(",") : null,
+      data.category || null,
+      data.thumbnail || null,
+      data.instructorID !== undefined ? data.instructorID : null, // برای ID
+      id,
+    ];
+
+    await connection.execute(
+      `UPDATE courses SET 
+        title = ?, description = ?, duration = ?, accessType = ?, price = ?, discountPrice = ?, 
+        introVideo = ?, level = ?, bannerImage = ?, features = ?, prerequisites = ?, 
+        targetAudience = ?, category = ?, thumbnail = ?, instructorID = ?
+      WHERE id = ?`,
+      params
+    );
+
+    await connection.end();
+
+    revalidatePath('/courselist', 'page');
+    return NextResponse.json({ message: 'دوره با موفقیت به‌روزرسانی شد' });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'خطا در به‌روزرسانی دوره' }, { status: 500 });
   }
 }

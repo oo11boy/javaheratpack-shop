@@ -1,4 +1,6 @@
+// src\app\components\LoginModal.tsx
 "use client";
+
 import React, { useState, useCallback, useEffect } from "react";
 import { X, Mail, Lock, User, Phone, ChevronLeft } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
@@ -19,7 +21,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isEmailRegistered, setIsEmailRegistered] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // پیام موفقیت
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { setIsLoggedIn, refreshUserData } = useAuth();
@@ -30,13 +32,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // پاک کردن پیام موفقیت پس از 3 ثانیه
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage(null);
-        handleClose(); // بستن مودال پس از محو شدن پیام
-      }, 3000); // 3 ثانیه
+        handleClose();
+        // ریدایرکت به AuthContext واگذار شده است
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
@@ -98,9 +100,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       }
 
       setIsLoggedIn(true);
-      await refreshUserData();
+      await refreshUserData(); // به‌روزرسانی اطلاعات و ریدایرکت توسط AuthContext
       setSuccessMessage(isLogin ? "ورود با موفقیت انجام شد!" : "ثبت‌نام با موفقیت انجام شد!");
-      router.push(pathname);
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error("خطای ناشناخته");
       setError(err.message);
@@ -303,65 +304,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       </div>
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
+          to { transform: rotate(360deg); }
         }
         @keyframes spinSlow {
-          to {
-            transform: rotate(-360deg);
-          }
+          to { transform: rotate(-360deg); }
         }
         @keyframes pulse {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.7;
-          }
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
         }
         @keyframes tooltip {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -20px);
-          }
-          10% {
-            opacity: 1;
-            transform: translate(-50%, 0);
-          }
-          90% {
-            opacity: 1;
-            transform: translate(-50%, 0);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -20px);
-          }
+          0% { opacity: 0; transform: translate(-50%, -20px); }
+          10% { opacity: 1; transform: translate(-50%, 0); }
+          90% { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, -20px); }
         }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-        .animate-spin-slow {
-          animation: spinSlow 1.5s linear infinite;
-        }
-        .animate-pulse {
-          animation: pulse 1.5s infinite;
-        }
-        .animate-tooltip {
-          animation: tooltip 3s ease-in-out forwards;
-        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        .animate-spin-slow { animation: spinSlow 1.5s linear infinite; }
+        .animate-pulse { animation: pulse 1.5s infinite; }
+        .animate-tooltip { animation: tooltip 3s ease-in-out forwards; }
       `}</style>
     </div>
   );

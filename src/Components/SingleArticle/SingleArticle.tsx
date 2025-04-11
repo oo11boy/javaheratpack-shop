@@ -6,15 +6,7 @@ import Image from "next/image";
 import sanitizeHtml from "sanitize-html";
 import "./SingleArticle.css";
 import { Check } from "@mui/icons-material";
-interface Article {
-  id: string;
-  title: string;
-  author: string;
-  date: string;
-  summary: string;
-  content: string;
-  heroImage: string;
-}
+import { Article } from "@/lib/Types/Types";
 
 interface Comment {
   id: number;
@@ -36,7 +28,7 @@ const SingleArticle: React.FC<SingleArticleProps> = ({ articleData }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/articles/${articleData.id}/comments`);
+        const res = await fetch(`/api/articles/${articleData.id}/comments`,{cache:"no-cache"});
         if (!res.ok) throw new Error("خطا در دریافت کامنت‌ها");
         const data = await res.json();
         setComments(data);

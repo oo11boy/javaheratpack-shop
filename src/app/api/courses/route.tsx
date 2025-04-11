@@ -1,9 +1,10 @@
-//api/courses/route.tsx
+// src\app\api\courses\route.tsx
 import { NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
 import { SimpleCourse } from '@/lib/Types/Types';
 import { RowDataPacket } from 'mysql2/promise';
+import { revalidatePath } from 'next/cache';
 
 function generateETag(courses: SimpleCourse[]): string {
   const dataString = JSON.stringify(courses, Object.keys(courses).sort());
@@ -56,5 +57,45 @@ export async function GET(request: Request): Promise<NextResponse<SimpleCourse[]
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'خطا در دریافت لیست دوره‌ها' }, { status: 500 });
+  }
+}
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const connection = await getConnection();
+    const [result] = await connection.execute(
+      `INSERT INTO courses (
+        title, description, duration, accessType, price, discountPrice, 
+        introVideo, level, bannerImage, features, prerequisites, 
+        targetAudience, category, thumbnail, instructorID
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        data.title,
+        data.description,
+        data.duration,
+        data.accessType,
+        data.price,
+        data.discountPrice,
+        data.introVideo,
+        data.level,
+        data.bannerImage,
+        data.features?.join(","),
+        data.prerequisites?.join(","),
+        data.targetAudience?.join(","),
+        data.category,
+        data.thumbnail,
+        data.instructorID,
+      ]
+    );
+    await connection.end();
+
+    revalidatePath("/courselist", "page");
+    return NextResponse.json(
+      { id: (result as any).insertId, ...data },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "خطا در افزودن دوره" }, { status: 500 });
   }
 }

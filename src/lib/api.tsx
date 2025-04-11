@@ -53,3 +53,8 @@ export async function getCourseVideos(courseId: number): Promise<CourseVideo[]> 
 export async function getArticles(): Promise<Article[]> {
   return fetchWithCache<Article[]>(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
 }
+export async function getArticlesbyid(id: string): Promise<Article> {
+  return fetchWithCache<Article>(
+    `${process.env.NEXT_PUBLIC_API_URL}/articles/${id}`
+  );
+}

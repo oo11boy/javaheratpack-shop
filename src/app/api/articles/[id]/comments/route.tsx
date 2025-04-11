@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getConnection } from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+// src\app\api\articles\[id]\comments\route.tsx
+import { NextRequest, NextResponse } from 'next/server';
+import { getConnection } from '@/lib/db';
+import { RowDataPacket } from 'mysql2';
 
 interface Comment {
   id: number;
@@ -8,17 +9,15 @@ interface Comment {
   author: string;
   text: string;
   date: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
 }
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<Comment[] | { error: string }>> {
-  const resolvedParams = await params; // منتظر دریافت params
+  const resolvedParams = await params;
   const { id } = resolvedParams;
-
- 
 
   try {
     const connection = await getConnection();
@@ -33,8 +32,6 @@ export async function GET(
     );
     await connection.end();
 
-   
-
     const comments: Comment[] = rows.map((row) => ({
       id: row.id,
       article_id: row.article_id,
@@ -44,16 +41,14 @@ export async function GET(
       status: row.status,
     }));
 
-  
-
     return NextResponse.json(comments, {
       headers: {
-        "Cache-Control": "public, max-age=300, must-revalidate",
+        'Cache-Control': 'no-store', // غیرفعال کردن کش
       },
     });
   } catch (error) {
-    console.error("خطا در دریافت کامنت‌ها:", error);
-    return NextResponse.json({ error: "خطا در دریافت کامنت‌ها" }, { status: 500 });
+    console.error('خطا در دریافت کامنت‌ها:', error);
+    return NextResponse.json({ error: 'خطا در دریافت کامنت‌ها' }, { status: 500 });
   }
 }
 
@@ -61,20 +56,18 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<{ message: string } | { error: string }>> {
-  const resolvedParams = await params; // منتظر دریافت params
+  const resolvedParams = await params;
   const { id } = resolvedParams;
   const { author, text } = await request.json();
 
- 
   if (!author || !text) {
-    return NextResponse.json({ error: "نام و متن کامنت الزامی است" }, { status: 400 });
+    return NextResponse.json({ error: 'نام و متن کامنت الزامی است' }, { status: 400 });
   }
 
   try {
     const connection = await getConnection();
-    const date = new Date().toLocaleDateString("fa-IR").replace(/\/\d{2}$/, "");
+    const date = new Date().toLocaleDateString('fa-IR').replace(/\/\d{2}$/, '');
 
-  
     await connection.execute(
       `
         INSERT INTO comments (article_id, author, text, date, status)
@@ -84,9 +77,11 @@ export async function POST(
     );
     await connection.end();
 
-    return NextResponse.json({ message: "کامنت ثبت شد و در انتظار تأیید است" }, { status: 201 });
+    return NextResponse.json({ message: 'کامنت ثبت شد و در انتظار تأیید است' }, { status: 201 });
   } catch (error) {
-    console.error("خطا در ثبت کامنت:", error);
-    return NextResponse.json({ error: "خطا در ثبت کامنت" }, { status: 500 });
+    console.error('خطا در ثبت کامنت:', error);
+    return NextResponse.json({ error: 'خطا در ثبت کامنت' }, { status: 500 });
   }
 }
+
+export const revalidate = 0;

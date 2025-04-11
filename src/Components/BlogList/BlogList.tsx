@@ -4,16 +4,9 @@ import React, { useState } from "react";
 import { FileText, Search, Filter, ChevronDown, Clock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Article } from "@/lib/Types/Types";
 
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  readTime: string;
-  thumbnail: string;
-  date: string;
-}
+
 
 interface BlogListProps {
   mockArticles: Article[]; // prop برای دریافت مقالات از صفحه

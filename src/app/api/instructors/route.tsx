@@ -1,3 +1,4 @@
+// src\app\api\instructors\route.tsx
 import { NextRequest, NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';

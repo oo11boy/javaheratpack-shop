@@ -29,10 +29,14 @@ const CartList: React.FC = () => {
       setAppliedDiscount(0);
     }
   };
-
-  const totalBasePrice = Cart.reduce((sum, item) => sum + item.price, 0);
+  console.log(Cart);
+  const totalBasePrice = Cart.reduce(
+    (sum, item) => sum + (item.discountPrice ? item.discountPrice : item.price),
+    0
+  );
   const packageCount = Cart.length;
-  const packageDiscount = packageCount === 2 ? 0.1 : packageCount === 3 ? 0.2 : 0;
+  const packageDiscount =
+    packageCount === 2 ? 0.1 : packageCount === 3 ? 0.2 : 0;
   const maxDiscount = Math.max(packageDiscount, appliedDiscount);
   const discountedPrice = totalBasePrice * (1 - maxDiscount);
   const discountAmount = totalBasePrice - discountedPrice;
@@ -90,7 +94,9 @@ const CartList: React.FC = () => {
       {/* Cart Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-full md:w-1/3 bg-gradient-to-br from-[#121824] via-[#1e2636] to-[#2a3347] text-white shadow-2xl transform transition-all duration-500 ease-in-out z-30 ${
-          isCartOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          isCartOpen
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0"
         }`}
       >
         <div className="p-6 h-full flex flex-col">
@@ -182,8 +188,12 @@ const CartList: React.FC = () => {
                     sizes="64px"
                   />
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-white line-clamp-1">{item.title}</h3>
-                    <p className="text-xs text-gray-300">{item.price.toLocaleString()} تومان</p>
+                    <h3 className="text-sm font-medium text-white line-clamp-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-gray-300">
+                      {item.price.toLocaleString()} تومان
+                    </p>
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
@@ -202,7 +212,9 @@ const CartList: React.FC = () => {
               <div className="space-y-3 bg-[#2a3347]/80 p-4 rounded-xl border border-[color:var(--primary-color)]/30">
                 <div className="flex justify-between text-sm">
                   <span>جمع اولیه:</span>
-                  <span className="text-gray-300">{totalBasePrice.toLocaleString()} تومان</span>
+                  <span className="text-gray-300">
+                    {totalBasePrice.toLocaleString()} تومان
+                  </span>
                 </div>
                 {maxDiscount > 0 && (
                   <>
@@ -244,7 +256,10 @@ const CartList: React.FC = () => {
       )}
 
       {/* Login Modal */}
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
 
       {/* Overlay */}
       {isCartOpen && (
@@ -272,20 +287,37 @@ const CartList: React.FC = () => {
       {/* Custom CSS */}
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         @keyframes pulseShort {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
         }
         @keyframes spinSlow {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
         @keyframes loadingBar {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
         @keyframes tooltip {
           0% {
@@ -305,11 +337,21 @@ const CartList: React.FC = () => {
             transform: translate(-50%, -20px);
           }
         }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        .animate-pulse-short { animation: pulseShort 2s infinite; }
-        .animate-spin-slow { animation: spinSlow 1.5s linear infinite; }
-        .animate-loading-bar { animation: loadingBar 2s infinite; }
-        .animate-tooltip { animation: tooltip 2s ease-in-out forwards; }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animate-pulse-short {
+          animation: pulseShort 2s infinite;
+        }
+        .animate-spin-slow {
+          animation: spinSlow 1.5s linear infinite;
+        }
+        .animate-loading-bar {
+          animation: loadingBar 2s infinite;
+        }
+        .animate-tooltip {
+          animation: tooltip 2s ease-in-out forwards;
+        }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
