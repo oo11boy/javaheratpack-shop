@@ -23,6 +23,7 @@ import UserAdd from "../Users/UserAdd";
 import UserEdit from "../Users/UserEdit";
 import PurchasedCoursesList from "../PurchasedCourses/PurchasedCoursesList";
 import Settings from "../Settings/Settings";
+import Uploader from "@/DashboardComponents/Uploader/Uploader";
 
 const AdminDashboard = ({
   deeppage,
@@ -102,6 +103,7 @@ const AdminDashboard = ({
         {deeppage === "instructor" && <InstructorEdit />}
         {deeppage === "commentarticlelist" && <CommentList />}
 
+        {deeppage === "uploader" && <Uploader />}
         {deeppage === "settings" && <Settings />}
       </div>
 

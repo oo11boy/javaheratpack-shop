@@ -3,7 +3,7 @@
 
 import { UserData } from "@/lib/Types/Types";
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface AuthContextType {
   isLoggedIn: boolean | null;
@@ -11,7 +11,7 @@ interface AuthContextType {
   userData: UserData | null;
   setUserData: (data: UserData | null) => void;
   refreshUserData: () => Promise<void>;
-  
+  handleRedirectAfterLogin: () => void; // متد جدید برای ریدایرکت
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,14 +22,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const router = useRouter();
+  const pathname = usePathname(); // مسیر فعلی
 
   const fetchUserData = async () => {
     if (cachedUserData && isLoggedIn) {
       setUserData(cachedUserData);
-      // ریدایرکت بر اساس vip
-      if (cachedUserData.vip === 1) {
-        router.push("/admin");
-      }
       return;
     }
 
@@ -37,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch("/api/auth", {
         method: "GET",
         credentials: "include",
-        cache: "no-store", // مطمئن شویم همیشه داده‌های تازه دریافت می‌شوند
+        cache: "no-store",
       });
       if (response.ok) {
         const data = await response.json();
@@ -46,16 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           completedCourses: data.completedCourses || 0,
           totalHours: data.totalHours || "0 ساعت",
           courseid: data.courseid || [],
-          vip: data.vip || 0, // اطمینان از وجود vip
+          vip: data.vip || 0,
         };
         setIsLoggedIn(true);
         setUserData(formattedData);
         cachedUserData = formattedData;
-
-        // ریدایرکت بر اساس vip
-        if (formattedData.vip === 1) {
-          router.push("/admin");
-        }
       } else {
         setIsLoggedIn(false);
         setUserData(null);
@@ -71,14 +63,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshUserData = useCallback(async () => {
     await fetchUserData();
-  }, [router]);
+  }, []);
+
+  // متد جدید برای مدیریت ریدایرکت
+  const handleRedirectAfterLogin = useCallback(() => {
+    if (userData?.vip === 1 && pathname !== "/admin") {
+      router.push("/admin");
+    }
+  }, [userData, pathname, router]);
 
   useEffect(() => {
     fetchUserData(); // بارگذاری اولیه
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userData, setUserData, refreshUserData }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, setIsLoggedIn, userData, setUserData, refreshUserData, handleRedirectAfterLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );

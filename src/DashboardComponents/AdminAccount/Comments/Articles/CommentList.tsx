@@ -4,8 +4,6 @@
 import { Trash2, CheckCircle, XCircle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-
 interface Comment {
   id: number;
   article_id: number;
@@ -17,7 +15,6 @@ interface Comment {
 }
 
 const CommentList: React.FC = () => {
-  const router = useRouter();
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState<number | null>(null);

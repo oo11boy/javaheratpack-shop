@@ -41,7 +41,6 @@ const CourseEdit: React.FC<{ courseId: number }> = ({ courseId }) => {
   const [deletedVideoIds, setDeletedVideoIds] = useState<number[]>([]); // برای ذخیره IDهای ویدیوهای حذف‌شده
   const [openVideoIndex, setOpenVideoIndex] = useState<number | null>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   // بارگذاری اطلاعات دوره و محتواها
   useEffect(() => {
@@ -83,8 +82,6 @@ const CourseEdit: React.FC<{ courseId: number }> = ({ courseId }) => {
       } catch (error) {
         console.error('خطا:', error);
         alert('خطا در بارگذاری اطلاعات دوره');
-      } finally {
-        setIsLoading(false);
       }
     };
   
@@ -99,7 +96,10 @@ const CourseEdit: React.FC<{ courseId: number }> = ({ courseId }) => {
   const handleContentChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const newContent = [...contentItems];
-    newContent[index][name as keyof ContentItem] = value;
+    newContent[index] = {
+      ...newContent[index],
+      [name]: value
+    };
     setContentItems(newContent);
   };
 

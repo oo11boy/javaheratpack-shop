@@ -1,4 +1,5 @@
 // AdminSideBar.tsx
+import { Upload } from "@mui/icons-material";
 import {
   ChevronDown,
   ChevronRight,
@@ -191,6 +192,13 @@ export default function AdminSideBar({
           <span className="text-sm">سفارشات</span>
         </Link>
 
+        <Link
+          href="/admin/uploader"
+          className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#2a3347] transition-all duration-200 group"
+        >
+          <Upload className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+          <span className="text-sm">آپلودر</span>
+        </Link>
         <Link
           href="/admin/instructor"
           className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#2a3347] transition-all duration-200 group"

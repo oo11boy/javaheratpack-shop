@@ -22,9 +22,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const router = useRouter();
-  const pathname = usePathname();
-  const { setIsLoggedIn, refreshUserData } = useAuth();
+  const { setIsLoggedIn, refreshUserData, handleRedirectAfterLogin } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +35,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       const timer = setTimeout(() => {
         setSuccessMessage(null);
         handleClose();
-        // ریدایرکت به AuthContext واگذار شده است
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -100,7 +97,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       }
 
       setIsLoggedIn(true);
-      await refreshUserData(); // به‌روزرسانی اطلاعات و ریدایرکت توسط AuthContext
+      await refreshUserData();
+      handleRedirectAfterLogin(); // ریدایرکت بعد از لاگین
       setSuccessMessage(isLogin ? "ورود با موفقیت انجام شد!" : "ثبت‌نام با موفقیت انجام شد!");
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error("خطای ناشناخته");
@@ -127,7 +125,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 animate-fade-in">
       <div className="w-full max-w-md sm:max-w-lg bg-[#2a3347]/95 rounded-3xl shadow-2xl border border-[color:var(--primary-color)]/20 p-6 sm:p-8 relative">

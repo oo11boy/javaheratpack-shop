@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { DashboardOutlined } from "@mui/icons-material";
-import { Users, BookOpen, FileText, ShoppingCart, MessageSquare, Clock } from "lucide-react";
+import { Users, BookOpen, FileText, MessageSquare } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface DashboardData {
