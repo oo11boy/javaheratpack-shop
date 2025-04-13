@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import ftp, { Options } from "ftp";
 import { Readable } from "stream";
-import { setUploadProgress } from "../ftp-progress/route";
+import { setUploadProgress } from "@/utils/ftpProgress";
 
 interface FTPResponse {
   success: boolean;
