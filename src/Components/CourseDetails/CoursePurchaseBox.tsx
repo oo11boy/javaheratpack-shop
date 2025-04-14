@@ -66,7 +66,7 @@ const CoursePurchaseBox: React.FC<{ course: Course }> = ({ course }) => {
             <span>{course.discountPrice.toLocaleString()} تومان</span>
           </div>
         ) : (
-          <span>{course.price.toLocaleString()} تومان</span>
+          <span>{course.price===0 ? 'این دوره رایگان است.':course.price.toLocaleString()+"تومان "} </span>
         )}
       </div>
 

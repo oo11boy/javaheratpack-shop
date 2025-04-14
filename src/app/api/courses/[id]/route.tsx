@@ -1,4 +1,3 @@
-// src\app\api\courses\[id]\route.tsx
 import { NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
@@ -84,8 +83,8 @@ export async function GET(
       targetAudience: course.targetAudience ? course.targetAudience.split(',').sort() : [],
       category: course.category || '',
       thumbnail: course.thumbnail || '',
-      name: course.title, // Assuming 'name' is the same as 'title'
-      courseLink: `/StudyRoom/${course.id}`, // Derive courseLink from the id
+      name: course.title,
+      courseLink: `/StudyRoom/${course.id}`,
     };
 
     const etag = generateETag(courseDetails);
@@ -98,7 +97,7 @@ export async function GET(
     return NextResponse.json(courseDetails, {
       headers: {
         'ETag': etag,
-        'Cache-Control': 'public, max-age=3600, must-revalidate', // کش برای ۱ ساعت
+        'Cache-Control': 'public, max-age=3600, must-revalidate',
       },
     });
   } catch (error) {
@@ -107,30 +106,32 @@ export async function GET(
   }
 }
 
-
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await request.json();
     const connection = await getConnection();
 
-    // تنظیم مقادیر پیش‌فرض یا تبدیل undefined به null
+    // تنظیم مقادیر پیش‌فرض
+    const price = data.price !== undefined && data.price !== null ? Number(data.price) : 0; // اطمینان از مقدار معتبر برای price
+    const discountPrice = data.discountPrice !== undefined && data.discountPrice !== null ? Number(data.discountPrice) : null; // اختیاری بودن discountPrice
+
     const params = [
-      data.title || null, // اگر title undefined باشد، null ارسال می‌شود
+      data.title || null,
       data.description || null,
       data.duration || null,
       data.accessType || null,
-      data.price !== undefined ? data.price : null, // برای اعداد
-      data.discountPrice !== undefined ? data.discountPrice : null,
+      price, // استفاده از مقدار معتبر price
+      discountPrice, // استفاده از مقدار اختیاری discountPrice
       data.introVideo || null,
       data.level || null,
       data.bannerImage || null,
-      data.features ? data.features.join(",") : null, // اگر features undefined باشد، null ارسال می‌شود
+      data.features ? data.features.join(",") : null,
       data.prerequisites ? data.prerequisites.join(",") : null,
       data.targetAudience ? data.targetAudience.join(",") : null,
       data.category || null,
       data.thumbnail || null,
-      data.instructorID !== undefined ? data.instructorID : null, // برای ID
+      data.instructorID !== undefined && data.instructorID !== null ? data.instructorID : null,
       id,
     ];
 

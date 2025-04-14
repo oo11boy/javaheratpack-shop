@@ -35,7 +35,7 @@ const CourseList: React.FC = () => {
       setIsLoading(true);
       try {
         const response = await fetch("/api/courses", {
-          cache: "no-cache",
+          cache: "no-store",
         });
         if (!response.ok) throw new Error("خطا در دریافت دوره‌ها");
         const data = await response.json();
@@ -123,14 +123,14 @@ const CourseList: React.FC = () => {
                       {course.discountPrice ? (
                         <>
                           <span className="line-through text-gray-400">
-                            {course.price.toLocaleString()}
+                            {course.price==0 ? 'رایگان' :course.price.toLocaleString()}
                           </span>
                           <span className="mr-2 text-[color:var(--primary-color)]">
                             {course.discountPrice.toLocaleString()}
                           </span>
                         </>
                       ) : (
-                        course.price.toLocaleString()
+                        course.price==0 ? 'رایگان': course.price.toLocaleString()
                       )}
                     </td>
                     <td className="p-4 flex gap-2">

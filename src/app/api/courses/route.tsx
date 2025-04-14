@@ -1,4 +1,3 @@
-// src\app\api\courses\route.tsx
 import { NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { createHash } from 'crypto';
@@ -29,7 +28,7 @@ export async function GET(request: Request): Promise<NextResponse<SimpleCourse[]
       level: course.level,
       duration: course.duration || '',
       accessType: course.accessType || null,
-      price: parseFloat(course.price),
+      price: parseFloat(course.price) || 0,
       discountPrice: course.discountPrice ? parseFloat(course.discountPrice) : null,
       introVideo: course.introVideo || null,
       bannerImage: course.bannerImage || null,
@@ -51,7 +50,7 @@ export async function GET(request: Request): Promise<NextResponse<SimpleCourse[]
       headers: {
         'ETag': etag,
         'Cache-Control': 'public, max-age=3600, must-revalidate',
-        'Vary': 'Accept-Encoding', // برای اطمینان از کش درست با فشرده‌سازی
+        'Vary': 'Accept-Encoding',
       },
     });
   } catch (error) {
@@ -59,6 +58,7 @@ export async function GET(request: Request): Promise<NextResponse<SimpleCourse[]
     return NextResponse.json({ error: 'خطا در دریافت لیست دوره‌ها' }, { status: 500 });
   }
 }
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -74,8 +74,8 @@ export async function POST(request: Request) {
         data.description,
         data.duration,
         data.accessType,
-        data.price,
-        data.discountPrice,
+        data.price ?? 0,
+        data.discountPrice ?? null,
         data.introVideo,
         data.level,
         data.bannerImage,

@@ -8,13 +8,13 @@ import LoginModal from "@/DashboardComponents/LoginModal/LoginModal";
 
 const CartList: React.FC = () => {
   const { Cart, setCart, isCartOpen, setIsCartOpen } = useCart();
-  const { isLoggedIn } = useAuth(); // وضعیت لاگین از AuthContext
+  const { isLoggedIn } = useAuth();
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showLoginMessage, setShowLoginMessage] = useState(false); // پیام "ابتدا وارد شوید"
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // وضعیت مودال
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const removeItem = (id: number) => {
     setCart(Cart.filter((item) => item.id !== id));
@@ -29,45 +29,67 @@ const CartList: React.FC = () => {
       setAppliedDiscount(0);
     }
   };
-  console.log(Cart);
-  const totalBasePrice = Cart.reduce(
+
+  const paidCourses = Cart.filter((item) => item.price > 0);
+  const totalBasePrice = paidCourses.reduce(
     (sum, item) => sum + (item.discountPrice ? item.discountPrice : item.price),
     0
   );
-  const packageCount = Cart.length;
+  const packageCount = paidCourses.length;
   const packageDiscount =
-    packageCount === 2 ? 0.1 : packageCount === 3 ? 0.2 : 0;
-  const maxDiscount = Math.max(packageDiscount, appliedDiscount);
+    totalBasePrice === 0 ? 0 : packageCount === 2 ? 0.1 : packageCount >= 3 ? 0.2 : 0;
+  const maxDiscount = totalBasePrice === 0 ? 0 : Math.max(packageDiscount, appliedDiscount);
   const discountedPrice = totalBasePrice * (1 - maxDiscount);
   const discountAmount = totalBasePrice - discountedPrice;
 
   const handleCheckout = async () => {
     if (!isLoggedIn) {
-      // اگر کاربر لاگین نکرده باشد
       setShowLoginMessage(true);
       setTimeout(() => {
         setShowLoginMessage(false);
-        setIsLoginModalOpen(true); // باز کردن مودال پس از محو شدن پیام
-      }, 2000); // پیام به مدت 2 ثانیه نمایش داده می‌شود
+        setIsLoginModalOpen(true);
+      }, 2000);
       return;
     }
 
     setIsLoading(true);
     try {
       const courseIds = Cart.map((item) => item.id);
-      const response = await fetch("/api/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseIds, totalAmount: discountedPrice }),
-        credentials: "include",
-      });
+      const isAllFree = Cart.every((item) => item.price === 0);
 
-      const data = await response.json();
-      if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+      if (isAllFree) {
+        console.log("Sending to /api/free-course-callback with courseIds:", courseIds);
+        const response = await fetch("/api/free-course-callback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courseIds }),
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        if (data.redirectUrl) {
+          setCart([]); // خالی کردن سبد خرید
+          window.location.href = data.redirectUrl; // هدایت به callback
+        } else {
+          alert(data.error || "خطا در ثبت دوره‌های رایگان");
+          setIsLoading(false);
+        }
       } else {
-        alert(data.error || "خطا در اتصال به درگاه پرداخت");
-        setIsLoading(false);
+        console.log("Sending to /api/payment with courseIds:", courseIds, "totalAmount:", discountedPrice);
+        const response = await fetch("/api/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courseIds, totalAmount: discountedPrice }),
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        if (data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+        } else {
+          alert(data.error || "خطا در اتصال به درگاه پرداخت");
+          setIsLoading(false);
+        }
       }
     } catch (error) {
       console.error("Checkout error:", error);
@@ -78,7 +100,6 @@ const CartList: React.FC = () => {
 
   return (
     <div className="relative font-sans">
-      {/* Cart Button */}
       <button
         onClick={() => setIsCartOpen(true)}
         className="fixed bottom-6 right-6 bg-gradient-to-r from-[color:var(--primary-color)] to-[#0aaf5a] text-[#1B2535] p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center gap-3 z-20 group"
@@ -91,16 +112,12 @@ const CartList: React.FC = () => {
         )}
       </button>
 
-      {/* Cart Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-full md:w-1/3 bg-gradient-to-br from-[#121824] via-[#1e2636] to-[#2a3347] text-white shadow-2xl transform transition-all duration-500 ease-in-out z-30 ${
-          isCartOpen
-            ? "translate-x-0 opacity-100"
-            : "translate-x-full opacity-0"
+          isCartOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
         <div className="p-6 h-full flex flex-col">
-          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-[color:var(--primary-color)] flex items-center gap-2 animate-pulse-short">
               <ShoppingCart className="w-8 h-8" />
@@ -114,7 +131,6 @@ const CartList: React.FC = () => {
             </button>
           </div>
 
-          {/* Discount Info */}
           <div className="bg-[#2a3347]/80 rounded-xl p-4 mb-4 border border-[color:var(--primary-color)]/30 shadow-inner">
             <p className="text-sm text-gray-200 flex items-center gap-2">
               <Info className="w-5 h-5 text-[color:var(--primary-color)]" />
@@ -132,7 +148,6 @@ const CartList: React.FC = () => {
             </ul>
           </div>
 
-          {/* Discount Code Toggle */}
           <div className="mb-4">
             <button
               onClick={() => setShowDiscountInput(!showDiscountInput)}
@@ -167,7 +182,6 @@ const CartList: React.FC = () => {
             )}
           </div>
 
-          {/* Cart Items */}
           {Cart.length === 0 ? (
             <p className="text-gray-400 text-center py-8 animate-fade-in flex-1 flex items-center justify-center">
               سبد خرید شما خالی است!
@@ -192,7 +206,7 @@ const CartList: React.FC = () => {
                       {item.title}
                     </h3>
                     <p className="text-xs text-gray-300">
-                      {item.price.toLocaleString()} تومان
+                      {item.price === 0 ? "رایگان" : `${item.price.toLocaleString()} تومان`}
                     </p>
                   </div>
                   <button
@@ -206,7 +220,6 @@ const CartList: React.FC = () => {
             </div>
           )}
 
-          {/* Total and Checkout */}
           {Cart.length > 0 && (
             <div className="mt-6 space-y-4">
               <div className="space-y-3 bg-[#2a3347]/80 p-4 rounded-xl border border-[color:var(--primary-color)]/30">
@@ -240,7 +253,11 @@ const CartList: React.FC = () => {
                   isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {isLoading ? "در حال انتقال..." : "تکمیل خرید"}
+                {isLoading
+                  ? "در حال پردازش..."
+                  : Cart.every((item) => item.price === 0)
+                  ? "دریافت رایگان"
+                  : "تکمیل خرید"}
                 <ChevronLeft className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -248,20 +265,17 @@ const CartList: React.FC = () => {
         </div>
       </div>
 
-      {/* Login Required Message */}
       {showLoginMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 p-3 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 rounded-lg text-white text-center shadow-lg animate-tooltip z-50">
           <span className="font-medium">ابتدا وارد شوید!</span>
         </div>
       )}
 
-      {/* Login Modal */}
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
       />
 
-      {/* Overlay */}
       {isCartOpen && (
         <div
           onClick={() => setIsCartOpen(false)}
@@ -269,14 +283,13 @@ const CartList: React.FC = () => {
         />
       )}
 
-      {/* Loading Overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fade-in">
           <div className="relative flex flex-col items-center gap-4">
             <div className="w-16 h-16 border-4 border-t-4 border-[color:var(--primary-color)] border-solid rounded-full animate-spin-slow"></div>
             <div className="relative">
               <p className="text-white text-lg font-semibold animate-pulse">
-                در حال انتقال به درگاه پرداخت...
+                در حال پردازش...
               </p>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[color:var(--primary-color)]/20 to-transparent h-1 animate-loading-bar"></div>
             </div>
@@ -284,7 +297,6 @@ const CartList: React.FC = () => {
         </div>
       )}
 
-      {/* Custom CSS */}
       <style jsx>{`
         @keyframes fadeIn {
           from {

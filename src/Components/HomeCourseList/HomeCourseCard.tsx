@@ -1,7 +1,7 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { SimpleCourse } from '@/lib/Types/Types';
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { SimpleCourse } from "@/lib/Types/Types";
 
 interface CourseCardProps {
   course: SimpleCourse;
@@ -9,11 +9,15 @@ interface CourseCardProps {
   index: number;
 }
 
-const HomeCourseCard: React.FC<CourseCardProps> = ({ course, isVisible, index }) => {
+const HomeCourseCard: React.FC<CourseCardProps> = ({
+  course,
+  isVisible,
+  index,
+}) => {
   return (
     <div
       className={`group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
@@ -38,9 +42,17 @@ const HomeCourseCard: React.FC<CourseCardProps> = ({ course, isVisible, index })
         <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[color:var(--primary-color)] transition-colors duration-300">
           {course.title}
         </h3>
-        <p className="text-gray-300 text-sm mb-4 line-clamp-2">{course.description}</p>
+        <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+          {course.description}
+        </p>
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-[color:var(--primary-color)]">{course.price}</span>
+          <span className="text-lg font-bold text-[color:var(--primary-color)]">
+            {course.price === 0
+              ? "رایگان"
+              : course.discountPrice
+              ? course.discountPrice.toLocaleString()
+              : course.price.toLocaleString() + "تومان "}
+          </span>
           <Link
             href={`/courselist/${course.id}`}
             className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"

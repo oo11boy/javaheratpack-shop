@@ -1,12 +1,12 @@
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { SimpleCourse } from '@/lib/Types/Types';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { SimpleCourse } from "@/lib/Types/Types";
 
 const CourseCard: React.FC<{ course: SimpleCourse }> = ({ course }) => {
   return (
     <div className="bg-[#2a3347]/70 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group cursor-pointer border border-[color:var(--primary-color)]/20">
-     <div className="relative overflow-hidden h-56">
+      <div className="relative overflow-hidden h-56">
         <Image
           src={course.thumbnail}
           alt={course.title}
@@ -27,9 +27,19 @@ const CourseCard: React.FC<{ course: SimpleCourse }> = ({ course }) => {
         <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[color:var(--primary-color)] transition-colors duration-300">
           {course.title}
         </h3>
-        <p className="text-gray-300 text-sm mb-4 line-clamp-2">{course.description}</p>
+        <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+          {course.description}
+        </p>
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-[color:var(--primary-color)]">{course.price}</span>
+          <span className="text-lg font-bold text-[color:var(--primary-color)]">
+            {course.price === 0
+              ? "رایگان"
+              : 
+            course.discountPrice ?   course.discountPrice.toLocaleString() :
+              course.price.toLocaleString() + "تومان "}
+
+        
+          </span>
           <Link
             href={`/courselist/${course.id}`}
             className="bg-[color:var(--primary-color)] cursor-pointer text-gray-900 px-5 py-2 rounded-lg hover:bg-[#0bb55a] transition-all duration-300 transform hover:scale-105 font-medium"
@@ -39,7 +49,6 @@ const CourseCard: React.FC<{ course: SimpleCourse }> = ({ course }) => {
         </div>
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-   
     </div>
   );
 };

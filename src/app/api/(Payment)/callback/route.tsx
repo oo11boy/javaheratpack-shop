@@ -1,12 +1,9 @@
-// src\app\api\(Payment)\callback\route.tsx
 import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
 const ZIBAL_MERCHANT = "zibal";
 const ZIBAL_VERIFY_URL = "https://gateway.zibal.ir/v1/verify";
-
-// Define the base URL based on environment (configurable via .env)
 const BASE_URL = process.env.BASE_URL;
 
 export async function GET(req: NextRequest) {
@@ -28,23 +25,42 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // تأیید پرداخت
+    // بررسی اینکه آیا این یک دوره رایگان است یا نه
+    if (trackId.startsWith("FREE-")) {
+      const [, , , courseIdsStr] = orderId.split("-");
+      const purchaseDate = new Date().toLocaleString("fa-IR");
+      return NextResponse.redirect(
+        `${BASE_URL}/PurchaseSuccess?orderId=${orderId}&purchaseDate=${encodeURIComponent(
+          purchaseDate
+        )}&totalAmount=0&courseIds=${courseIdsStr}`
+      );
+    }
+
+    // برای پرداخت‌های معمولی (غیر رایگان)
     const verifyResponse = await fetch(ZIBAL_VERIFY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ merchant: ZIBAL_MERCHANT, trackId }),
     });
 
-    const verifyResult = await verifyResponse.json();
+    // بررسی وضعیت پاسخ
+    if (!verifyResponse.ok) {
+      throw new Error(`خطا در تأیید پرداخت: ${verifyResponse.statusText}`);
+    }
+
+    // دریافت و پارس کردن نتیجه
+    const verifyResult = await verifyResponse.json(); // اینجا باید از verifyResponse استفاده کنید
+
     if (verifyResult.result !== 100) {
       return NextResponse.redirect(
-        `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent(verifyResult.message || "خطا در تأیید پرداخت")}`
+        `${BASE_URL}/PurchaseFailure?error=${encodeURIComponent(
+          verifyResult.message || "خطا در تأیید پرداخت"
+        )}`
       );
     }
 
     // استخراج اطلاعات از orderId
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, timestamp, userId, courseIdsStr] = orderId.split("-");
+    const [, timestamp, userId, courseIdsStr] = orderId.split("-");
     const userIdNum = parseInt(userId, 10);
     const newCourseIds = courseIdsStr.split(",").map(Number);
 
@@ -66,9 +82,8 @@ export async function GET(req: NextRequest) {
 
     await connection.end();
 
-    // هدایت به صفحه موفقیت با اطلاعات داینامیک
     const purchaseDate = new Date(parseInt(timestamp)).toLocaleString("fa-IR");
-    const totalAmount = verifyResult.amount / 10; // تبدیل از ریال به تومان
+    const totalAmount = verifyResult.amount / 10;
     return NextResponse.redirect(
       `${BASE_URL}/PurchaseSuccess?orderId=${orderId}&purchaseDate=${encodeURIComponent(
         purchaseDate
