@@ -262,7 +262,7 @@ export async function PUT(req: NextRequest) {
   let connection: Awaited<ReturnType<typeof getConnection>> | null = null;
 
   try {
-    const { currentPassword, newPassword, newName, newLastname, newEmail, action } = await req.json();
+    const { currentPassword, newPassword, newName, newLastname, newEmail, newPhonenumber, action } = await req.json();
     const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -305,39 +305,90 @@ export async function PUT(req: NextRequest) {
 
       return NextResponse.json({ message: "Password updated successfully" }, { status: 200 });
     } else if (action === "updateProfile") {
-      if (!newName || !newLastname || !newEmail || !currentPassword) {
-        return NextResponse.json({ error: "New name, lastname, email, and current password required" }, { status: 400 });
+      const updates: string[] = [];
+      const values: any[] = [];
+
+      if (newName) {
+        if (newName.length < 2) {
+          return NextResponse.json({ error: "Name must be at least 2 characters" }, { status: 400 });
+        }
+        updates.push("name = ?");
+        values.push(newName);
       }
 
-      const [users] = await connection.execute<User[]>(
-        "SELECT password FROM accounts WHERE id = ?",
-        [decoded.id]
+      if (newLastname) {
+        if (newLastname.length < 2) {
+          return NextResponse.json({ error: "Lastname must be at least 2 characters" }, { status: 400 });
+        }
+        updates.push("lastname = ?");
+        values.push(newLastname);
+      }
+
+      if (newEmail) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+          return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+        }
+        const [emailCheck] = await connection.execute<RowDataPacket[]>(
+          "SELECT COUNT(*) as count FROM accounts WHERE email = ? AND id != ?",
+          [newEmail, decoded.id]
+        );
+        if (emailCheck[0].count > 0) {
+          return NextResponse.json({ error: "This email is already in use" }, { status: 400 });
+        }
+        updates.push("email = ?");
+        values.push(newEmail);
+      }
+
+      if (newPhonenumber) {
+        if (!/^09[0-9]{9}$/.test(newPhonenumber)) {
+          return NextResponse.json({ error: "Invalid phonenumber format" }, { status: 400 });
+        }
+        const [phoneCheck] = await connection.execute<RowDataPacket[]>(
+          "SELECT COUNT(*) as count FROM accounts WHERE phonenumber = ? AND id != ?",
+          [newPhonenumber, decoded.id]
+        );
+        if (phoneCheck[0].count > 0) {
+          return NextResponse.json({ error: "This phonenumber is already in use" }, { status: 400 });
+        }
+        updates.push("phonenumber = ?");
+        values.push(newPhonenumber);
+      }
+
+      if (updates.length === 0) {
+        return NextResponse.json({ error: "No updates provided" }, { status: 400 });
+      }
+
+      if (newEmail || newPhonenumber) {
+        if (!currentPassword) {
+          return NextResponse.json({ error: "Current password required for email or phonenumber update" }, { status: 400 });
+        }
+
+        const [users] = await connection.execute<User[]>(
+          "SELECT password FROM accounts WHERE id = ?",
+          [decoded.id]
+        );
+        const user = users[0];
+
+        if (!user) {
+          return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!passwordMatch) {
+          return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
+        }
+      }
+
+      values.push(decoded.id);
+      const query = `UPDATE accounts SET ${updates.join(", ")} WHERE id = ?`;
+
+      await connection.execute<ResultSetHeader>(query, values);
+
+      const newToken = jwt.sign(
+        { id: decoded.id, identifier: newEmail || newPhonenumber || decoded.identifier },
+        JWT_SECRET,
+        { expiresIn: "24h" }
       );
-      const user = users[0];
-
-      if (!user) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-
-      const passwordMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!passwordMatch) {
-        return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
-      }
-
-      const [existingUsers] = await connection.execute<User[]>(
-        "SELECT COUNT(*) as count FROM accounts WHERE email = ? AND id != ?",
-        [newEmail, decoded.id]
-      );
-      if (existingUsers[0].count > 0) {
-        return NextResponse.json({ error: "This email is already in use" }, { status: 400 });
-      }
-
-      await connection.execute<ResultSetHeader>(
-        "UPDATE accounts SET name = ?, lastname = ?, email = ? WHERE id = ?",
-        [newName, newLastname, newEmail, decoded.id]
-      );
-
-      const newToken = jwt.sign({ id: decoded.id, identifier: newEmail }, JWT_SECRET, { expiresIn: "24h" });
       const response = NextResponse.json({ message: "Profile updated successfully" }, { status: 200 });
       response.cookies.set(COOKIE_NAME, newToken, COOKIE_OPTIONS);
 
