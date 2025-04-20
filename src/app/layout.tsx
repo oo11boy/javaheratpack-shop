@@ -17,6 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
+      <head>
+      <meta name="enamad" content="71822216" /> 
+      </head>
       <body>
       <AuthProvider>
         <CartContextProvider>

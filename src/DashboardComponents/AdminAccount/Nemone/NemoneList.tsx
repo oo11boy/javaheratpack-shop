@@ -5,6 +5,7 @@ import { Edit, Trash2, FileText } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface NemoneItem {
   id: number;
@@ -80,7 +81,7 @@ const NemoneList: React.FC = () => {
               <thead>
                 <tr className="bg-gradient-to-r from-[color:var(--primary-color)]/10 to-[#2a3347] text-white">
                   <th className="p-4 font-semibold">شناسه</th>
-                  <th className="p-4 font-semibold">آدرس تصویر</th>
+                  <th className="p-4 font-semibold"> تصویر نمونه کار</th>
                   <th className="p-4 font-semibold">عملیات</th>
                 </tr>
               </thead>
@@ -94,7 +95,9 @@ const NemoneList: React.FC = () => {
                     className="border-b border-[color:var(--primary-color)]/20 hover:bg-[#2a3347] transition-colors duration-200"
                   >
                     <td className="p-4">{item.id}</td>
-                    <td className="p-4">{item.src}</td>
+                    <td className="p-4">
+                      <Image className='w-[120px] rounded-3xl' src={item.src} width={320} height={320} alt={item.src}/>
+                    </td>
                     <td className="p-4 flex gap-2">
                       <motion.button
                         onClick={() => handleEdit(item.id)}

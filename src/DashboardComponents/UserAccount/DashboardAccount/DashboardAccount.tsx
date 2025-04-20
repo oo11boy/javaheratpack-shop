@@ -11,6 +11,7 @@ const UserAccount: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const { userData: user, setIsLoggedIn, setUserData, isLoggedIn, refreshUserData } = useAuth();
@@ -18,16 +19,27 @@ const UserAccount: React.FC = () => {
   // به‌روزرسانی داده‌ها هنگام ورود به کامپوننت
   useEffect(() => {
     if (isLoggedIn) {
-      refreshUserData(); // فراخوانی تابع برای به‌روزرسانی داده‌ها
+      refreshUserData();
     }
   }, [isLoggedIn, refreshUserData]);
 
   // بررسی وضعیت لاگین و ریدایرکت به صفحه اصلی در صورت عدم لاگین
   useEffect(() => {
     if (isLoggedIn === false) {
-      router.push("/"); // ریدایرکت به صفحه اصلی
+      router.push("/");
     }
   }, [isLoggedIn, router]);
+
+  // مدیریت موفقیت و بسته شدن مودال
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+        closeModal();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -46,22 +58,38 @@ const UserAccount: React.FC = () => {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
+
+    // اعتبارسنجی رمز عبور جدید
+    if (newPassword.length < 8) {
+      setError("رمز عبور جدید باید حداقل ۸ کاراکتر باشد");
+      return;
+    }
 
     try {
       const response = await fetch("/api/auth", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, action: "changePassword" }),
         credentials: "include",
       });
 
-      const data: { error?: string } = await response.json();
-      if (!response.ok) throw new Error(data.error || "خطا در تغییر رمز عبور");
-      alert("رمز عبور با موفقیت تغییر یافت!");
-      setIsModalOpen(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      await refreshUserData(); // به‌روزرسانی داده‌ها پس از تغییر رمز
+      const data: { message?: string; error?: string } = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          data.error === "Invalid current password"
+            ? "رمز عبور فعلی اشتباه است"
+            : data.error === "Current password and new password required"
+            ? "رمز عبور فعلی و جدید الزامی است"
+            : data.error === "User not found"
+            ? "کاربر یافت نشد"
+            : data.error === "Token required"
+            ? "نیاز به ورود مجدد است"
+            : data.error || "خطا در تغییر رمز عبور"
+        );
+      }
+
+      setSuccessMessage("رمز عبور با موفقیت تغییر یافت!");
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error("خطای ناشناخته");
       setError(error.message);
@@ -72,6 +100,7 @@ const UserAccount: React.FC = () => {
     setIsModalOpen(false);
     setCurrentPassword("");
     setNewPassword("");
+    setError(null);
   };
 
   if (isLoggedIn === null || isLoggingOut) {
@@ -85,6 +114,7 @@ const UserAccount: React.FC = () => {
   if (!user) {
     return null;
   }
+
   return (
     <div className="min-h-screen ccontainer bg-gradient-to-b from-[#121824] to-[#1e2636] text-white flex flex-col items-center justify-start p-4 md:p-8">
       <div className="w-full bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 flex flex-col gap-10 animate-fade-in">
@@ -118,7 +148,7 @@ const UserAccount: React.FC = () => {
               <button
                 onClick={handleLogout}
                 className="px-5 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
-                disabled={isLoggingOut} // غیرفعال کردن دکمه هنگام لودینگ
+                disabled={isLoggingOut}
               >
                 خروج
                 <LogOut className="w-4 h-4" />
@@ -213,7 +243,10 @@ const UserAccount: React.FC = () => {
               تغییر رمز عبور
             </h3>
             {error && (
-              <p className="text-red-400 mb-4 text-center">{error}</p>
+              <p className="text-red-400 mb-4 text-center bg-red-500/20 p-2 rounded">{error}</p>
+            )}
+            {successMessage && (
+              <p className="text-green-400 mb-4 text-center bg-green-500/20 p-2 rounded">{successMessage}</p>
             )}
             <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
               <div>

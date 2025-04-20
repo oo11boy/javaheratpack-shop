@@ -1,14 +1,18 @@
-// src\app\components\Settings.tsx
 "use client";
 
 import React, { useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, User } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Settings() {
-  const [currentPassword, setCurrentPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState(""); // برای تغییر رمز
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newLastname, setNewLastname] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [currentPasswordForProfile, setCurrentPasswordForProfile] = useState(""); // برای به‌روزرسانی پروفایل
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,9 +24,8 @@ export default function Settings() {
     setSuccess(null);
     setIsLoading(true);
 
-    // اعتبارسنجی اولیه
     if (!currentPassword || !newPassword || !confirmNewPassword) {
-      setError("لطفاً تمام فیلدها را پر کنید.");
+      setError("لطفاً تمام فیلدها را برای تغییر رمز عبور پر کنید.");
       setIsLoading(false);
       return;
     }
@@ -43,11 +46,11 @@ export default function Settings() {
       const response = await fetch("/api/auth", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, action: "changePassword" }),
         credentials: "include",
       });
 
-      const data: { message?: string; error?: string } = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "خطا در تغییر رمز عبور");
@@ -57,103 +60,282 @@ export default function Settings() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
-      await refreshUserData(); // به‌روزرسانی اطلاعات کاربر
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err : new Error("خطای ناشناخته");
-      setError(error.message);
+      await refreshUserData();
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+
+    if (!newName || !newLastname || !newEmail || !currentPasswordForProfile) {
+      setError("لطفاً تمام فیلدها، از جمله رمز عبور فعلی، را برای به‌روزرسانی پروفایل پر کنید.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          newName, 
+          newLastname, 
+          newEmail, 
+          currentPassword: currentPasswordForProfile, 
+          action: "updateProfile" 
+        }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "خطا در به‌روزرسانی پروفایل");
+      }
+
+      setSuccess("پروفایل با موفقیت به‌روزرسانی شد!");
+      setNewName("");
+      setNewLastname("");
+      setNewEmail("");
+      setCurrentPasswordForProfile("");
+      await refreshUserData();
+    } catch (err) {
+   console.log(err)
     } finally {
       setIsLoading(false);
     }
   };
 
   if (!userData) {
-    return <div>در حال بارگذاری...</div>;
+    return <div className="flex justify-center items-center h-screen">در حال بارگذاری...</div>;
   }
 
   return (
-    <div className="p-6 bg-[#f0f2f5] min-h-screen flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <Lock className="w-6 h-6 text-[color:var(--primary-color)]" />
-          تنظیمات حساب
+    <main className="min-h-screen flex items-start justify-center p-4 md:p-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-4xl bg-[#1e2636]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 animate-fade-in relative"
+      >
+        <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--primary-color)] mb-8 flex items-center gap-3">
+          <User className="w-8 h-8" />
+          تنظیمات حساب کاربری
         </h2>
 
-        <div className="mb-6">
-          <p className="text-gray-600">کاربر: {userData.name} {userData.lastname}</p>
-          <p className="text-gray-600">ایمیل: {userData.email}</p>
-        </div>
-
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg shadow-md"
+          >
             {error}
-          </div>
+          </motion.div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg shadow-md"
+          >
             {success}
-          </div>
+          </motion.div>
         )}
 
-        <form onSubmit={handleChangePassword} className="space-y-6">
-          <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-              رمز عبور فعلی
-            </label>
-            <input
-              type="password"
-              id="currentPassword"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[color:var(--primary-color)] focus:border-[color:var(--primary-color)]"
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-              رمز عبور جدید
-            </label>
-            <input
-              type="password"
-              id="newPassword"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[color:var(--primary-color)] focus:border-[color:var(--primary-color)]"
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-gray-700">
-              تأیید رمز عبور جدید
-            </label>
-            <input
-              type="password"
-              id="confirmNewPassword"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[color:var(--primary-color)] focus:border-[color:var(--primary-color)]"
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-[#0aaf5a] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            disabled={isLoading}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* بخش اطلاعات کاربر */}
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#2a3347] rounded-xl p-6 shadow-lg"
           >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-black border-solid"></div>
-            ) : (
-              "تغییر رمز عبور"
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
+            <h3 className="text-xl font-semibold text-white mb-4">اطلاعات فعلی</h3>
+            <p className="text-gray-300 mb-2">نام: {userData.name}</p>
+            <p className="text-gray-300 mb-2">نام خانوادگی: {userData.lastname}</p>
+            <p className="text-gray-300">ایمیل: {userData.email}</p>
+          </motion.div>
+
+          {/* فرم به‌روزرسانی پروفایل */}
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-6"
+          >
+            <h3 className="text-xl font-semibold text-white mb-4">به‌روزرسانی پروفایل</h3>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div>
+                <label htmlFor="newName" className="block text-sm font-medium text-gray-300 mb-1">
+                  نام جدید
+                </label>
+                <input
+                  type="text"
+                  id="newName"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="newLastname" className="block text-sm font-medium text-gray-300 mb-1">
+                  نام خانوادگی جدید
+                </label>
+                <input
+                  type="text"
+                  id="newLastname"
+                  value={newLastname}
+                  onChange={(e) => setNewLastname(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="newEmail" className="block text-sm font-medium text-gray-300 mb-1">
+                  ایمیل جدید
+                </label>
+                <input
+                  type="email"
+                  id="newEmail"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="currentPasswordForProfile" className="block text-sm font-medium text-gray-300 mb-1">
+                  رمز عبور فعلی (برای تأیید)
+                </label>
+                <input
+                  type="password"
+                  id="currentPasswordForProfile"
+                  value={currentPasswordForProfile}
+                  onChange={(e) => setCurrentPasswordForProfile(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-[#0aaf5a] transition-all duration-300 shadow-md hover:shadow-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-black border-solid mx-auto"></div>
+                ) : (
+                  "به‌روزرسانی پروفایل"
+                )}
+              </motion.button>
+            </form>
+          </motion.div>
+
+          {/* فرم تغییر رمز عبور */}
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="space-y-6 md:col-span-2"
+          >
+            <h3 className="text-xl font-semibold text-white mb-4">تغییر رمز عبور</h3>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                  رمز عبور فعلی
+                </label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                  رمز عبور جدید
+                </label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                  تأیید رمز عبور جدید
+                </label>
+                <input
+                  type="password"
+                  id="confirmNewPassword"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-[#3a465b] text-white focus:outline-none focus:ring-2 focus:ring-[color:var(--primary-color)]"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                className="w-full py-3 bg-[color:var(--primary-color)] text-black rounded-lg hover:bg-[#0aaf5a] transition-all duration-300 shadow-md hover:shadow-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-black border-solid mx-auto"></div>
+                ) : (
+                  "تغییر رمز عبور"
+                )}
+              </motion.button>
+            </form>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.6s ease-out forwards;
+        }
+      `}</style>
+    </main>
   );
 }

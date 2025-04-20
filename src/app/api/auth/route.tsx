@@ -1,4 +1,3 @@
-// src\app\api\auth\route.tsx
 import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import bcrypt from "bcryptjs";
@@ -18,7 +17,7 @@ const COOKIE_OPTIONS = {
 
 interface User extends RowDataPacket {
   id: number;
-  email: string;
+  email: string | null;
   name: string;
   lastname: string;
   password: string;
@@ -43,36 +42,59 @@ interface PurchasedCourse {
 }
 
 export async function GET(req: NextRequest) {
+  let connection: Awaited<ReturnType<typeof getConnection>> | null = null;
+
   try {
     const { searchParams } = new URL(req.url);
+    const identifier = searchParams.get("identifier");
     const email = searchParams.get("email");
+    const phoneNumber = searchParams.get("phoneNumber");
     const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get("Authorization")?.replace("Bearer ", "");
 
-    const connection = await getConnection();
+    connection = await getConnection();
 
-    if (email) {
-      const [rows] = await connection.execute<RowDataPacket[]>(
+    // بررسی ایمیل و شماره موبایل برای ثبت‌نام
+    if (email && phoneNumber) {
+      const [emailRows] = await connection.execute<RowDataPacket[]>(
         "SELECT COUNT(*) as count FROM accounts WHERE email = ?",
         [email]
       );
-      await connection.end();
+      const [phoneRows] = await connection.execute<RowDataPacket[]>(
+        "SELECT COUNT(*) as count FROM accounts WHERE phonenumber = ?",
+        [phoneNumber]
+      );
+
+      return NextResponse.json({
+        emailExists: emailRows[0].count > 0,
+        phoneExists: phoneRows[0].count > 0,
+      });
+    }
+
+    // بررسی وجود یک شناسه (ایمیل یا شماره موبایل)
+    if (identifier) {
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+      const field = isEmail ? "email" : "phonenumber";
+      const [rows] = await connection.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as count FROM accounts WHERE ${field} = ?`,
+        [identifier]
+      );
       const exists = rows[0].count > 0;
       return NextResponse.json({ exists });
     }
 
+    // دریافت اطلاعات کاربر با توکن
     if (!token) {
       return NextResponse.json({ error: "Token required" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; identifier: string };
     const [userRows] = await connection.execute<User[]>(
-      "SELECT id, name, lastname, email, phonenumber, courseid, vip FROM accounts WHERE id = ?", // vip اضافه شد
+      "SELECT id, name, lastname, email, phonenumber, courseid, vip FROM accounts WHERE id = ?",
       [decoded.id]
     );
     const user = userRows[0];
 
     if (!user) {
-      await connection.end();
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -81,9 +103,7 @@ export async function GET(req: NextRequest) {
       const courseIds = user.courseid.split(",").map((id) => id.trim()).filter((id) => id !== "");
       if (courseIds.length > 0) {
         const [courseRows] = await connection.execute<Course[]>(
-          `SELECT id, title, duration, thumbnail
-           FROM courses
-           WHERE id IN (${courseIds.map(() => "?").join(",")})`,
+          `SELECT id, title, duration, thumbnail FROM courses WHERE id IN (${courseIds.map(() => "?").join(",")})`,
           courseIds
         );
         courseid = courseRows.map((course) => ({
@@ -96,47 +116,49 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    await connection.end();
-
     const userData = {
       id: user.id,
       name: user.name,
       lastname: user.lastname,
-      email: user.email,
+      email: user.email || null,
       phonenumber: user.phonenumber || null,
-      vip: user.vip, // vip به پاسخ اضافه شد
+      vip: user.vip,
       courseid,
     };
 
     return NextResponse.json(userData, {
-      headers: { "Cache-Control": "no-store" }, // جلوگیری از کش شدن پاسخ
+      headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
     console.error("GET error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
   }
 }
+
 export async function POST(req: NextRequest) {
+  let connection: Awaited<ReturnType<typeof getConnection>> | null = null;
+
   try {
-    const { email, password, name, lastname, phonenumber, courseId, action } = await req.json();
+    const { identifier, password, name, lastname, phonenumber, email, courseId, action } = await req.json();
 
-    const connection = await getConnection();
+    connection = await getConnection();
 
-    // Handle adding a course to the cart
     if (action === "add_to_cart" && courseId) {
       const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get("Authorization")?.replace("Bearer ", "");
 
       if (!token) {
-        await connection.end();
         return NextResponse.json({ error: "Authentication required" }, { status: 401 });
       }
 
       if (!courseId) {
-        await connection.end();
         return NextResponse.json({ error: "Course ID required" }, { status: 400 });
       }
 
-      const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as { id: number; identifier: string };
       const [userRows] = await connection.execute<User[]>(
         "SELECT courseid FROM accounts WHERE id = ?",
         [decoded.id]
@@ -144,7 +166,6 @@ export async function POST(req: NextRequest) {
       const user = userRows[0];
 
       if (!user) {
-        await connection.end();
         return NextResponse.json({ error: "User not found" }, { status: 404 });
       }
 
@@ -159,19 +180,18 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      await connection.end();
       return NextResponse.json({ message: "Course added to cart successfully" }, { status: 200 });
     }
 
-    // Handle login/signup
-    if (!email || !password) {
-      await connection.end();
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+    if (!identifier || !password) {
+      return NextResponse.json({ error: "Identifier and password required" }, { status: 400 });
     }
 
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const field = isEmail ? "email" : "phonenumber";
     const [users] = await connection.execute<User[]>(
-      "SELECT * FROM accounts WHERE email = ?",
-      [email]
+      `SELECT * FROM accounts WHERE ${field} = ?`,
+      [identifier]
     );
 
     const response = NextResponse.json({ redirect: "/useraccount" });
@@ -181,78 +201,156 @@ export async function POST(req: NextRequest) {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        await connection.end();
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
       }
 
-      const token = jwt.sign({ id: user.id, email }, JWT_SECRET, { expiresIn: "24h" });
+      const token = jwt.sign({ id: user.id, identifier }, JWT_SECRET, { expiresIn: "24h" });
       response.cookies.set(COOKIE_NAME, token, COOKIE_OPTIONS);
     } else {
-      if (!name || !lastname) {
-        await connection.end();
-        return NextResponse.json({ error: "Name and lastname required" }, { status: 400 });
+      if (!name || !lastname || !email || !phonenumber) {
+        return NextResponse.json(
+          { error: "نام، نام خانوادگی، ایمیل و شماره موبایل الزامی است" },
+          { status: 400 }
+        );
+      }
+
+      // اعتبارسنجی ایمیل و شماره تلفن
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return NextResponse.json({ error: "ایمیل معتبر نیست" }, { status: 400 });
+      }
+      if (!/^09[0-9]{9}$/.test(phonenumber)) {
+        return NextResponse.json({ error: "شماره موبایل معتبر نیست" }, { status: 400 });
+      }
+
+      // بررسی وجود ایمیل یا شماره تلفن در دیتابیس
+      const [existingUsers] = await connection.execute<RowDataPacket[]>(
+        "SELECT COUNT(*) as count, email, phonenumber FROM accounts WHERE email = ? OR phonenumber = ?",
+        [email, phonenumber]
+      );
+      if (existingUsers[0].count > 0) {
+        if (existingUsers[0].email === email) {
+          return NextResponse.json({ error: "این ایمیل قبلاً ثبت شده است" }, { status: 400 });
+        }
+        if (existingUsers[0].phonenumber === phonenumber) {
+          return NextResponse.json({ error: "این شماره موبایل قبلاً ثبت شده است" }, { status: 400 });
+        }
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const [result] = await connection.execute<ResultSetHeader>(
         "INSERT INTO accounts (email, name, lastname, password, phonenumber, vip, courseid) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [email, name, lastname, hashedPassword, phonenumber || null, 0, null]
+        [email, name, lastname, hashedPassword, phonenumber, 0, null]
       );
 
       const newUserId = result.insertId;
-      const token = jwt.sign({ id: newUserId, email }, JWT_SECRET, { expiresIn: "24h" });
+      const token = jwt.sign({ id: newUserId, identifier }, JWT_SECRET, { expiresIn: "24h" });
       response.cookies.set(COOKIE_NAME, token, COOKIE_OPTIONS);
     }
 
-    await connection.end();
     return response;
   } catch (error) {
     console.error("POST error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
   }
 }
 
 export async function PUT(req: NextRequest) {
+  let connection: Awaited<ReturnType<typeof getConnection>> | null = null;
+
   try {
-    const { currentPassword, newPassword } = await req.json();
+    const { currentPassword, newPassword, newName, newLastname, newEmail, action } = await req.json();
     const token = req.cookies.get(COOKIE_NAME)?.value || req.headers.get("Authorization")?.replace("Bearer ", "");
 
-    if (!token || !currentPassword || !newPassword) {
-      return NextResponse.json(
-        { error: "Token, current password, and new password required" },
-        { status: 400 }
+    if (!token) {
+      return NextResponse.json({ error: "Token required" }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; identifier: string };
+    connection = await getConnection();
+
+    if (action === "changePassword") {
+      if (!currentPassword || !newPassword) {
+        return NextResponse.json({ error: "Current password and new password required" }, { status: 400 });
+      }
+
+      // اعتبارسنجی طول رمز عبور جدید
+      if (newPassword.length < 8) {
+        return NextResponse.json({ error: "New password must be at least 8 characters" }, { status: 400 });
+      }
+
+      const [users] = await connection.execute<User[]>(
+        "SELECT password FROM accounts WHERE id = ?",
+        [decoded.id]
       );
+      const user = users[0];
+
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!passwordMatch) {
+        return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await connection.execute<ResultSetHeader>(
+        "UPDATE accounts SET password = ? WHERE id = ?",
+        [hashedNewPassword, decoded.id]
+      );
+
+      return NextResponse.json({ message: "Password updated successfully" }, { status: 200 });
+    } else if (action === "updateProfile") {
+      if (!newName || !newLastname || !newEmail || !currentPassword) {
+        return NextResponse.json({ error: "New name, lastname, email, and current password required" }, { status: 400 });
+      }
+
+      const [users] = await connection.execute<User[]>(
+        "SELECT password FROM accounts WHERE id = ?",
+        [decoded.id]
+      );
+      const user = users[0];
+
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!passwordMatch) {
+        return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
+      }
+
+      const [existingUsers] = await connection.execute<User[]>(
+        "SELECT COUNT(*) as count FROM accounts WHERE email = ? AND id != ?",
+        [newEmail, decoded.id]
+      );
+      if (existingUsers[0].count > 0) {
+        return NextResponse.json({ error: "This email is already in use" }, { status: 400 });
+      }
+
+      await connection.execute<ResultSetHeader>(
+        "UPDATE accounts SET name = ?, lastname = ?, email = ? WHERE id = ?",
+        [newName, newLastname, newEmail, decoded.id]
+      );
+
+      const newToken = jwt.sign({ id: decoded.id, identifier: newEmail }, JWT_SECRET, { expiresIn: "24h" });
+      const response = NextResponse.json({ message: "Profile updated successfully" }, { status: 200 });
+      response.cookies.set(COOKIE_NAME, newToken, COOKIE_OPTIONS);
+
+      return response;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
-    const connection = await getConnection();
-    const [users] = await connection.execute<User[]>(
-      "SELECT password FROM accounts WHERE id = ?",
-      [decoded.id]
-    );
-    const user = users[0];
-
-    if (!user) {
-      await connection.end();
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!passwordMatch) {
-      await connection.end();
-      return NextResponse.json({ error: "Invalid current password" }, { status: 401 });
-    }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await connection.execute<ResultSetHeader>(
-      "UPDATE accounts SET password = ? WHERE id = ?",
-      [hashedNewPassword, decoded.id]
-    );
-
-    await connection.end();
-    return NextResponse.json({ message: "Password updated successfully" }, { status: 200 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("PUT error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
   }
 }
