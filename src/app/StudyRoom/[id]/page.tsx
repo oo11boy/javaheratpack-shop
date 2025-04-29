@@ -1,16 +1,23 @@
-import Footer from '@/Components/Footer/Footer';
-import Header from '@/Components/Header/Header';
-import CourseVideoPlayer from '@/Components/StudyRoom/CourseVideoPlayer/CourseVideoPlayer';
-import { CourseVideo } from '@/lib/Types/Types';
-import { redirect } from 'next/navigation';
-import { getConnection } from '@/lib/db';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-import Link from 'next/link';
-import { getCourseVideos } from '@/lib/api';
-import { RowDataPacket } from 'mysql2/promise';
+import Footer from "@/Components/Footer/Footer";
+import Header from "@/Components/Header/Header";
+import CourseVideoPlayer from "@/Components/StudyRoom/CourseVideoPlayer/CourseVideoPlayer";
+import { CourseVideo } from "@/lib/Types/Types";
+import { redirect } from "next/navigation";
+import { getConnection } from "@/lib/db";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getCourseVideos } from "@/lib/api";
+import { RowDataPacket } from "mysql2/promise";
 
-const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
+// تعریف متا دیتا
+export const metadata = {
+  title: "شوید | مشاهده دوره",
+};
+
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
 
 // تعریف تایپ برای کاربر
 interface User extends RowDataPacket {
@@ -23,65 +30,75 @@ async function fetchCourseData(id: number): Promise<CourseVideo[]> {
 
 async function checkUserAccess(courseId: number) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
+  const token = cookieStore.get("auth_token")?.value;
 
   if (!token) return { isAuthenticated: false, hasAccess: false };
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
-   
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      id: number;
+      email: string;
+    };
+
     const connection = await getConnection();
     const [users] = await connection.execute<User[]>(
-      'SELECT courseid FROM accounts WHERE id = ?',
+      "SELECT courseid FROM accounts WHERE id = ?",
       [decoded.id]
     );
     await connection.end();
 
     const user = users[0];
-   
-    if (!user || !user.courseid) return { isAuthenticated: true, hasAccess: false };
+
+    if (!user || !user.courseid)
+      return { isAuthenticated: true, hasAccess: false };
 
     let courseIds: string[];
-   
-    if (typeof user.courseid === 'string') {
+
+    if (typeof user.courseid === "string") {
       try {
         const parsed = JSON.parse(user.courseid);
-      
+
         // اگر پارس‌شده یک آرایه نیست، آن را به آرایه تبدیل کن
         courseIds = Array.isArray(parsed) ? parsed : [parsed.toString()];
       } catch (error) {
-        courseIds = user.courseid.split(',').map((id: string) => id.trim()).filter(Boolean);
-     console.log(error)
+        courseIds = user.courseid
+          .split(",")
+          .map((id: string) => id.trim())
+          .filter(Boolean);
+        console.log(error);
       }
     } else {
       courseIds = [];
-      console.log('courseid is not a string, setting empty array');
+      console.log("courseid is not a string, setting empty array");
     }
 
-  
     const hasAccess = courseIds.includes(courseId.toString());
-    console.log('Course ID to check:', courseId, 'Has access:', hasAccess);
+    console.log("Course ID to check:", courseId, "Has access:", hasAccess);
     return { isAuthenticated: true, hasAccess };
   } catch (error) {
-    console.error('Error verifying user access:', error);
+    console.error("Error verifying user access:", error);
     return { isAuthenticated: false, hasAccess: false };
   }
 }
 
-export default async function VideoPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function VideoPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = await params;
   const courseId = parseInt(resolvedParams.id);
 
   const { isAuthenticated, hasAccess } = await checkUserAccess(courseId);
 
-  if (!isAuthenticated) redirect('../');
-  if (!hasAccess) redirect('../useraccount');
+  if (!isAuthenticated) redirect("../");
+  if (!hasAccess) redirect("../useraccount");
 
   let videos: CourseVideo[] = [];
   try {
     videos = await fetchCourseData(courseId);
   } catch (error) {
-    console.error('خطا در دریافت داده‌ها:', error);
+    console.error("خطا در دریافت داده‌ها:", error);
   }
 
   return (
@@ -92,12 +109,18 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
           <CourseVideoPlayer videos={videos} />
         ) : (
           <div className="max-w-md w-full p-6 bg-[#1a2233] rounded-lg shadow-lg animate-fade-in text-center">
-            <h2 className="text-3xl font-bold mb-4 text-white">به زودی در دسترس شماست!</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">
+              به زودی در دسترس شماست!
+            </h2>
             <p className="text-gray-300 text-lg">
-              محتوای این دوره هنوز آماده نشده. ما در حال کار روی اون هستیم و به زودی می‌تونید ازش استفاده کنید.
+              محتوای این دوره هنوز آماده نشده. ما در حال کار روی اون هستیم و به
+              زودی می‌تونید ازش استفاده کنید.
             </p>
             <div className="mt-6">
-              <Link href={'../useraccount'} className="inline-block bg-[color:var(--primary-color)] text-white py-2 px-4 rounded-full text-sm font-semibold">
+              <Link
+                href={"../useraccount"}
+                className="inline-block bg-[color:var(--primary-color)] text-white py-2 px-4 rounded-full text-sm font-semibold"
+              >
                 بازگشت به حساب کاربری
               </Link>
             </div>

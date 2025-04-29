@@ -4,6 +4,33 @@ import PurchaseSuccess from "@/Components/PurchaseSuccess/PurchaseSuccess";
 import { getConnection } from "@/lib/db";
 import { RowDataPacket } from "mysql2/promise";
 
+// تعریف متا دیتا
+export const metadata = {
+  title: 'شوید-آموزش طراحی جواهرات | خرید موفق',
+  description: 'خرید دوره طراحی جواهرات با موفقیت انجام شد! اکنون می‌توانید به محتوای آموزشی دسترسی پیدا کنید.',
+  keywords: ['خرید دوره', 'آموزش طراحی جواهرات', 'نرم‌افزار ماتریکس', 'شوید'],
+  openGraph: {
+    title: 'شوید-آموزش طراحی جواهرات | خرید موفق',
+    description: 'خرید دوره طراحی جواهرات با موفقیت انجام شد! اکنون می‌توانید به محتوای آموزشی دسترسی پیدا کنید.',
+    url: 'https://shivid.co/PurchaseSuccess',
+    type: 'website',
+    images: [
+      {
+        url: 'https://shivid.co/Images/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'خرید موفق دوره طراحی جواهرات',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'شوید-آموزش طراحی جواهرات | خرید موفق',
+    description: 'خرید دوره طراحی جواهرات با موفقیت انجام شد! اکنون می‌توانید به محتوای آموزشی دسترسی پیدا کنید.',
+    image: 'https://shivid.co/Images/logo.png',
+  },
+};
+
 // Define the interface for purchased courses
 interface PurchasedCourse {
   id: string;
@@ -13,13 +40,11 @@ interface PurchasedCourse {
   courseLink: string;
 }
 
-// Use the correct type for searchParams in a server component
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // Await the searchParams since it's a Promise
   const resolvedSearchParams = await searchParams;
   const { orderId, purchaseDate, totalAmount, courseIds } = resolvedSearchParams;
 
@@ -27,10 +52,8 @@ export default async function Page({
     return <div>خطا: اطلاعات ناقص است</div>;
   }
 
-  // Ensure courseIds is a string (not an array or undefined)
   const courseIdsString = Array.isArray(courseIds) ? courseIds.join(",") : courseIds;
 
-  // Fetch course data from the database
   const connection = await getConnection();
   const [courseRows] = await connection.execute<RowDataPacket[]>(
     `SELECT id, title AS name, price, thumbnail FROM courses WHERE id IN (${courseIdsString
@@ -62,3 +85,5 @@ export default async function Page({
     </div>
   );
 }
+
+export const revalidate = 3600;

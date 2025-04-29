@@ -27,7 +27,7 @@ const CourseDetails: React.FC<{ CourseData: Course; }> = ({ CourseData }) => {
             <CourseSidebar    course={course} />
           </div>
           <CourseDescription description={course.description} />
-          <section className="bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-[color:var(--primary-color)]/30">
+          {/* <section className="bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-[color:var(--primary-color)]/30">
             <h2 className="text-2xl font-semibold text-[color:var(--primary-color)] flex items-center gap-2 mb-6 animate-pulse">
               <Star className="w-6 h-6 animate-spin-slow" /> در این دوره می‌آموزید
             </h2>
@@ -51,7 +51,7 @@ const CourseDetails: React.FC<{ CourseData: Course; }> = ({ CourseData }) => {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
           <CourseSyllabus syllabus={course.syllabus} />
           <CourseInstructor instructor={course.instructor} />
           <CourseReviews />
