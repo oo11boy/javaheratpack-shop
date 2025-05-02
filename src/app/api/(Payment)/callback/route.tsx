@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getConnection } from "@/lib/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
-const ZIBAL_MERCHANT = "zibal";
+const ZIBAL_MERCHANT = "680fa5ba6f3803000d83edcb";
 const ZIBAL_VERIFY_URL = "https://gateway.zibal.ir/v1/verify";
 const BASE_URL = process.env.BASE_URL;
 

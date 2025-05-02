@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { getConnection } from "@/lib/db";
 import { RowDataPacket } from "mysql2/promise";
 
-const ZIBAL_MERCHANT = "zibal";
+const ZIBAL_MERCHANT = "680fa5ba6f3803000d83edcb";
 const ZIBAL_REQUEST_URL = "https://gateway.zibal.ir/v1/request";
 const CALLBACK_URL = process.env.NEXT_PUBLIC_API_URL + "/callback";
 const JWT_SECRET = process.env.JWT_SECRET || "cc6478c5badae87c098b5fef7e841305706296775504172f2aea8078359b9cfc";
