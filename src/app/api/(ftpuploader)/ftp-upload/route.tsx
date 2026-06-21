@@ -1,3 +1,4 @@
+// app/api/ftp-upload/route.ts
 import { NextResponse } from "next/server";
 import ftp, { Options } from "ftp";
 import { Readable } from "stream";
@@ -9,13 +10,34 @@ interface FTPResponse {
   fileLink?: string;
 }
 
+// تابع تولید نام فایل فقط بر اساس تاریخ و زمان (بدون نام اصلی)
+function generateUniqueFileName(originalName: string): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+  
+  // دریافت پسوند فایل
+  const extension = originalName.includes('.') ? originalName.slice(originalName.lastIndexOf('.')) : '';
+  
+  // ایجاد نام فقط با تاریخ و زمان (بدون نام اصلی)
+  // فرمت: YYYY-MM-DD_HH-MM-SS_میلی‌ثانیه
+  const uniqueName = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}_${milliseconds}${extension}`;
+  
+  return uniqueName;
+}
+
 async function deleteIncompleteFile(client: ftp, destinationPath: string) {
   try {
     await new Promise<void>((resolve, reject) => {
       client.delete(destinationPath, (err) => {
         if (err) {
           console.warn(`[FTP] Failed to delete incomplete file ${destinationPath}: ${err.message}`);
-          resolve(); // ادامه دادن حتی در صورت خطا
+          resolve();
         } else {
           console.log(`[FTP] Incomplete file ${destinationPath} deleted successfully`);
           resolve();
@@ -41,15 +63,19 @@ async function uploadToFTP(file: File, fileName: string, signal: AbortSignal): P
     pasvTimeout: 10000,
   };
 
-  const videoExtensions = [".mp4", ".mkv", ".avi", ".mov"];
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif"];
-  const extension = fileName.toLowerCase().slice(fileName.lastIndexOf("."));
-  let destinationPath = fileName;
-
+  const videoExtensions = [".mp4", ".mkv", ".avi", ".mov", ".webm"];
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+  
+  // تولید نام فایل فقط با تاریخ و زمان
+  const uniqueFileName = generateUniqueFileName(fileName);
+  const extension = uniqueFileName.toLowerCase().slice(uniqueFileName.lastIndexOf("."));
+  
+  let destinationPath = uniqueFileName;
+  // قرار دادن ویدیوها در پوشه cvideo و تصاویر در پوشه jimg
   if (videoExtensions.includes(extension)) {
-    destinationPath = `cvideo/${fileName}`;
+    destinationPath = `cvideo/${uniqueFileName}`;
   } else if (imageExtensions.includes(extension)) {
-    destinationPath = `jimg/${fileName}`;
+    destinationPath = `jimg/${uniqueFileName}`;
   }
 
   let progressInterval: NodeJS.Timeout | null = null;
@@ -103,7 +129,7 @@ async function uploadToFTP(file: File, fileName: string, signal: AbortSignal): P
     const fileLink = `https://dl.shivid.co/${destinationPath}`;
     return {
       success: true,
-      message: `فایل ${fileName} با موفقیت آپلود شد.`,
+      message: `فایل با موفقیت آپلود شد.`,
       fileLink,
     };
   } catch (error) {
@@ -125,6 +151,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const fileName = formData.get("fileName") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -140,9 +167,11 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(`[FTP] Starting upload for ${file.name} (${file.size} bytes)`);
+    // استفاده از نام اصلی فایل فقط برای دریافت پسوند
+    const originalName = fileName ? decodeURIComponent(fileName) : file.name;
+    console.log(`[FTP] Starting upload for ${originalName} (${file.size} bytes)`);
     setUploadProgress(0);
-    const result = await uploadToFTP(file, file.name, request.signal);
+    const result = await uploadToFTP(file, originalName, request.signal);
     return NextResponse.json(result, { status: result.success ? 200 : 500 });
   } catch (error) {
     console.error(`[API] Error: ${error instanceof Error ? error.message : String(error)}`);
