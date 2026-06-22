@@ -1,4 +1,5 @@
-// lib/types.ts
+// src/lib/Types/Types.ts
+
 export interface Instructor {
   id: number;
   name: string;
@@ -15,7 +16,6 @@ export interface Instructor {
 export interface SyllabusItem {
   title: string;
   description: string;
-
 }
 
 export interface Course {
@@ -27,7 +27,7 @@ export interface Course {
   price: number;
   discountPrice?: number;
   introVideo: string;
-  level:string,
+  level: string;
   bannerImage: string;
   syllabus: SyllabusItem[];
   features: string[];
@@ -38,6 +38,7 @@ export interface Course {
   instructor: Instructor;
   name: string;
   courseLink: string;
+  updatedAt?: string; // ← اضافه شد
 }
 
 export interface SimpleCourse {
@@ -49,15 +50,15 @@ export interface SimpleCourse {
   price: number;
   discountPrice: number | null;
   introVideo: string | null;
-  level:string,
+  level: string;
   bannerImage: string | null;
   features: string[];
   prerequisites: string[];
   targetAudience: string[];
   category: string;
   thumbnail: string;
+  updatedAt?: string; // ← اضافه شد
 }
-
 
 export interface CourseVideo {
   id: string;
@@ -68,23 +69,20 @@ export interface CourseVideo {
   isCompleted?: boolean;
   courseid: number;
   place: number;
-
 }
 
-
 export interface UserData {
-  id:number,
+  id: number;
   name: string;
-  lastname:string;
+  lastname: string;
   email: string;
   phonenumber: string | null;
   avatar: string;
   courseid: Course[];
   completedCourses?: number;
   totalHours?: string;
-  vip:number
+  vip: number;
 }
-
 
 export interface PurchasedCourse {
   id: number;
@@ -93,8 +91,6 @@ export interface PurchasedCourse {
   thumbnail: string | null;
   progress: number;
 }
-
-
 
 export interface Article {
   id: string;
@@ -108,9 +104,9 @@ export interface Article {
   category: string;
   readTime: string;
   thumbnail: string;
-
+  updatedAt?: string; // ← اضافه شد
 }
 
 export interface BlogListProps {
-  mockArticles: Article[]; // prop برای دریافت مقالات از صفحه
+  mockArticles: Article[];
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import "./AboutUs.css";
+
 import InstructorProfile from './InstructorProfile';
 import HeroSection from './HeroSection';
 import { Instructor } from '@/lib/Types/Types';

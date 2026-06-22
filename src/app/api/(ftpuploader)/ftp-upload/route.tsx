@@ -33,7 +33,7 @@ function generateUniqueFileName(originalName: string): string {
 
 async function deleteIncompleteFile(client: ftp, destinationPath: string) {
   try {
-    await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve) => {
       client.delete(destinationPath, (err) => {
         if (err) {
           console.warn(`[FTP] Failed to delete incomplete file ${destinationPath}: ${err.message}`);

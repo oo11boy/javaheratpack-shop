@@ -2,7 +2,7 @@ import { getCourses, getArticles } from '@/lib/api';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const baseUrl = 'https://shivid.co';
+  const baseUrl = process.env.BASE_URL || "";
   const now = new Date().toISOString();
 
   const courses = await getCourses();

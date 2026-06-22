@@ -12,11 +12,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  let course: Course;
+  let course: Course | null = null;
   try {
     course = await getCourseBySlug(resolvedParams.slug);
   } catch (error) {
     console.error('خطا در دریافت دوره برای متا دیتا:', error);
+    return {
+      title: 'دوره یافت نشد | شوید-آموزش طراحی جواهرات',
+      description: 'دوره مورد نظر یافت نشد. دوره‌های دیگر طراحی جواهرات با نرم‌افزار ماتریکس را در شوید ببینید.',
+    };
+  }
+
+  // اگر دوره وجود نداشت، متا دیتای پیش‌فرض برگردون
+  if (!course) {
     return {
       title: 'دوره یافت نشد | شوید-آموزش طراحی جواهرات',
       description: 'دوره مورد نظر یافت نشد. دوره‌های دیگر طراحی جواهرات با نرم‌افزار ماتریکس را در شوید ببینید.',
@@ -57,11 +65,16 @@ export async function generateMetadata({
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  let course: Course;
+  let course: Course | null = null;
   try {
     course = await getCourseBySlug(resolvedParams.slug);
   } catch (error) {
     console.error('خطا در دریافت داده‌ها:', error);
+    notFound();
+  }
+
+  // اگر دوره وجود نداشت، 404 برگردون
+  if (!course) {
     notFound();
   }
 

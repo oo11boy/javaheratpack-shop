@@ -14,11 +14,19 @@ export async function generateMetadata({
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  let article: Article;
+  let article: Article | null = null;
   try {
     article = await getArticlesbyid(id);
   } catch (error) {
     console.error('خطا در دریافت مقاله برای متا دیتا:', error);
+    return {
+      title: 'مقاله یافت نشد | شوید-آموزش طراحی جواهرات',
+      description: 'مقاله مورد نظر یافت نشد. مقالات دیگر درباره طراحی جواهرات با نرم‌افزار ماتریکس را در شوید بخوانید.',
+    };
+  }
+
+  // اگر مقاله وجود نداشت، متا دیتای پیش‌فرض برگردون
+  if (!article) {
     return {
       title: 'مقاله یافت نشد | شوید-آموزش طراحی جواهرات',
       description: 'مقاله مورد نظر یافت نشد. مقالات دیگر درباره طراحی جواهرات با نرم‌افزار ماتریکس را در شوید بخوانید.',
@@ -65,11 +73,16 @@ export default async function SingleArticlePage({
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  let article: Article;
+  let article: Article | null = null;
   try {
     article = await getArticlesbyid(id);
   } catch (error) {
     console.error('خطا در دریافت مقاله:', error);
+    notFound();
+  }
+
+  // اگر مقاله وجود نداشت، 404 برگردون
+  if (!article) {
     notFound();
   }
 

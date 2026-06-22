@@ -3,7 +3,7 @@
 import { DiamondOutlined } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import "./Nemone.css";
+
 
 interface NemoneItem {
   id: number;
@@ -12,6 +12,7 @@ interface NemoneItem {
 
 export default function Nemone() {
   const [nemoneha, setNemoneha] = useState<NemoneItem[]>([]);
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -26,6 +27,7 @@ export default function Nemone() {
         if (!res.ok) throw new Error("خطا در دریافت نمونه‌کارها");
         const data: NemoneItem[] = await res.json();
         setNemoneha(data);
+      
       } catch (error) {
         console.error("خطا:", error);
       } finally {

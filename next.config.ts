@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+      unoptimized: true, // ← این خط را اضافه کنید
     remotePatterns: [
       {
         protocol: 'https',
@@ -22,9 +23,7 @@ const nextConfig = {
       },
     ],
   },
-  eslint: {
-    ignoreDuringBuilds: true, // غیرفعال کردن ESLint در زمان بیلد
-  },
+
 };
 
 module.exports = nextConfig;

@@ -1,7 +1,11 @@
+// src/app/aboutus/page.tsx
 import AboutUs from '@/Components/AboutUs/AboutUs';
 import Footer from '@/Components/Footer/Footer';
 import Header from '@/Components/Header/Header';
 import { getInstructor } from '@/lib/api';
+
+// ✅ این خط رو اضافه کن - باعث میشه صفحه در زمان بیلد رندر نشه و درخواست به API نره
+export const dynamic = 'force-dynamic';
 
 // تعریف متا دیتا
 export const metadata = {
@@ -31,7 +35,7 @@ export const metadata = {
 };
 
 export default async function AboutPage() {
-  let instructor;
+  let instructor = null;
   try {
     instructor = await getInstructor();
   } catch (error) {
@@ -48,4 +52,5 @@ export default async function AboutPage() {
   );
 }
 
+// ✅ این خط رو هم می‌تونی نگه داری یا حذف کنی
 export const revalidate = 3600;
