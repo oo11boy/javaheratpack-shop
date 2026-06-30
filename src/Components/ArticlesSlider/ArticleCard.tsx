@@ -1,18 +1,31 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Article } from '@/lib/Types/Types';
 
+const FALLBACK_IMAGE = "/Images/placeholder.png";
+
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
+  const [imgSrc, setImgSrc] = useState(article.thumbnail || FALLBACK_IMAGE);
+
+  const handleImageError = () => {
+    if (imgSrc !== FALLBACK_IMAGE) {
+      setImgSrc(FALLBACK_IMAGE);
+    }
+  };
+
   return (
     <div className="group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden h-[400px] flex flex-col transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700">
       <div className="relative overflow-hidden">
         <Image
-          src={article.thumbnail}
+          src={imgSrc}
           alt={article.title}
           width={500}
           height={600}
           className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={handleImageError}
         />
         <span className="absolute top-4 right-4 bg-gray-900/80 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
           {article.date}

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SimpleCourse } from "@/lib/Types/Types";
@@ -9,11 +11,21 @@ interface CourseCardProps {
   index: number;
 }
 
+const FALLBACK_IMAGE = "/Images/placeholder.png";
+
 const HomeCourseCard: React.FC<CourseCardProps> = ({
   course,
   isVisible,
   index,
 }) => {
+  const [imgSrc, setImgSrc] = useState(course.thumbnail || FALLBACK_IMAGE);
+
+  const handleImageError = () => {
+    if (imgSrc !== FALLBACK_IMAGE) {
+      setImgSrc(FALLBACK_IMAGE);
+    }
+  };
+
   return (
     <div
       className={`group relative bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-gray-700 ${
@@ -23,13 +35,15 @@ const HomeCourseCard: React.FC<CourseCardProps> = ({
     >
       <div className="relative overflow-hidden h-56">
         <Image
-          src={course.thumbnail}
+          src={imgSrc}
           alt={course.title}
           width={500}
           height={300}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          loading="lazy"
+      
+          onError={handleImageError}
+          priority={index < 3} // فقط ۳ تا اول priority
         />
         <span className="absolute top-4 left-4 bg-[color:var(--primary-color)] text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
           {course.level}
@@ -51,7 +65,7 @@ const HomeCourseCard: React.FC<CourseCardProps> = ({
               ? "رایگان"
               : course.discountPrice
               ? course.discountPrice.toLocaleString()
-              : course.price.toLocaleString() + "تومان "}
+              : course.price.toLocaleString() + " تومان "}
           </span>
           <Link
             href={`/courselist/${course.id}`}

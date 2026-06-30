@@ -1,12 +1,14 @@
-// src\app\api\nemone\route.tsx
 import { NextRequest, NextResponse } from 'next/server';
 import { getConnection } from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
+import { revalidateTag } from 'next/cache';
 
 interface NemoneItem {
   id: number;
   src: string;
 }
+
+export const revalidate = 3600;
 
 export async function GET(): Promise<NextResponse<NemoneItem[] | { error: string }>> {
   try {
@@ -23,7 +25,7 @@ export async function GET(): Promise<NextResponse<NemoneItem[] | { error: string
 
     return NextResponse.json(nemoneItems, {
       headers: {
-        'Cache-Control': 'no-store', // غیرفعال کردن کش
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
   } catch (error) {
@@ -49,6 +51,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ id: num
     const insertId = (result as any).insertId;
     await connection.end();
 
+    // رفع خطا - اضافه کردن پارامتر دوم
+    revalidateTag('nemone', 'default');
+
     return NextResponse.json(
       { id: insertId, message: 'نمونه‌کار با موفقیت ثبت شد' },
       { status: 201 }
@@ -58,6 +63,3 @@ export async function POST(request: NextRequest): Promise<NextResponse<{ id: num
     return NextResponse.json({ error: 'خطا در ثبت نمونه‌کار' }, { status: 500 });
   }
 }
-
-
-export const revalidate = 0; // غیرفعال کردن ISR
