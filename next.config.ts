@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: { useCache: true, optimizeCss: true, webpackBuildWorker: true },
+ 
   images: {
-    unoptimized: true, // ← این خط را اضافه کنید
+   
     remotePatterns: [
       {
         protocol: "https",
