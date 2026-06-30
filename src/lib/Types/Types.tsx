@@ -44,6 +44,7 @@ export interface Course {
 export interface SimpleCourse {
   id: number;
   title: string;
+   slug?: string; 
   description: string;
   duration: string;
   accessType: string | null;

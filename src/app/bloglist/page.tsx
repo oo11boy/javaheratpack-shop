@@ -38,6 +38,7 @@ export default async function BlogListPage() {
   } catch (error) {
     console.error("خطا در دریافت داده‌ها:", error);
   }
+  console.log(articles)
 
   return (
     <div>

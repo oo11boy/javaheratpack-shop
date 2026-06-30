@@ -1,64 +1,96 @@
 // src/lib/api.ts
 import { Article, Course, CourseVideo, Instructor, SimpleCourse } from "./Types/Types";
+import { cache } from "react";
 
-const cache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_DURATION = 3600 * 1000; // 1 ساعت
-
-// تابع کمکی برای تشخیص زمان بیلد
 function isBuildTime(): boolean {
   return process.env.NEXT_PHASE === 'phase-production-build';
 }
 
-// تابع کمکی برای گرفتن آدرس API
 function getApiBaseUrl(): string {
-  // در زمان بیلد، از آدرس کامل استفاده کن
   if (isBuildTime()) {
     return process.env.NEXT_PUBLIC_API_URL || 'https://shivid.co/api';
   }
-  // در زمان توسعه، از localhost استفاده کن
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 }
 
-async function fetchWithCache<T>(
-  url: string,
-  options: RequestInit = {},
-  cacheDuration = CACHE_DURATION
-): Promise<T> {
-  const cacheKey = `${url}_${JSON.stringify(options)}`;
-
-  // چک کردن کش
-  const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < cacheDuration) {
-    return cached.data as T;
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      next: { revalidate: 3600 },
-      cache: "force-cache",
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Fetch پایه با لاگ بهتر برای دیباگ بیلد
+const fetchWithCache = cache(
+  async function <T>(url: string, options: RequestInit = {}): Promise<T> {
+    const isBuild = isBuildTime();
+    
+    if (isBuild) {
+      console.log(`[Build] Fetching: ${url}`);
     }
 
-    const data = await response.json();
-    cache.set(cacheKey, { data, timestamp: Date.now() });
-    return data as T;
-  } catch (error) {
-    console.error(`خطا در fetch از ${url}:`, error);
-    throw error;
-  }
-}
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // افزایش timeout برای بیلد
 
-export async function getInstructor(): Promise<Instructor | null> {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        cache: "force-cache",
+        next: { 
+          revalidate: 3600,
+          tags: ['articles', 'courses', 'instructor']
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (isBuild) {
+        console.log(`[Build] Success: ${url} - ${Array.isArray(data) ? data.length : 'OK'} items`);
+      }
+
+      return data;
+    } catch (error: any) {
+      if (isBuild) {
+        console.error(`[Build Error] Failed to fetch ${url}:`, error.message);
+      } else {
+        console.error(`خطا در fetch از ${url}:`, error);
+      }
+      
+      // در زمان بیلد اگر خطا داد، داده خالی برنگردون (برای مقالات مهم)
+      throw error;
+    }
+  }
+);
+
+// ====================== API Functions ======================
+
+export const getArticles = cache(async (): Promise<Article[]> => {
+  try {
+    const baseUrl = getApiBaseUrl();
+    return await fetchWithCache<Article[]>(`${baseUrl}/articles`);
+  } catch (error) {
+    console.error('خطا در دریافت مقالات:', error);
+    
+    // در زمان بیلد حداقل یک آرایه خالی مطمئن برگردون
+    if (isBuildTime()) {
+      console.warn('⚠️ مقالات در زمان بیلد لود نشدند. صفحه بدون مقاله ساخته می‌شود.');
+    }
+    return [];
+  }
+});
+
+export const getArticlesbyid = cache(async (id: string): Promise<Article | null> => {
+  try {
+    const baseUrl = getApiBaseUrl();
+    return await fetchWithCache<Article>(`${baseUrl}/articles/${id}`);
+  } catch (error) {
+    console.error(`خطا در دریافت مقاله ${id}:`, error);
+    return null;
+  }
+});
+
+// بقیه توابع (بدون تغییر زیاد)
+export const getInstructor = cache(async (): Promise<Instructor | null> => {
   try {
     const baseUrl = getApiBaseUrl();
     return await fetchWithCache<Instructor>(`${baseUrl}/instructors`);
@@ -66,9 +98,9 @@ export async function getInstructor(): Promise<Instructor | null> {
     console.error('خطا در دریافت اطلاعات مربی:', error);
     return null;
   }
-}
+});
 
-export async function getCourses(): Promise<SimpleCourse[]> {
+export const getCourses = cache(async (): Promise<SimpleCourse[]> => {
   try {
     const baseUrl = getApiBaseUrl();
     return await fetchWithCache<SimpleCourse[]>(`${baseUrl}/courses`);
@@ -76,19 +108,19 @@ export async function getCourses(): Promise<SimpleCourse[]> {
     console.error('خطا در دریافت دوره‌ها:', error);
     return [];
   }
-}
+});
 
-export async function getCourseBySlug(slug: string): Promise<Course | null> {
+export const getCourseBySlug = cache(async (slug: string): Promise<Course | null> => {
   try {
     const baseUrl = getApiBaseUrl();
     return await fetchWithCache<Course>(`${baseUrl}/courses/${slug}`);
   } catch (error) {
-    console.error(`خطا در دریافت دوره با slug ${slug}:`, error);
+    console.error(`خطا در دریافت دوره ${slug}:`, error);
     return null;
   }
-}
+});
 
-export async function getCourseVideos(courseId: number): Promise<CourseVideo[]> {
+export const getCourseVideos = cache(async (courseId: number): Promise<CourseVideo[]> => {
   try {
     const baseUrl = getApiBaseUrl();
     return await fetchWithCache<CourseVideo[]>(
@@ -98,26 +130,4 @@ export async function getCourseVideos(courseId: number): Promise<CourseVideo[]> 
     console.error(`خطا در دریافت ویدیوهای دوره ${courseId}:`, error);
     return [];
   }
-}
-
-export async function getArticles(): Promise<Article[]> {
-  try {
-    const baseUrl = getApiBaseUrl();
-    return await fetchWithCache<Article[]>(`${baseUrl}/articles`);
-  } catch (error) {
-    console.error('خطا در دریافت مقالات:', error);
-    return [];
-  }
-}
-
-export async function getArticlesbyid(id: string): Promise<Article | null> {
-  try {
-    const baseUrl = getApiBaseUrl();
-    return await fetchWithCache<Article>(
-      `${baseUrl}/articles/${id}`
-    );
-  } catch (error) {
-    console.error(`خطا در دریافت مقاله با id ${id}:`, error);
-    return null;
-  }
-}
+});

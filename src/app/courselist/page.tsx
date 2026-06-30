@@ -49,5 +49,3 @@ export default async function CourseListPage() {
     </div>
   );
 }
-
-export const revalidate = 3600;
